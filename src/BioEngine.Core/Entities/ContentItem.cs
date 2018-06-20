@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BioEngine.Core.Interfaces;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.Entities
 {
     [Table("Content")]
     public abstract class ContentItem : IEntity<int>, ISiteEntity, ISectionEntity

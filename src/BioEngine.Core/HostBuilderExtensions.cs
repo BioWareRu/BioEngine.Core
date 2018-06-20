@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BioEngine.Core.Core;
+using BioEngine.Core.DB;
+using BioEngine.Core.Entities;
+using BioEngine.Core.Interfaces;
+using BioEngine.Core.Repository;
 using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;

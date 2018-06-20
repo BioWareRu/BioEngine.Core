@@ -1,5 +1,4 @@
-﻿using BioEngine.Core.Core;
-using BioEngine.Core.Entities;
+﻿using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Repository
 {

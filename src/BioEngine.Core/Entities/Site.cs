@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using BioEngine.Core.Core;
+using BioEngine.Core.Interfaces;
 
 namespace BioEngine.Core.Entities
 {

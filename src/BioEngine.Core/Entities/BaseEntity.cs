@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.Entities
 {
     public abstract class BaseEntity
     {

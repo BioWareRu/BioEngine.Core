@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.Interfaces
 {
     public interface IEntity<TId>
     {

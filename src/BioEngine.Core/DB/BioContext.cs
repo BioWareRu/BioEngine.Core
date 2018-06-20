@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Reflection;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.DB
 {
     public sealed class BioContext : DbContext
     {

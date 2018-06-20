@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using BioEngine.Core.Entities;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.DB
 {
     public class TypesProvider
     {

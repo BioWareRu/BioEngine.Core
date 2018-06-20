@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Interfaces;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.DB
 {
     public class QueryContext<T, TId> where T : class, IEntity<TId>
     {

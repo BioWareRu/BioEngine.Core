@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
+using BioEngine.Core.Entities;
+using BioEngine.Core.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 
-namespace BioEngine.Core.Core
+namespace BioEngine.Core.Repository
 {
     public interface IBioRepository
     {
