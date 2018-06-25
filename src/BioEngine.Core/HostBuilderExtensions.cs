@@ -6,6 +6,7 @@ using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Repository;
+using BioEngine.Core.Storage;
 using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -84,20 +85,10 @@ namespace BioEngine.Core
                 BioContext.TypesProvider = typesProvider;
 
                 // register repositories
-                var repositoryRegisterMethod = typeof(HostBuilderExtensions)
-                    .GetMethod(nameof(AddRepository), BindingFlags.NonPublic | BindingFlags.Static);
+                services.AddScoped(typeof(BioRepositoryContext<,>));
                 foreach (var type in repositoryTypes)
                 {
-                    if (type.BaseType != null)
-                    {
-                        var entityType = type.BaseType.GenericTypeArguments[0];
-                        var entityIdType = type.BaseType.GenericTypeArguments[1];
-
-                        var registerMethod =
-                            repositoryRegisterMethod?.MakeGenericMethod(type, entityType, entityIdType);
-
-                        registerMethod?.Invoke(null, new object[] {services});
-                    }
+                    services.AddScoped(type);
                 }
             });
             return hostBuilder;
@@ -133,6 +124,97 @@ namespace BioEngine.Core
                 }
             });
 
+            return webHostBuilder;
+        }
+
+        public static IWebHostBuilder AddBioEngineFileStorage(this IWebHostBuilder webHostBuilder)
+        {
+            webHostBuilder.ConfigureServices((context, collection) =>
+            {
+                collection.Configure<FileStorageOptions>(o =>
+                {
+                    var path = context.Configuration["BRC_STORAGE_FILE_PATH"];
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        throw new ArgumentException("File storage path is empty");
+                    }
+
+                    var uri = context.Configuration["BRC_STORAGE_PUBLIC_URI"];
+                    if (string.IsNullOrEmpty(uri))
+                    {
+                        throw new ArgumentException("Storage url is empty");
+                    }
+
+                    var success = Uri.TryCreate(uri, UriKind.Absolute, out var publicUri);
+                    if (!success)
+                    {
+                        throw new ArgumentException($"URI {uri} is not proper URI");
+                    }
+
+                    o.PublicUri = publicUri;
+                    o.StoragePath = path;
+                });
+                collection.AddSingleton<IStorage, FileStorage>();
+            });
+            return webHostBuilder;
+        }
+
+        public static IWebHostBuilder AddBioEngineS3Storage(this IWebHostBuilder webHostBuilder)
+        {
+            webHostBuilder.ConfigureServices((context, collection) =>
+            {
+                collection.Configure<S3StorageOptions>(o =>
+                {
+                    var uri = context.Configuration["BRC_STORAGE_PUBLIC_URI"];
+                    if (string.IsNullOrEmpty(uri))
+                    {
+                        throw new ArgumentException("Storage url is empty");
+                    }
+
+                    var success = Uri.TryCreate(uri, UriKind.Absolute, out var publicUri);
+                    if (!success)
+                    {
+                        throw new ArgumentException($"URI {uri} is not proper URI");
+                    }
+
+                    var serverUriStr = context.Configuration["BRC_STORAGE_S3_SERVER_URI"];
+                    if (string.IsNullOrEmpty(serverUriStr))
+                    {
+                        throw new ArgumentException("S3 server url is empty");
+                    }
+
+                    var bucketName = context.Configuration["BRC_STORAGE_S3_BUCKET"];
+                    if (string.IsNullOrEmpty(bucketName))
+                    {
+                        throw new ArgumentException("S3 bucketName is empty");
+                    }
+
+                    var accessKey = context.Configuration["BRC_STORAGE_S3_ACCESS_KEY"];
+                    if (string.IsNullOrEmpty(accessKey))
+                    {
+                        throw new ArgumentException("S3 access key is empty");
+                    }
+
+                    var secretKey = context.Configuration["BRC_STORAGE_S3_SECRET_KEY"];
+                    if (string.IsNullOrEmpty(secretKey))
+                    {
+                        throw new ArgumentException("S3 secret key is empty");
+                    }
+
+                    success = Uri.TryCreate(serverUriStr, UriKind.Absolute, out var serverUri);
+                    if (!success)
+                    {
+                        throw new ArgumentException($"S3 server URI {uri} is not proper URI");
+                    }
+
+                    o.PublicUri = publicUri;
+                    o.Server = serverUri;
+                    o.Bucket = bucketName;
+                    o.AccessKey = accessKey;
+                    o.SecretKey = secretKey;
+                });
+                collection.AddSingleton<IStorage, S3Storage>();
+            });
             return webHostBuilder;
         }
     }

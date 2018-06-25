@@ -23,7 +23,8 @@ namespace BioEngine.Core.Interfaces
 
     public interface ITypedEntity
     {
-        
+        int Type { get; set; }
+        string TypeTitle { get; set; }
     }
 
     public interface ITypedEntity<T> : ITypedEntity where T : TypedData, new()

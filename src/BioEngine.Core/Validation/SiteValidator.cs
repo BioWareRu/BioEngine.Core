@@ -7,7 +7,7 @@ namespace BioEngine.Core.Validation
     {
         public SiteValidator()
         {
-            RuleFor(x => x.Title).NotEmpty().MinimumLength(1024);
+            RuleFor(x => x.Title).NotEmpty().MaximumLength(1024).MinimumLength(5);
         }
     }
 }

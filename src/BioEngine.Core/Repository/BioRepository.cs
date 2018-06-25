@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
@@ -27,10 +25,16 @@ namespace BioEngine.Core.Repository
             Validators = repositoryContext.Validators;
         }
 
-        public virtual async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null)
+        public virtual async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
+            Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
         {
             var query = GetBaseQuery(queryContext);
-            await DbContext.Set<Section>().ToListAsync();
+            if (addConditionsCallback != null)
+            {
+                query = addConditionsCallback(query);
+            }
+
+
             var itemsCount = await query.CountAsync();
 
             if (queryContext != null)
@@ -103,12 +107,15 @@ namespace BioEngine.Core.Repository
         public virtual async Task<(bool isValid, IList<ValidationFailure> errors)> Validate(T entity)
         {
             var failures = new List<ValidationFailure>();
-            foreach (var validator in Validators)
+            if (Validators != null)
             {
-                var result = await validator.ValidateAsync(entity);
-                if (!result.IsValid)
+                foreach (var validator in Validators)
                 {
-                    failures.AddRange(result.Errors);
+                    var result = await validator.ValidateAsync(entity);
+                    if (!result.IsValid)
+                    {
+                        failures.AddRange(result.Errors);
+                    }
                 }
             }
 
@@ -153,8 +160,12 @@ namespace BioEngine.Core.Repository
     public abstract class SiteEntityRepository<T, TId> : BioRepository<T, TId>
         where T : class, IEntity<TId>, ISiteEntity
     {
-        protected SiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext) : base(repositoryContext)
+        private readonly SitesRepository _sitesRepository;
+
+        protected SiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext, SitesRepository sitesRepository)
+            : base(repositoryContext)
         {
+            _sitesRepository = sitesRepository;
         }
 
         protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)
@@ -166,12 +177,21 @@ namespace BioEngine.Core.Repository
 
             return base.ApplyContext(query, queryContext);
         }
+
+        public override async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
+            Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
+        {
+            var entities = await base.GetAll(queryContext, addConditionsCallback);
+
+            return entities;
+        }
     }
 
     public abstract class SectionEntityRepository<T, TId> : SiteEntityRepository<T, TId>
         where T : class, IEntity<TId>, ISiteEntity, ISectionEntity
     {
-        protected SectionEntityRepository(BioRepositoryContext<T, TId> repositoryContext) : base(repositoryContext)
+        protected SectionEntityRepository(BioRepositoryContext<T, TId> repositoryContext,
+            SitesRepository sitesRepository) : base(repositoryContext, sitesRepository)
         {
         }
 
@@ -191,7 +211,7 @@ namespace BioEngine.Core.Repository
         internal BioContext DbContext { get; }
         public IValidator<T>[] Validators { get; }
 
-        internal BioRepositoryContext(BioContext dbContext, IValidator<T>[] validators)
+        public BioRepositoryContext(BioContext dbContext, IValidator<T>[] validators = default)
         {
             DbContext = dbContext;
             Validators = validators;
@@ -202,12 +222,12 @@ namespace BioEngine.Core.Repository
     {
         public bool IsSuccess { get; }
         public T Entity { get; }
-        public ReadOnlyCollection<ValidationFailure> Errors { get; }
+        public ValidationFailure[] Errors { get; }
 
         public AddOrUpdateOperationResult(T entity, IEnumerable<ValidationFailure> errors)
         {
             Entity = entity;
-            Errors = (ReadOnlyCollection<ValidationFailure>) errors;
+            Errors = errors.ToArray();
             IsSuccess = !errors.Any();
         }
     }

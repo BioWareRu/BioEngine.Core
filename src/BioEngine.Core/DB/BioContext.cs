@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
@@ -24,6 +26,9 @@ namespace BioEngine.Core.DB
             base.OnModelCreating(modelBuilder);
             modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
 
+            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.Logo);
+            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.LogoSmall);
+            
             var dataConversionRegistrationMethod = GetType().GetMethod(nameof(RegisterDataConversion),
                 BindingFlags.Instance | BindingFlags.NonPublic);
             foreach (var sectionType in TypesProvider.GetSectionTypes())
@@ -66,6 +71,19 @@ namespace BioEngine.Core.DB
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<TData>(v));
+        }
+
+        private void RegisterJsonConversion<TEntity, TProperty>(ModelBuilder modelBuilder,
+            Expression<Func<TEntity, TProperty>> propertySelector)
+            where TEntity : class
+        {
+            modelBuilder
+                .Entity<TEntity>()
+                .Property(propertySelector)
+                .HasColumnType("jsonb")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<TProperty>(v));
         }
     }
 }

@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Storage;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace BioEngine.Core.Entities
 {
@@ -14,8 +16,8 @@ namespace BioEngine.Core.Entities
         public virtual int? ForumId { get; set; }
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }
-        [Required] public virtual string Logo { get; set; }
-        [Required] public virtual string LogoSmall { get; set; }
+        [Required] public virtual StorageItem Logo { get; set; }
+        [Required] public virtual StorageItem LogoSmall { get; set; }
         public virtual string Description { get; set; }
         [Required] public virtual string ShortDescription { get; set; }
         public virtual string Keywords { get; set; }
@@ -24,15 +26,13 @@ namespace BioEngine.Core.Entities
         public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         public virtual DateTimeOffset? DatePublished { get; set; }
         public virtual bool IsPublished { get; set; }
-        public virtual int[] SiteIds { get; set; }
+        public virtual int[] SiteIds { get; set; } = new int[0];
     }
 
     public abstract class Section<T> : Section, ITypedEntity<T> where T : TypedData, new()
     {
         public virtual T Data { get; set; } = new T();
-    }
-
-    public abstract class SectionData
-    {
+        [NotMapped]
+        public virtual string TypeTitle { get; set; }
     }
 }
