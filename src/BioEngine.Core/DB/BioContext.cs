@@ -20,6 +20,7 @@ namespace BioEngine.Core.DB
         }
 
         public DbSet<Site> Sites { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,7 +29,18 @@ namespace BioEngine.Core.DB
 
             RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.Logo);
             RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.LogoSmall);
-            
+
+            modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
+            modelBuilder.Entity<Section>().HasIndex(s => s.IsPublished);
+            modelBuilder.Entity<Section>().HasIndex(s => s.Url);
+
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.SiteIds);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.TagIds);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.SectionIds);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.IsPublished);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.Type);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url);
+
             var dataConversionRegistrationMethod = GetType().GetMethod(nameof(RegisterDataConversion),
                 BindingFlags.Instance | BindingFlags.NonPublic);
             foreach (var sectionType in TypesProvider.GetSectionTypes())

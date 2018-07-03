@@ -7,7 +7,8 @@ namespace BioEngine.Core.Validation
     {
         public SiteValidator()
         {
-            RuleFor(x => x.Title).NotEmpty().MaximumLength(1024).MinimumLength(5);
+            RuleFor(x => x.Title).NotEmpty().MaximumLength(1024).MinimumLength(5)
+                .WithMessage("Название сайте должно быть от 5 до 1024 символов.");
         }
     }
 }

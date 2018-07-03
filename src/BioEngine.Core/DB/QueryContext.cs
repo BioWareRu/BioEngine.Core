@@ -14,6 +14,7 @@ namespace BioEngine.Core.DB
         public int? Offset { get; set; }
         public int? SiteId { get; private set; }
         public int? SectionId { get; private set; }
+        public int? TagId { get; private set; }
         public Expression<Func<T, object>> OrderBy { get; private set; }
         public bool OrderByDescending { get; private set; }
         public bool IncludeUnpublished { get; set; }
@@ -29,6 +30,11 @@ namespace BioEngine.Core.DB
         public void SetSection(Section section)
         {
             SectionId = section.Id;
+        }
+        
+        public void SetTag(Tag tag)
+        {
+            TagId = tag.Id;
         }
 
         public void SetOrderBy(Expression<Func<T, object>> keySelector)

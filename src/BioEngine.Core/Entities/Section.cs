@@ -33,6 +33,6 @@ namespace BioEngine.Core.Entities
     {
         public virtual T Data { get; set; } = new T();
         [NotMapped]
-        public virtual string TypeTitle { get; set; }
+        public abstract string TypeTitle { get; set; }
     }
 }

@@ -1,51 +1,35 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using BioEngine.Core.Interfaces;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace BioEngine.Core.Storage
 {
     [UsedImplicitly]
-    public class FileStorage : IStorage
+    public class FileStorage : Storage
     {
         private readonly FileStorageOptions _options;
 
-        public FileStorage(IOptions<FileStorageOptions> options)
+        public FileStorage(IOptions<FileStorageOptions> options, ILogger<FileStorage> logger) : base(options, logger)
         {
             _options = options.Value;
         }
 
-        public async Task<StorageItem> SaveFile(byte[] file, string fileName, string path)
+        protected override Task<bool> DoSave(string path, string tmpPath)
         {
-            var destinationPath = _options.StoragePath + "/" + path;
-            if (!Directory.Exists(destinationPath))
+            var dirPath = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dirPath))
             {
-                Directory.CreateDirectory(destinationPath);
+                Directory.CreateDirectory(dirPath ?? throw new Exception($"Empty dir path in {path}"));
             }
 
-            var extension = fileName.Substring(fileName.LastIndexOf('.'));
-            var destinationFileName = Guid.NewGuid() + extension;
-            var filePath = destinationPath + "/" + destinationFileName;
-
-            using (var sourceStream = new FileStream(filePath,
-                FileMode.CreateNew, FileAccess.Write, FileShare.None,
-                bufferSize: 4096, useAsync: true))
-            {
-                await sourceStream.WriteAsync(file, 0, file.Length);
-            }
-
-            return new StorageItem
-            {
-                FileName = fileName,
-                FilePath = $"{path}/{destinationFileName}",
-                FileSize = file.LongLength,
-                PublicUri = new Uri($"{_options.PublicUri}/{path}/{destinationFileName}")
-            };
+            File.Move(tmpPath, path);
+            return Task.FromResult(true);
         }
 
-        public Task<bool> DeleteFile(string filePath)
+        public override Task<bool> DeleteFile(string filePath)
         {
             var path = _options.StoragePath + '/' + filePath;
             if (File.Exists(path))
@@ -57,9 +41,8 @@ namespace BioEngine.Core.Storage
         }
     }
 
-    public class FileStorageOptions : IStorageOptions
+    public class FileStorageOptions : StorageOptions
     {
-        public Uri PublicUri { get; set; }
         public string StoragePath { get; set; }
     }
 }

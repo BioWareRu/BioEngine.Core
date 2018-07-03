@@ -4,9 +4,10 @@ using JetBrains.Annotations;
 namespace BioEngine.Core.Repository
 {
     [UsedImplicitly]
-    public class SectionsRepository : BioRepository<Section, int>
+    public class SectionsRepository : SiteEntityRepository<Section, int>
     {
-        public SectionsRepository(BioRepositoryContext<Section, int> repositoryContext) : base(repositoryContext)
+        public SectionsRepository(BioRepositoryContext<Section, int> repositoryContext, SitesRepository sitesRepository)
+            : base(repositoryContext, sitesRepository)
         {
         }
     }

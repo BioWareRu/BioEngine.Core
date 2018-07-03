@@ -19,6 +19,7 @@ namespace BioEngine.Core.Interfaces
     public interface ISectionEntity
     {
         int[] SectionIds { get; set; }
+        int[] TagIds { get; set; }
     }
 
     public interface ITypedEntity

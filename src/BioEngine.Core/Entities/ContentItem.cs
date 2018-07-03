@@ -24,19 +24,21 @@ namespace BioEngine.Core.Entities
         public int CommentsCount { get; set; }
         public virtual int[] SectionIds { get; set; } = new int[0];
         public virtual int[] SiteIds { get; set; } = new int[0];
+        public virtual int[] TagIds { get; set; } = new int[0];
     }
 
     public abstract class ContentItem<T> : ContentItem, ITypedEntity<T> where T : TypedData, new()
     {
         public virtual T Data { get; set; } = new T();
         [NotMapped]
-        public virtual string TypeTitle { get; set; }
+        public abstract string TypeTitle { get; set; }
     }
 
     public abstract class ContentData
     {
     }
 
+    [AttributeUsage(AttributeTargets.Class)]
     public class TypedEntityAttribute : Attribute
     {
         public int Type { get; }

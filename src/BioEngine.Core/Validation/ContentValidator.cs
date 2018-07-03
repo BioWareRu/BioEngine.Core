@@ -8,7 +8,6 @@ namespace BioEngine.Core.Validation
         protected ContentValidator() : base()
         {
             RuleFor(e => e.SectionIds).NotEmpty();
-            RuleFor(e => e.SiteIds).NotEmpty();
         }
     }
 }

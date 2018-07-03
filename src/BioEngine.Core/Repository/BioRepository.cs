@@ -10,10 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
-    public interface IBioRepository
-    {
-    }
-
     public abstract class BioRepository<T, TId> : IBioRepository where T : class, IEntity<TId>
     {
         internal readonly BioContext DbContext;
@@ -28,14 +24,13 @@ namespace BioEngine.Core.Repository
         public virtual async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
             Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
         {
+            var itemsCount = await Count(queryContext, addConditionsCallback);
+
             var query = GetBaseQuery(queryContext);
             if (addConditionsCallback != null)
             {
                 query = addConditionsCallback(query);
             }
-
-
-            var itemsCount = await query.CountAsync();
 
             if (queryContext != null)
             {
@@ -54,18 +49,44 @@ namespace BioEngine.Core.Repository
             return (items, itemsCount);
         }
 
+        public virtual async Task<int> Count(QueryContext<T, TId> queryContext = null,
+            Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
+        {
+            var query = GetBaseQuery(queryContext);
+            if (addConditionsCallback != null)
+            {
+                query = addConditionsCallback(query);
+            }
+
+
+            return await query.CountAsync();
+        }
+
         public virtual async Task<T> GetById(TId id, QueryContext<T, TId> queryContext = null)
         {
             return await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
         }
 
+        public virtual async Task<IEnumerable<T>> GetByIds(TId[] ids, QueryContext<T, TId> queryContext = null)
+        {
+            return await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToListAsync();
+        }
+
         public virtual async Task<AddOrUpdateOperationResult<T, TId>> Add(T item)
         {
-            var validationResult = await Validate(item);
-            if (validationResult.isValid)
+            (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
+            if (await BeforeValidate(item, validationResult))
             {
-                DbContext.Add(item);
-                await DbContext.SaveChangesAsync();
+                validationResult = await Validate(item);
+                if (validationResult.isValid)
+                {
+                    if (await BeforeSave(item, validationResult))
+                    {
+                        DbContext.Add(item);
+                        await DbContext.SaveChangesAsync();
+                        await AfterSave(item);
+                    }
+                }
             }
 
             return new AddOrUpdateOperationResult<T, TId>(item, validationResult.errors);
@@ -74,11 +95,19 @@ namespace BioEngine.Core.Repository
         public virtual async Task<AddOrUpdateOperationResult<T, TId>> Update(T item)
         {
             item.DateUpdated = DateTimeOffset.UtcNow;
-            var validationResult = await Validate(item);
-            if (validationResult.isValid)
+            (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
+            if (await BeforeValidate(item, validationResult))
             {
-                DbContext.Update(item);
-                await DbContext.SaveChangesAsync();
+                validationResult = await Validate(item);
+                if (validationResult.isValid)
+                {
+                    if (await BeforeSave(item, validationResult))
+                    {
+                        DbContext.Update(item);
+                        await DbContext.SaveChangesAsync();
+                        await AfterSave(item);
+                    }
+                }
             }
 
             return new AddOrUpdateOperationResult<T, TId>(item, validationResult.errors);
@@ -155,80 +184,22 @@ namespace BioEngine.Core.Repository
 
             return query;
         }
-    }
 
-    public abstract class SiteEntityRepository<T, TId> : BioRepository<T, TId>
-        where T : class, IEntity<TId>, ISiteEntity
-    {
-        private readonly SitesRepository _sitesRepository;
-
-        protected SiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext, SitesRepository sitesRepository)
-            : base(repositoryContext)
+        protected virtual Task<bool> BeforeValidate(T item,
+            (bool isValid, IList<ValidationFailure> errors) validationResult)
         {
-            _sitesRepository = sitesRepository;
+            return Task.FromResult(true);
         }
 
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)
+        protected virtual Task<bool> BeforeSave(T item,
+            (bool isValid, IList<ValidationFailure> errors) validationResult)
         {
-            if ((queryContext?.SiteId).HasValue)
-            {
-                query = query.Where(e => e.SiteIds.Contains(queryContext.SiteId.Value));
-            }
-
-            return base.ApplyContext(query, queryContext);
+            return Task.FromResult(true);
         }
 
-        public override async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
-            Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
+        protected virtual Task<bool> AfterSave(T item)
         {
-            var entities = await base.GetAll(queryContext, addConditionsCallback);
-
-            return entities;
-        }
-    }
-
-    public abstract class SectionEntityRepository<T, TId> : SiteEntityRepository<T, TId>
-        where T : class, IEntity<TId>, ISiteEntity, ISectionEntity
-    {
-        protected SectionEntityRepository(BioRepositoryContext<T, TId> repositoryContext,
-            SitesRepository sitesRepository) : base(repositoryContext, sitesRepository)
-        {
-        }
-
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)
-        {
-            if ((queryContext?.SectionId).HasValue)
-            {
-                query = query.Where(e => e.SectionIds.Contains(queryContext.SectionId.Value));
-            }
-
-            return base.ApplyContext(query, queryContext);
-        }
-    }
-
-    public class BioRepositoryContext<T, TId> where T : IEntity<TId>
-    {
-        internal BioContext DbContext { get; }
-        public IValidator<T>[] Validators { get; }
-
-        public BioRepositoryContext(BioContext dbContext, IValidator<T>[] validators = default)
-        {
-            DbContext = dbContext;
-            Validators = validators;
-        }
-    }
-
-    public class AddOrUpdateOperationResult<T, TId> where T : IEntity<TId>
-    {
-        public bool IsSuccess { get; }
-        public T Entity { get; }
-        public ValidationFailure[] Errors { get; }
-
-        public AddOrUpdateOperationResult(T entity, IEnumerable<ValidationFailure> errors)
-        {
-            Entity = entity;
-            Errors = errors.ToArray();
-            IsSuccess = !errors.Any();
+            return Task.FromResult(true);
         }
     }
 }
