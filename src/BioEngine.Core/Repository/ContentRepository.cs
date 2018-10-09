@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Providers;
 using JetBrains.Annotations;
 
 namespace BioEngine.Core.Repository
@@ -9,8 +10,8 @@ namespace BioEngine.Core.Repository
     public class ContentRepository : SectionEntityRepository<ContentItem, int>
     {
         public ContentRepository(BioRepositoryContext<ContentItem, int> repositoryContext,
-            SitesRepository sitesRepository, SectionsRepository sectionsRepository) : base(repositoryContext,
-            sitesRepository, sectionsRepository)
+            SectionsRepository sectionsRepository) : base(repositoryContext,
+            sectionsRepository)
         {
         }
 

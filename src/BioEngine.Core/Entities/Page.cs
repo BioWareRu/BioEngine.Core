@@ -7,7 +7,7 @@ using BioEngine.Core.Providers;
 
 namespace BioEngine.Core.Entities
 {
-    public class Site : IEntity<int>
+    public class Page : IEntity<int>, ISiteEntity<int>
     {
         public object GetId() => Id;
 
@@ -16,10 +16,14 @@ namespace BioEngine.Core.Entities
         [Required] public DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }
-        [Required] public string Title { get; set; }
-        [Required] public string Url { get; set; }
+        public int[] SiteIds { get; set; } = new int[0];
+        
+
+        [Required] public virtual string Title { get; set; }
+        [Required] public virtual string Url { get; set; }
+        [Required] public string Text { get; set; }
         
         [NotMapped]
-        public Dictionary<string, SettingsBase> Settings { get; set; }
+        public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
     }
 }

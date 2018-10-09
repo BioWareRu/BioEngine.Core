@@ -21,6 +21,8 @@ namespace BioEngine.Core.DB
 
         public DbSet<Site> Sites { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Page> Pages { get; set; }
+        public DbSet<SettingsRecord> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

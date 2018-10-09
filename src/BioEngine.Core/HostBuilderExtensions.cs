@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Providers;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Storage;
 using FluentValidation;
@@ -50,6 +50,8 @@ namespace BioEngine.Core
                     }
                 });
 
+                services.AddScoped<SettingsProvider>();
+
                 // collect defined types
                 var assembliesList = new List<Assembly>(assemblies) {domainAssembly, typeof(BioContext).Assembly};
                 var types = new List<TypeInfo>();
@@ -92,20 +94,6 @@ namespace BioEngine.Core
                 }
             });
             return hostBuilder;
-        }
-
-        private static IServiceCollection AddRepository<TRepository, TEntity, TId>(IServiceCollection services)
-            where TRepository : BioRepository<TEntity, TId> where TEntity : class, IEntity<TId>
-        {
-            services.AddScoped<TRepository>(provider =>
-            {
-                var context = new BioRepositoryContext<TEntity, TId>(provider.GetRequiredService<BioContext>(),
-                    provider.GetServices<IValidator<TEntity>>().ToArray());
-                return (TRepository) Activator.CreateInstance(typeof(TRepository),
-                    BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] {context}, null);
-            });
-
-            return services;
         }
 
         public static IWebHostBuilder AddBioEngineValidation(this IWebHostBuilder webHostBuilder,
@@ -217,13 +205,16 @@ namespace BioEngine.Core
             });
             return webHostBuilder;
         }
-    }
 
-    internal class RepostioryRegistrator
-    {
-        public IServiceCollection RegisterRepositories(IServiceCollection serviceCollection)
+        public static IWebHostBuilder AddBioEngineSeo(this IWebHostBuilder webHostBuilder)
         {
-            return serviceCollection;
+            return webHostBuilder.ConfigureServices((context, collection) =>
+            {
+                SettingsProvider.RegisterBioEngineSectionSettings<SeoSettings>();
+                SettingsProvider.RegisterBioEngineContentSettings<SeoSettings>();
+                SettingsProvider.RegisterBioEngineSettings<SeoSettings, Site>();
+                SettingsProvider.RegisterBioEngineSettings<SeoSettings, Page>();
+            });
         }
     }
 }

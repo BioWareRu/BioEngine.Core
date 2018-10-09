@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Providers;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,15 @@ namespace BioEngine.Core.Repository
     {
         internal readonly BioContext DbContext;
         protected readonly IValidator<T>[] Validators;
+        protected readonly IRepositoryFilter[] Filters;
+        protected readonly SettingsProvider SettingsProvider;
 
         protected BioRepository(BioRepositoryContext<T, TId> repositoryContext)
         {
             DbContext = repositoryContext.DbContext;
             Validators = repositoryContext.Validators;
+            Filters = repositoryContext.Filters;
+            SettingsProvider = repositoryContext.SettingsProvider;
         }
 
         public virtual async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
@@ -46,7 +51,14 @@ namespace BioEngine.Core.Repository
             }
 
             var items = await query.ToListAsync();
+            await AfterLoad(items);
+
             return (items, itemsCount);
+        }
+
+        public virtual async Task AfterLoad(IEnumerable<T> entities)
+        {
+            await SettingsProvider.LoadSettings<T, TId>(entities);
         }
 
         public virtual async Task<int> Count(QueryContext<T, TId> queryContext = null,
@@ -64,12 +76,24 @@ namespace BioEngine.Core.Repository
 
         public virtual async Task<T> GetById(TId id, QueryContext<T, TId> queryContext = null)
         {
-            return await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
+            var item = await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
+            await AfterLoad(new[] {item});
+            return item;
+        }
+
+        public virtual async Task<T> New()
+        {
+            var item = Activator.CreateInstance<T>();
+            await AfterLoad(new[] {item});
+            return item;
         }
 
         public virtual async Task<IEnumerable<T>> GetByIds(TId[] ids, QueryContext<T, TId> queryContext = null)
         {
-            return await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToListAsync();
+            var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToListAsync();
+            await AfterLoad(items);
+
+            return items;
         }
 
         public virtual async Task<AddOrUpdateOperationResult<T, TId>> Add(T item)
@@ -185,21 +209,56 @@ namespace BioEngine.Core.Repository
             return query;
         }
 
-        protected virtual Task<bool> BeforeValidate(T item,
+        protected virtual async Task<bool> BeforeValidate(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult)
         {
-            return Task.FromResult(true);
+            var result = true;
+            foreach (var repositoryFilter in Filters)
+            {
+                if (!repositoryFilter.CanProcess(item.GetType())) continue;
+                if (!await repositoryFilter.BeforeValidate<T, TId>(item, validationResult))
+                {
+                    result = false;
+                }
+            }
+
+            return result;
         }
 
-        protected virtual Task<bool> BeforeSave(T item,
+        protected virtual async Task<bool> BeforeSave(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult)
         {
-            return Task.FromResult(true);
+            var result = true;
+            foreach (var repositoryFilter in Filters)
+            {
+                if (!repositoryFilter.CanProcess(item.GetType())) continue;
+                if (!await repositoryFilter.BeforeSave<T, TId>(item, validationResult))
+                {
+                    result = false;
+                }
+            }
+
+            return result;
         }
 
-        protected virtual Task<bool> AfterSave(T item)
+        protected virtual async Task<bool> AfterSave(T item)
         {
-            return Task.FromResult(true);
+            var result = true;
+            foreach (var repositoryFilter in Filters)
+            {
+                if (!repositoryFilter.CanProcess(item.GetType())) continue;
+                if (!await repositoryFilter.AfterSave<T, TId>(item))
+                {
+                    result = false;
+                }
+            }
+
+            foreach (var itemSetting in item.Settings)
+            {
+                await SettingsProvider.Set(itemSetting.Value, item);
+            }
+
+            return result;
         }
     }
 }

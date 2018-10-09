@@ -8,13 +8,12 @@ using FluentValidation.Results;
 namespace BioEngine.Core.Repository
 {
     public abstract class SectionEntityRepository<T, TId> : SiteEntityRepository<T, TId>
-        where T : class, IEntity<TId>, ISiteEntity, ISectionEntity
+        where T : class, IEntity<TId>, ISiteEntity<TId>, ISectionEntity<TId>
     {
         private readonly SectionsRepository _sectionsRepository;
 
         protected SectionEntityRepository(BioRepositoryContext<T, TId> repositoryContext,
-            SitesRepository sitesRepository, SectionsRepository sectionsRepository) : base(repositoryContext,
-            sitesRepository)
+            SectionsRepository sectionsRepository) : base(repositoryContext)
         {
             _sectionsRepository = sectionsRepository;
         }
@@ -32,6 +31,10 @@ namespace BioEngine.Core.Repository
         protected override async Task<bool> BeforeValidate(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult)
         {
+            var result = await base.BeforeValidate(item, validationResult);
+
+            if (!result) return false;
+
             if (item.SectionIds != null && item.SectionIds.Any())
             {
                 var sections = (await _sectionsRepository.GetByIds(item.SectionIds)).ToArray();
@@ -44,17 +47,18 @@ namespace BioEngine.Core.Repository
                         return true;
                     }
 
-                    validationResult.errors.Add(new ValidationFailure(nameof(ISiteEntity.SiteIds), "Не найдены сайты"));
+                    validationResult.errors.Add(new ValidationFailure(nameof(ISiteEntity<TId>.SiteIds),
+                        "Не найдены сайты"));
                 }
                 else
                 {
                     validationResult.errors.Add(
-                        new ValidationFailure(nameof(ISiteEntity.SiteIds), "Не найдены разделы"));
+                        new ValidationFailure(nameof(ISiteEntity<TId>.SiteIds), "Не найдены разделы"));
                 }
             }
             else
             {
-                validationResult.errors.Add(new ValidationFailure(nameof(ISectionEntity.SectionIds),
+                validationResult.errors.Add(new ValidationFailure(nameof(ISectionEntity<TId>.SectionIds),
                     "Не указаны разделы"));
             }
 

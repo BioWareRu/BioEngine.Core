@@ -4,18 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Providers;
 
 namespace BioEngine.Core.Repository
 {
     public abstract class SiteEntityRepository<T, TId> : BioRepository<T, TId>
-        where T : class, IEntity<TId>, ISiteEntity
+        where T : class, IEntity<TId>, ISiteEntity<TId>
     {
-        private readonly SitesRepository _sitesRepository;
-
-        protected SiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext, SitesRepository sitesRepository)
+        protected SiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext)
             : base(repositoryContext)
         {
-            _sitesRepository = sitesRepository;
         }
 
         protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)
