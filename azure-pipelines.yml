@@ -20,3 +20,5 @@ steps:
     majorVersion: '$(Major)'
     minorVersion: '$(Minor)'
     patchVersion: '$(Patch)'
+    verbosityRestore: 'minimal'
+    packDirectory: '$(build.artifactStagingDirectory)'
