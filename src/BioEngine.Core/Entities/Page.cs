@@ -24,6 +24,6 @@ namespace BioEngine.Core.Entities
         [Required] public string Text { get; set; }
         
         [NotMapped]
-        public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
+        public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
     }
 }

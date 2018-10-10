@@ -29,7 +29,7 @@ namespace BioEngine.Core.Entities
         public virtual int[] TagIds { get; set; } = new int[0];
 
         [NotMapped]
-        public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
+        public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
 
         [NotMapped] public string PublicUrl => $"/content/{Id}-{Url}.html";
     }

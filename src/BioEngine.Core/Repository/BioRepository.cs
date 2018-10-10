@@ -255,7 +255,10 @@ namespace BioEngine.Core.Repository
 
             foreach (var itemSetting in item.Settings)
             {
-                await SettingsProvider.Set(itemSetting.Value, item);
+                foreach (var val in itemSetting.Settings)
+                {
+                    await SettingsProvider.Set(val.Value, item, val.SiteId);
+                }
             }
 
             return result;

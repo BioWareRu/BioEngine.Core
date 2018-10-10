@@ -19,12 +19,12 @@ namespace BioEngine.Core.Entities
         [Required] public string Key { get; set; }
         public string EntityType { get; set; }
         public string EntityId { get; set; }
+        public int? SiteId { get; set; }
 
         [Column(TypeName = "jsonb")]
         [Required]
         public string Data { get; set; }
-        
-        [NotMapped]
-        public Dictionary<string, SettingsBase> Settings { get; set; }
+
+        [NotMapped] public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
     }
 }

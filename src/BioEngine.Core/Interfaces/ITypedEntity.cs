@@ -17,7 +17,7 @@ namespace BioEngine.Core.Interfaces
         DateTimeOffset DateUpdated { get; set; }
         bool IsPublished { get; set; }
         DateTimeOffset? DatePublished { get; set; }
-        Dictionary<string, SettingsBase> Settings { get; set; }
+        List<SettingsEntry> Settings { get; set; }
     }
 
     public interface ISiteEntity<TId>

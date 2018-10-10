@@ -20,6 +20,6 @@ namespace BioEngine.Core.Entities
         [Required] public string Url { get; set; }
         
         [NotMapped]
-        public Dictionary<string, SettingsBase> Settings { get; set; }
+        public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
     }
 }

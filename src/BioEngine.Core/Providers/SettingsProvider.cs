@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -17,14 +16,9 @@ namespace BioEngine.Core.Providers
     public class SettingsProvider
     {
         private readonly BioContext _dbContext;
-        private static List<SettingsType> _types = new List<SettingsType>();
+        private static readonly List<SettingsType> Types = new List<SettingsType>();
 
-        private static Dictionary<Type, (string name, bool isEditable,
-                Dictionary<string, (string name, SettingType type)> properties)>
-            _schema =
-                new Dictionary<Type, (string name, bool isEditable,
-                    Dictionary<string, (string name, SettingType type)>
-                    properties)>();
+        private static readonly Dictionary<Type, SettingsSchema> Schema = new Dictionary<Type, SettingsSchema>();
 
         public SettingsProvider(BioContext dbContext)
         {
@@ -58,46 +52,49 @@ namespace BioEngine.Core.Providers
         private static void RegisterBioEngineSettings(Type settingsType, Type entityType = null,
             SettingsRegistrationType registrationType = SettingsRegistrationType.Entity)
         {
-            SettingsType type = _types.FirstOrDefault(t => t.SettingsClassType == settingsType);
+            SettingsType type = Types.FirstOrDefault(t => t.SettingsClassType == settingsType);
             if (type == null)
             {
                 type = new SettingsType(settingsType);
                 var classAttr = settingsType.GetCustomAttribute<SettingsClassAttribute>();
                 if (classAttr != null)
                 {
-                    var properties = new Dictionary<string, (string name, SettingType type)>();
+                    var properties = new List<SettingsPropertySchema>();
                     foreach (var propertyInfo in settingsType.GetProperties())
                     {
                         var attr = propertyInfo.GetCustomAttribute<SettingsPropertyAttribute>();
                         if (attr != null)
                         {
-                            properties.Add(propertyInfo.Name, (attr.Name, attr.Type));
+                            properties.Add(new SettingsPropertySchema(propertyInfo.Name, attr.Name, attr.Type));
                         }
                     }
 
-                    _schema.Add(settingsType, (classAttr.Name, classAttr.IsEditable, properties));
+                    var schema = new SettingsSchema(settingsType.FullName, classAttr.Name, classAttr.IsEditable,
+                        classAttr.Mode);
+                    schema.Properties.AddRange(properties);
+
+                    Schema.Add(settingsType, schema);
                 }
 
-                _types.Add(type);
+                Types.Add(type);
             }
 
             type.AddRegistration(registrationType, entityType);
         }
 
-        public static (string name, bool isEditable, Dictionary<string, (string name, SettingType type)>
-            propertions) GetSchema<TSettings>() where TSettings : SettingsBase, new()
+        public static SettingsSchema GetSchema<TSettings>() where TSettings : SettingsBase, new()
         {
-            if (!_schema.ContainsKey(typeof(TSettings)))
+            if (!Schema.ContainsKey(typeof(TSettings)))
             {
                 throw new ArgumentException($"Type {typeof(TSettings)} is not registered in settings provider!");
             }
 
-            return _schema[typeof(TSettings)];
+            return Schema[typeof(TSettings)];
         }
 
         public static SettingsBase GetInstance(string className)
         {
-            var type = _schema.Keys.FirstOrDefault(k => k.FullName == className);
+            var type = Schema.Keys.FirstOrDefault(k => k.FullName == className);
             if (type != null)
             {
                 return (SettingsBase) Activator.CreateInstance(type);
@@ -106,15 +103,14 @@ namespace BioEngine.Core.Providers
             return null;
         }
 
-        public static (string name, bool isEditable, Dictionary<string, (string name, SettingType type)>
-            properties) GetSchema(Type settingsType)
+        public static SettingsSchema GetSchema(Type settingsType)
         {
-            if (!_schema.ContainsKey(settingsType))
+            if (!Schema.ContainsKey(settingsType))
             {
                 throw new ArgumentException($"Type {settingsType} is not registered in settings provider!");
             }
 
-            return _schema[settingsType];
+            return Schema[settingsType];
         }
 
         public async Task<TSettings> Get<TSettings>() where TSettings : SettingsBase, new()
@@ -165,7 +161,7 @@ namespace BioEngine.Core.Providers
             return true;
         }
 
-        public async Task<bool> Set<TSettings>(TSettings settings, IEntity entity)
+        public async Task<bool> Set<TSettings>(TSettings settings, IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
             var record = await LoadFromDatabase(settings, entity);
@@ -175,7 +171,8 @@ namespace BioEngine.Core.Providers
                 {
                     Key = settings.GetType().FullName,
                     EntityType = entity.GetType().FullName,
-                    EntityId = entity.GetId().ToString()
+                    EntityId = entity.GetId().ToString(),
+                    SiteId = siteId
                 };
 
                 _dbContext.Add(record);
@@ -208,93 +205,94 @@ namespace BioEngine.Core.Providers
                 && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString());
         }
 
-        public async Task<Dictionary<string, SettingsBase>> GetAllSettings(IEntity entity)
-        {
-            var types = _types.Where(registration => registration.IsRegisteredFor(entity.GetType())).ToList();
-            if (entity is Section)
-            {
-                types.AddRange(_types.Where(registration =>
-                    registration.IsRegisteredForSections()));
-            }
-
-            if (entity is ContentItem)
-            {
-                types.AddRange(_types.Where(registration =>
-                    registration.IsRegisteredForContent()));
-            }
-
-            var keys = types.Select(t => t.SettingsClassType.FullName).ToArray();
-            var settings = await _dbContext.Settings.Where(s =>
-                s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString() &&
-                keys.Contains(s.Key)).ToListAsync();
-            var entitySettings = new Dictionary<string, SettingsBase>();
-            foreach (var type in types)
-            {
-                var record = settings.FirstOrDefault(s => s.Key == type.SettingsClassType.FullName);
-                if (record != null)
-                {
-                    entitySettings.Add(type.SettingsClassType.FullName,
-                        (SettingsBase) JsonConvert.DeserializeObject(record.Data, type.SettingsClassType));
-                }
-                else
-                {
-                    entitySettings.Add(type.SettingsClassType.FullName, GetInstance(type.SettingsClassType.FullName));
-                }
-            }
-
-            return entitySettings;
-        }
-
         public async Task LoadSettings<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
         {
-            if (entities != null && entities.Any())
+            var entitiesArray = entities as T[] ?? entities.ToArray();
+            if (entitiesArray.Any())
             {
-                var groups = entities.GroupBy(e => e.GetType().FullName);
+                var sites = await _dbContext.Sites.ToListAsync();
+                var groups = entitiesArray.GroupBy(e => e.GetType().FullName);
                 foreach (var @group in groups)
                 {
                     var ids = @group.Where(e => e.GetId() != default).Select(e => e.GetId().ToString());
                     var entityType = @group.Key;
                     var groupEntity = group.First();
-                    var types = _types.Where(registration => registration.IsRegisteredFor(groupEntity.GetType()))
+                    var types = Types.Where(registration => registration.IsRegisteredFor(groupEntity.GetType()))
                         .ToList();
                     if (groupEntity is Section)
                     {
-                        types.AddRange(_types.Where(registration =>
+                        types.AddRange(Types.Where(registration =>
                             registration.IsRegisteredForSections()));
                     }
 
                     if (groupEntity is ContentItem)
                     {
-                        types.AddRange(_types.Where(registration =>
+                        types.AddRange(Types.Where(registration =>
                             registration.IsRegisteredForContent()));
-                    }
-
-                    foreach (var entity in @group)
-                    {
-                        entity.Settings = new Dictionary<string, SettingsBase>();
-                        foreach (var type in types)
-                        {
-                            entity.Settings.Add(type.SettingsClassType.FullName,
-                                GetInstance(type.SettingsClassType.FullName));
-                        }
                     }
 
                     var settings = await _dbContext.Settings.Where(s =>
                         s.EntityType == entityType && ids.Contains(s.EntityId)).ToListAsync();
-                    foreach (var settingsRecord in settings)
-                    {
-                        var type = types.FirstOrDefault(r => r.SettingsClassType.FullName == settingsRecord.Key);
-                        if (type != null)
-                        {
-                            var entity = group.First(e => e.GetId().ToString() == settingsRecord.EntityId);
 
-                            entity.Settings[type.SettingsClassType.FullName] =
-                                (SettingsBase) JsonConvert.DeserializeObject(settingsRecord.Data,
-                                    type.SettingsClassType);
+                    foreach (var entity in @group)
+                    {
+                        entity.Settings = new List<SettingsEntry>();
+                        foreach (var type in types)
+                        {
+                            var entry = new SettingsEntry(type.SettingsClassType.FullName,
+                                GetSchema(type.SettingsClassType));
+
+                            var records = settings.Where(s =>
+                                    s.EntityId == entity.Id.ToString() && s.Key == type.SettingsClassType.FullName)
+                                .ToList();
+
+                            switch (entry.Schema.Mode)
+                            {
+                                case SettingMode.OnePerEntity:
+                                    if (records.Any())
+                                    {
+                                        entry.Settings.Add(new SettingsValue(null,
+                                            DeserializeSettings(records.First(), type)));
+                                    }
+                                    else
+                                    {
+                                        entry.Settings.Add(new SettingsValue(null,
+                                            GetInstance(type.SettingsClassType.FullName)));
+                                    }
+
+                                    break;
+                                case SettingMode.OnePerSite:
+                                    foreach (var site in sites)
+                                    {
+                                        var record = records.FirstOrDefault(r => r.SiteId == site.Id);
+                                        SettingsBase recordSettings;
+                                        if (record == null)
+                                        {
+                                            recordSettings = GetInstance(type.SettingsClassType.FullName);
+                                        }
+                                        else
+                                        {
+                                            recordSettings = DeserializeSettings(records.First(), type);
+                                        }
+
+                                        entry.Settings.Add(new SettingsValue(site.Id, recordSettings));
+                                    }
+
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+
+                            entity.Settings.Add(entry);
                         }
                     }
                 }
             }
+        }
+
+        private SettingsBase DeserializeSettings(SettingsRecord record, SettingsType type)
+        {
+            return (SettingsBase) JsonConvert.DeserializeObject(record.Data, type.SettingsClassType);
         }
     }
 
@@ -302,14 +300,21 @@ namespace BioEngine.Core.Providers
     public class SettingsClassAttribute : Attribute
     {
         public string Name { get; set; }
-        public bool IsEditable { get; set; } = false;
+        public bool IsEditable { get; set; }
+        public SettingMode Mode { get; set; } = SettingMode.OnePerEntity;
     }
 
     [AttributeUsage(AttributeTargets.Property)]
     public class SettingsPropertyAttribute : Attribute
     {
         public string Name { get; set; }
-        public SettingType Type { get; set; }
+        public SettingType Type { get; set; } = SettingType.String;
+    }
+
+    public enum SettingMode
+    {
+        OnePerEntity = 1,
+        OnePerSite = 2
     }
 
     public enum SettingType
@@ -377,6 +382,64 @@ namespace BioEngine.Core.Providers
 
     public class SettingsBase
     {
+    }
+
+    public class SettingsEntry
+    {
+        public SettingsEntry(string key, SettingsSchema schema)
+        {
+            Key = key;
+            Schema = schema;
+        }
+
+        public string Key { get; }
+
+        public SettingsSchema Schema { get; }
+
+        public List<SettingsValue> Settings { get; } = new List<SettingsValue>();
+    }
+
+    public class SettingsValue
+    {
+        public SettingsValue(int? siteId, SettingsBase value)
+        {
+            SiteId = siteId;
+            Value = value;
+        }
+
+        public int? SiteId { get; set; }
+        public SettingsBase Value { get; set; }
+    }
+
+    public class SettingsSchema
+    {
+        public SettingsSchema(string key, string name, bool isEditable, SettingMode mode)
+        {
+            Key = key;
+            Name = name;
+            IsEditable = isEditable;
+            Mode = mode;
+        }
+
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public bool IsEditable { get; set; }
+        public SettingMode Mode { get; set; }
+        public List<SettingsPropertySchema> Properties { get; } = new List<SettingsPropertySchema>();
+    }
+
+    public class SettingsPropertySchema
+    {
+        public SettingsPropertySchema(string key, string name, SettingType type)
+        {
+            Key = key;
+            Name = name;
+            Type = type;
+        }
+
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public SettingType Type { get; set; }
     }
 
     [SettingsClass(Name = "Seo", IsEditable = true)]
