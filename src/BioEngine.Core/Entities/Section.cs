@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Design;
 namespace BioEngine.Core.Entities
 {
     [Table("Sections")]
-    public abstract class Section : IEntity<int>, ISiteEntity<int>
+    public abstract class Section : IEntity<int>, ISiteEntity<int>, IRoutable
     {
         public object GetId() => Id;
 
@@ -28,7 +28,11 @@ namespace BioEngine.Core.Entities
         public virtual DateTimeOffset? DatePublished { get; set; }
         public virtual bool IsPublished { get; set; }
         public virtual int[] SiteIds { get; set; } = new int[0];
-        [NotMapped] public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
+
+        [NotMapped]
+        public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
+
+        [NotMapped] public string PublicUrl => $"/section/{Id}-{Url}.html";
     }
 
     public abstract class Section<T> : Section, ITypedEntity<T> where T : TypedData, new()

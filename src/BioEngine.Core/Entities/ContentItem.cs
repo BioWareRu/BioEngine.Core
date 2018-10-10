@@ -8,7 +8,8 @@ using BioEngine.Core.Providers;
 namespace BioEngine.Core.Entities
 {
     [Table("Content")]
-    public abstract class ContentItem : IEntity<int>, ISiteEntity<int>, ISectionEntity<int>, IContentEntity<int>
+    public abstract class ContentItem : IEntity<int>, ISiteEntity<int>, ISectionEntity<int>, IContentEntity<int>,
+        IRoutable
     {
         public object GetId() => Id;
 
@@ -27,7 +28,10 @@ namespace BioEngine.Core.Entities
         public virtual int[] SiteIds { get; set; } = new int[0];
         public virtual int[] TagIds { get; set; } = new int[0];
 
-        [NotMapped] public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
+        [NotMapped]
+        public Dictionary<string, SettingsBase> Settings { get; set; } = new Dictionary<string, SettingsBase>();
+
+        [NotMapped] public string PublicUrl => $"/content/{Id}-{Url}.html";
     }
 
     public abstract class ContentItem<T> : ContentItem, ITypedEntity<T> where T : TypedData, new()
