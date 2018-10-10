@@ -65,7 +65,8 @@ namespace BioEngine.Core.Providers
                         var attr = propertyInfo.GetCustomAttribute<SettingsPropertyAttribute>();
                         if (attr != null)
                         {
-                            properties.Add(new SettingsPropertySchema(propertyInfo.Name, attr.Name, attr.Type));
+                            properties.Add(new SettingsPropertySchema(propertyInfo.Name, attr.Name, attr.Type,
+                                attr.IsRequired));
                         }
                     }
 
@@ -126,12 +127,12 @@ namespace BioEngine.Core.Providers
             return settings;
         }
 
-        public async Task<TSettings> Get<TSettings>(IEntity entity)
+        public async Task<TSettings> Get<TSettings>(IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
             var settings = new TSettings();
             var settingsRecord =
-                await LoadFromDatabase(settings, entity);
+                await LoadFromDatabase(settings, entity, siteId);
             if (settingsRecord != null)
             {
                 settings = JsonConvert.DeserializeObject<TSettings>(settingsRecord.Data);
@@ -197,12 +198,13 @@ namespace BioEngine.Core.Providers
                 && s.EntityType == null && s.EntityId == null);
         }
 
-        private Task<SettingsRecord> LoadFromDatabase<TSettings>(TSettings settings, IEntity entity)
+        private Task<SettingsRecord> LoadFromDatabase<TSettings>(TSettings settings, IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
             return _dbContext.Settings.FirstOrDefaultAsync(s =>
                 s.Key == settings.GetType().FullName
-                && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString());
+                && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString() &&
+                siteId == null || s.SiteId == siteId);
         }
 
         public async Task LoadSettings<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
@@ -309,6 +311,7 @@ namespace BioEngine.Core.Providers
     {
         public string Name { get; set; }
         public SettingType Type { get; set; } = SettingType.String;
+        public bool IsRequired { get; set; }
     }
 
     public enum SettingMode
@@ -326,7 +329,9 @@ namespace BioEngine.Core.Providers
         Date = 5,
         DateTime = 6,
         Dropdown = 7,
-        LongString = 8
+        LongString = 8,
+        Checkbox = 9,
+        Url = 10
     }
 
     internal class SettingsType
@@ -430,16 +435,18 @@ namespace BioEngine.Core.Providers
 
     public class SettingsPropertySchema
     {
-        public SettingsPropertySchema(string key, string name, SettingType type)
+        public SettingsPropertySchema(string key, string name, SettingType type, bool isRequired)
         {
             Key = key;
             Name = name;
             Type = type;
+            IsRequired = isRequired;
         }
 
         public string Key { get; set; }
         public string Name { get; set; }
         public SettingType Type { get; set; }
+        public bool IsRequired { get; set; }
     }
 
     [SettingsClass(Name = "Seo", IsEditable = true)]
