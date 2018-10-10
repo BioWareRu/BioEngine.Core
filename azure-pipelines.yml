@@ -22,3 +22,5 @@ steps:
     patchVersion: '$(Patch)'
     verbosityPack: 'minimal'
     packDirectory: '$(build.artifactStagingDirectory)'
+    
+- task: PublishBuildArtifacts@1
