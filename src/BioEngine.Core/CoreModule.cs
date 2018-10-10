@@ -17,7 +17,7 @@ using Npgsql;
 
 namespace BioEngine.Core
 {
-    public class BioEngineCoreModule : BioEngineModule<BioEngineCoreModuleConfig>
+    public class CoreModule : BioEngineModule<CoreModuleConfig>
     {
         public override void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services)
         {
@@ -225,7 +225,7 @@ namespace BioEngine.Core
         }
     }
 
-    public class BioEngineCoreModuleConfig
+    public class CoreModuleConfig
     {
         public bool EnableDatabase = true;
         public bool EnableValidation = false;
