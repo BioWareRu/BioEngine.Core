@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
 
 namespace BioEngine.Core.Repository
 {

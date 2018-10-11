@@ -9,6 +9,7 @@ using BioEngine.Core.Providers;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Storage;
 using FluentValidation;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -166,7 +167,7 @@ namespace BioEngine.Core
                 Pooling = false
             };
 
-            Config.DBConfigure?.Invoke(connBuilder, context.Configuration);
+            Config.DbConfigure?.Invoke(connBuilder, context.Configuration);
             services.AddDbContextPool<BioContext>(options =>
             {
                 options.UseNpgsql(connBuilder.ConnectionString,
@@ -225,15 +226,16 @@ namespace BioEngine.Core
         }
     }
 
+    [PublicAPI]
     public class CoreModuleConfig
     {
         public bool EnableDatabase = true;
-        public bool EnableValidation = false;
-        public bool EnableFileStorage = false;
+        public bool EnableValidation;
+        public bool EnableFileStorage;
         public bool EnableS3Storage = true;
         public bool EnableSeoExtensions = true;
 
-        public Action<NpgsqlConnectionStringBuilder, IConfiguration> DBConfigure;
+        public Action<NpgsqlConnectionStringBuilder, IConfiguration> DbConfigure;
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
         public Assembly MigrationsAssembly;
     }

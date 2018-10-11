@@ -14,8 +14,9 @@ namespace BioEngine.Core.Repository
         public AddOrUpdateOperationResult(T entity, IEnumerable<ValidationFailure> errors)
         {
             Entity = entity;
-            Errors = errors.ToArray();
-            IsSuccess = !errors.Any();
+            var validationFailures = errors as ValidationFailure[] ?? errors.ToArray();
+            Errors = validationFailures.ToArray();
+            IsSuccess = !validationFailures.Any();
         }
     }
 }

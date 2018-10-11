@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Providers;
 
 namespace BioEngine.Core.Interfaces

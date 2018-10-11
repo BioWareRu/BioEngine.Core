@@ -81,23 +81,23 @@ namespace BioEngine.Core.DB
 
     internal static class FieldsResolver
     {
-        private static readonly ConcurrentDictionary<string, Dictionary<string, string>> _properties =
+        private static readonly ConcurrentDictionary<string, Dictionary<string, string>> Properties =
             new ConcurrentDictionary<string, Dictionary<string, string>>();
 
         internal static string GetPropertyName<T>(string name)
         {
             var typeName = typeof(T).Name;
-            if (!_properties.ContainsKey(typeName))
+            if (!Properties.ContainsKey(typeName))
             {
-                _properties.TryAdd(typeName,
+                Properties.TryAdd(typeName,
                     typeof(T).GetProperties().ToDictionary(p => p.Name.ToLowerInvariant(), p => p.Name));
             }
 
             name = name.ToLowerInvariant();
 
-            if (_properties[typeName].ContainsKey(name))
+            if (Properties[typeName].ContainsKey(name))
             {
-                return _properties[typeName][name];
+                return Properties[typeName][name];
             }
 
             return null;

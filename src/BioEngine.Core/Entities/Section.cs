@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Providers;
 using BioEngine.Core.Storage;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace BioEngine.Core.Entities
 {

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Providers;
 using JetBrains.Annotations;
 
 namespace BioEngine.Core.Repository
