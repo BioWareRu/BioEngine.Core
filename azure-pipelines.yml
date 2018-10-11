@@ -9,17 +9,15 @@ pool:
 variables:
   Major: '3'
   Minor: '0'
-  Patch: '0'
 
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: pack
     configuration: 'release'
-    versioningScheme: byPrereleaseNumber
     majorVersion: '$(Major)'
     minorVersion: '$(Minor)'
-    patchVersion: '$(Patch)'
+    patchVersion: '$(Build.BuildId)'
     verbosityPack: 'minimal'
     packDirectory: '$(build.artifactStagingDirectory)'
     
