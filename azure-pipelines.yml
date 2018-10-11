@@ -7,17 +7,15 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 variables:
-  Major: '3'
-  Minor: '0'
+  Version: '3.0.$(Build.BuildId)'
 
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: pack
     configuration: 'release'
-    majorVersion: '$(Major)'
-    minorVersion: '$(Minor)'
-    patchVersion: '$(Build.BuildId)'
+    versioningScheme: byEnvVar
+    versionEnvVar: 'Version'
     verbosityPack: 'minimal'
     packDirectory: '$(build.artifactStagingDirectory)'
     
