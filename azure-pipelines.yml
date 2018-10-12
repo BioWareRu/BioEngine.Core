@@ -24,6 +24,7 @@ steps:
       versioningScheme: byEnvVar
       versionEnvVar: 'Version'
       verbosityPack: 'minimal'
+      projects: 'src/**/*.csproj'
 
   - task: DotNetCoreCLI@2
     inputs:
