@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -141,6 +141,13 @@ namespace BioEngine.Core.Repository
         {
             item.IsPublished = true;
             item.DatePublished = DateTimeOffset.UtcNow;
+            await Update(item);
+        }
+
+        public virtual async Task UnPublish(T item)
+        {
+            item.IsPublished = false;
+            item.DatePublished = null;
             await Update(item);
         }
 
