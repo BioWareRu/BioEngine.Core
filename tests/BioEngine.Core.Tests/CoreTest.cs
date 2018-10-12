@@ -4,10 +4,12 @@ using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Providers;
 using BioEngine.Core.Tests.Fixtures;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
 {
+    [UsedImplicitly]
     public class CoreTestFixture : BaseTestFixture
     {
         protected override void InitDbContext(BioContext dbContext)
@@ -57,9 +59,9 @@ namespace BioEngine.Core.Tests
         }
     }
 
-    public class CoreTest : BaseTest<CoreTestFixture>
+    public abstract class CoreTest : BaseTest<CoreTestFixture>
     {
-        public CoreTest(CoreTestFixture testFixture, ITestOutputHelper testOutputHelper) : base(testFixture,
+        protected CoreTest(CoreTestFixture testFixture, ITestOutputHelper testOutputHelper) : base(testFixture,
             testOutputHelper)
         {
         }
