@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Interfaces;
 using BioEngine.Core.Tests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;

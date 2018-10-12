@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Tests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
