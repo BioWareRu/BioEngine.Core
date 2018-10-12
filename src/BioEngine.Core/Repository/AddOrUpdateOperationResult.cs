@@ -18,5 +18,7 @@ namespace BioEngine.Core.Repository
             Errors = validationFailures.ToArray();
             IsSuccess = !validationFailures.Any();
         }
+
+        public string ErrorsString => string.Join(" ", Errors.Select(e => e.ErrorMessage));
     }
 }
