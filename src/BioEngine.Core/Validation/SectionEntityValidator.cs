@@ -3,10 +3,10 @@ using FluentValidation;
 
 namespace BioEngine.Core.Validation
 {
-    public abstract class ContentValidator<T, TId> : SectionValidator<T, TId>
+    public sealed class SectionEntityValidator<T, TId> : AbstractValidator<T>
         where T : ISiteEntity<TId>, ISectionEntity<TId>
     {
-        protected ContentValidator()
+        public SectionEntityValidator()
         {
             RuleFor(e => e.SectionIds).NotEmpty();
         }

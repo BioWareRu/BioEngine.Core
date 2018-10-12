@@ -10,8 +10,8 @@ namespace BioEngine.Core.Repository
     public class BioRepositoryContext<T, TId> where T : class, IEntity<TId>
     {
         internal BioContext DbContext { get; }
-        public IRepositoryFilter[] Filters { get; }
-        public IValidator<T>[] Validators { get; }
+        public List<IRepositoryFilter> Filters { get; }
+        public List<IValidator<T>> Validators { get; }
         public SettingsProvider SettingsProvider { get; }
 
         public BioRepositoryContext(BioContext dbContext, SettingsProvider settingsProvider,
@@ -20,8 +20,8 @@ namespace BioEngine.Core.Repository
         {
             DbContext = dbContext;
             SettingsProvider = settingsProvider;
-            Filters = filters?.ToArray();
-            Validators = validators?.ToArray();
+            Filters = filters?.ToList();
+            Validators = validators?.ToList();
         }
     }
 }

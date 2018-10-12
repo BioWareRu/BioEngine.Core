@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Validation;
 using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository
@@ -16,6 +17,12 @@ namespace BioEngine.Core.Repository
             SectionsRepository sectionsRepository) : base(repositoryContext)
         {
             _sectionsRepository = sectionsRepository;
+        }
+
+        protected override void RegisterValidators()
+        {
+            base.RegisterValidators();
+            Validators.Add(new SectionEntityValidator<T, TId>());
         }
 
         protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)

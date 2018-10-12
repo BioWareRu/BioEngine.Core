@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Providers;
+using BioEngine.Core.Validation;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +15,28 @@ namespace BioEngine.Core.Repository
     public abstract class BioRepository<T, TId> : IBioRepository where T : class, IEntity<TId>
     {
         internal readonly BioContext DbContext;
-        protected readonly IValidator<T>[] Validators;
-        protected readonly IRepositoryFilter[] Filters;
+        protected readonly List<IValidator<T>> Validators;
+        protected readonly List<IRepositoryFilter> Filters;
         protected readonly SettingsProvider SettingsProvider;
 
         protected BioRepository(BioRepositoryContext<T, TId> repositoryContext)
         {
             DbContext = repositoryContext.DbContext;
-            Validators = repositoryContext.Validators ?? new IValidator<T>[0];
-            Filters = repositoryContext.Filters ?? new IRepositoryFilter[0];
+            Validators = repositoryContext.Validators ?? new List<IValidator<T>>();
+            Filters = repositoryContext.Filters ?? new List<IRepositoryFilter>();
             SettingsProvider = repositoryContext.SettingsProvider;
+
+            Init();
+        }
+
+        private void Init()
+        {
+            RegisterValidators();
+        }
+
+        protected virtual void RegisterValidators()
+        {
+            Validators.Add(new EntityValidator<TId>());
         }
 
         public virtual async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
