@@ -103,7 +103,7 @@ namespace BioEngine.Core.Tests
                         : 5432,
                 Username = Configuration["BIO_POSTGRES_USERNAME"] ?? "postgres",
                 Password = Configuration["BIO_POSTGRES_PASSWORD"] ?? "",
-                Database = Configuration["BIO_POSTGRES_DATABASE"] ?? "postgres",
+                Database = databaseName,
                 Pooling = false
             };
             return connBuilder.ConnectionString;
