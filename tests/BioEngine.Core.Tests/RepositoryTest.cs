@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Repository;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,22 +14,12 @@ namespace BioEngine.Core.Tests
         {
         }
 
-
-        private SitesRepository GetRepository(BioContext context)
-        {
-            var settingsProvider = GetSettingsProvider(context);
-            var repositoryContext = new BioRepositoryContext<Site, int>(context, settingsProvider);
-            var repository = new SitesRepository(repositoryContext);
-            return repository;
-        }
-
-
         [Fact]
         public async Task Create()
         {
             using (var context = CreateDbContext(init: false))
             {
-                var repository = GetRepository(context);
+                var repository = GetSitesRepository(context);
                 var count = await repository.Count();
                 Assert.Equal(0, count);
                 var site = new Site
@@ -51,7 +40,7 @@ namespace BioEngine.Core.Tests
         {
             using (var context = CreateDbContext())
             {
-                var repository = GetRepository(context);
+                var repository = GetSitesRepository(context);
                 var site = await repository.GetById(1);
                 Assert.NotNull(site);
                 Assert.Equal(1, site.Id);
@@ -63,7 +52,7 @@ namespace BioEngine.Core.Tests
         {
             using (var context = CreateDbContext())
             {
-                var repository = GetRepository(context);
+                var repository = GetSitesRepository(context);
                 var site = await repository.GetById(1);
                 const string newTitle = "Test new";
                 var oldDate = site.DateUpdated;
@@ -80,7 +69,7 @@ namespace BioEngine.Core.Tests
         {
             using (var context = CreateDbContext())
             {
-                var repository = GetRepository(context);
+                var repository = GetSitesRepository(context);
                 var count = await context.Sites.CountAsync();
                 var site = await context.Sites.FirstAsync();
                 await repository.Delete(site.Id);
@@ -94,7 +83,7 @@ namespace BioEngine.Core.Tests
         {
             using (var context = CreateDbContext())
             {
-                var repository = GetRepository(context);
+                var repository = GetSitesRepository(context);
                 var queryContext = new QueryContext<Site, int>();
                 var result = await repository.GetAll(queryContext);
                 var count = await context.Sites.CountAsync();
@@ -108,7 +97,7 @@ namespace BioEngine.Core.Tests
         {
             using (var context = CreateDbContext())
             {
-                var repository = GetRepository(context);
+                var repository = GetSitesRepository(context);
                 var site = await context.Sites.FirstAsync();
                 await repository.UnPublish(site);
                 var count = await context.Sites.CountAsync(s => s.IsPublished);

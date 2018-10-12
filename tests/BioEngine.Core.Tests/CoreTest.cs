@@ -3,9 +3,11 @@ using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Providers;
+using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using JetBrains.Annotations;
 using Xunit.Abstractions;
+using ContentRepository = BioEngine.Core.Tests.Fixtures.ContentRepository;
 
 namespace BioEngine.Core.Tests
 {
@@ -81,6 +83,31 @@ namespace BioEngine.Core.Tests
             var provider = new SettingsProvider(dbContext);
             //init settings
             return provider;
+        }
+
+        protected SitesRepository GetSitesRepository(BioContext context)
+        {
+            var settingsProvider = GetSettingsProvider(context);
+            var repositoryContext = new BioRepositoryContext<Site, int>(context, settingsProvider);
+            var repository = new SitesRepository(repositoryContext);
+            return repository;
+        }
+
+        protected SectionRepository GetSectionsRepository(BioContext context)
+        {
+            var settingsProvider = GetSettingsProvider(context);
+            var repositoryContext = new BioRepositoryContext<TestSection, int>(context, settingsProvider);
+            var repository = new SectionRepository(repositoryContext);
+            return repository;
+        }
+
+        protected ContentRepository GetContentRepository(BioContext context)
+        {
+            var settingsProvider = GetSettingsProvider(context);
+            var repositoryContext = new BioRepositoryContext<TestContent, int>(context, settingsProvider);
+            var repository = new ContentRepository(repositoryContext,
+                new SectionsRepository(new BioRepositoryContext<Section, int>(context, settingsProvider)));
+            return repository;
         }
     }
 }
