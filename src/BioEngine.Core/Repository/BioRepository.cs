@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,8 +21,8 @@ namespace BioEngine.Core.Repository
         protected BioRepository(BioRepositoryContext<T, TId> repositoryContext)
         {
             DbContext = repositoryContext.DbContext;
-            Validators = repositoryContext.Validators;
-            Filters = repositoryContext.Filters;
+            Validators = repositoryContext.Validators ?? new IValidator<T>[0];
+            Filters = repositoryContext.Filters ?? new IRepositoryFilter[0];
             SettingsProvider = repositoryContext.SettingsProvider;
         }
 
