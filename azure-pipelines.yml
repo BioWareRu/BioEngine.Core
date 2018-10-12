@@ -14,7 +14,7 @@ steps:
     inputs:
       command: test
       publishTestResults: true
-      projects: 'tests/**/*.csproj's
+      projects: 'tests/**/*.csproj'
 
 
   - task: DotNetCoreCLI@2
