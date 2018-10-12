@@ -12,6 +12,12 @@ variables:
 steps:
 - task: DotNetCoreCLI@2
   inputs:
+    command: test
+    publishTestResults: true  
+  
+  
+- task: DotNetCoreCLI@2
+  inputs:
     command: pack
     configuration: 'release'
     versioningScheme: byEnvVar
