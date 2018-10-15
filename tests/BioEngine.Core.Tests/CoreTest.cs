@@ -6,13 +6,14 @@ using BioEngine.Core.Providers;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 using ContentRepository = BioEngine.Core.Tests.Fixtures.ContentRepository;
 
 namespace BioEngine.Core.Tests
 {
     [UsedImplicitly]
-    public class CoreTestFixture : BaseTestFixture
+    public class CoreTestScope : BaseTestScope
     {
         protected override void InitDbContext(BioContext dbContext)
         {
@@ -59,26 +60,27 @@ namespace BioEngine.Core.Tests
             dbContext.Add(page);
             dbContext.SaveChanges();
         }
+
+        protected override IServiceCollection ConfigureServices(IServiceCollection services)
+        {
+            services.RegisterEntityType(typeof(TestSection));
+            services.RegisterEntityType(typeof(TestContent));
+            return base.ConfigureServices(services);
+        }
     }
 
-    public abstract class CoreTest : BaseTest<CoreTestFixture>
+    public abstract class CoreTest : BaseTest<CoreTestScope>
     {
-        protected CoreTest(CoreTestFixture testFixture, ITestOutputHelper testOutputHelper) : base(testFixture,
-            testOutputHelper)
+        protected CoreTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
-        protected BioContext CreateDbContext([CallerMemberName] string databaseName = "", bool inMemory = true,
-            bool init = true)
+        protected BioContext CreateDbContext([CallerMemberName] string databaseName = "", bool init = true)
         {
-            var typesProvider = new TypesProvider();
-            typesProvider.AddContentType(typeof(TestContent));
-            typesProvider.AddSectionType(typeof(TestSection));
-            BioContext.TypesProvider = typesProvider;
-            return GetDbContext(databaseName, inMemory, init);
+            return GetDbContext(databaseName, init);
         }
 
-        protected SettingsProvider GetSettingsProvider(BioContext dbContext)
+        private SettingsProvider GetSettingsProvider(BioContext dbContext)
         {
             var provider = new SettingsProvider(dbContext);
             //init settings

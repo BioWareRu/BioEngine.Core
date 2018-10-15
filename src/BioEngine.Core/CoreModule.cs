@@ -168,12 +168,13 @@ namespace BioEngine.Core
             };
 
             Config.DbConfigure?.Invoke(connBuilder, context.Configuration);
-            services.AddDbContextPool<BioContext>(options =>
+            services.AddEntityFrameworkNpgsql();
+            services.AddDbContextPool<BioContext>((p, options) =>
             {
                 options.UseNpgsql(connBuilder.ConnectionString,
                     builder => builder.MigrationsAssembly(Config.MigrationsAssembly != null
                         ? Config.MigrationsAssembly.FullName
-                        : typeof(DbContext).Assembly.FullName));
+                        : typeof(DbContext).Assembly.FullName)).UseInternalServiceProvider(p);
                 if (context.HostingEnvironment.IsDevelopment())
                 {
                     options.EnableSensitiveDataLogging();
@@ -191,38 +192,16 @@ namespace BioEngine.Core
                 types.AddRange(assembly.DefinedTypes);
             }
 
+            services.Scan(s =>
+                s.FromAssemblies(assembliesList).AddClasses(classes => classes.AssignableTo<IBioRepository>())
+                    .AsSelfWithInterfaces());
 
-            var typesProvider = new TypesProvider();
-            var repositoryTypes = new List<Type>();
             foreach (var type in types)
             {
-                if (!type.IsAbstract && typeof(Section).IsAssignableFrom(type) &&
-                    type.BaseType != null)
-                {
-                    typesProvider.AddSectionType(type);
-                }
-
-                if (!type.IsAbstract && typeof(ContentItem).IsAssignableFrom(type) &&
-                    type.BaseType != null)
-                {
-                    typesProvider.AddContentType(type);
-                }
-
-                if (!type.IsAbstract && typeof(IBioRepository).IsAssignableFrom(type) &&
-                    type.BaseType != null)
-                {
-                    repositoryTypes.Add(type);
-                }
+                services.RegisterEntityType(type);
             }
 
-            BioContext.TypesProvider = typesProvider;
-
-            // register repositories
             services.AddScoped(typeof(BioRepositoryContext<,>));
-            foreach (var type in repositoryTypes)
-            {
-                services.AddScoped(type);
-            }
         }
     }
 

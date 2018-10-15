@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BioEngine.Core.Repository
 {
     [PublicAPI]
-    public abstract class BioRepository<T, TId> : IBioRepository where T : class, IEntity<TId>
+    public abstract class BioRepository<T, TId> : IBioRepository<T, TId> where T : class, IEntity<TId>
     {
         internal readonly BioContext DbContext;
         protected readonly List<IValidator<T>> Validators;
@@ -71,7 +71,7 @@ namespace BioEngine.Core.Repository
             return (items, itemsCount);
         }
 
-        public virtual async Task AfterLoad(IEnumerable<T> entities)
+        protected virtual async Task AfterLoad(IEnumerable<T> entities)
         {
             await SettingsProvider.LoadSettings<T, TId>(entities);
         }
@@ -201,7 +201,7 @@ namespace BioEngine.Core.Repository
             throw new ArgumentException();
         }
 
-        public virtual async Task<(bool isValid, IList<ValidationFailure> errors)> Validate(T entity,
+        protected virtual async Task<(bool isValid, IList<ValidationFailure> errors)> Validate(T entity,
             PropertyChange[] changes = null)
         {
             var failures = new List<ValidationFailure>();

@@ -7,15 +7,15 @@ using BioEngine.Core.Interfaces;
 using BioEngine.Core.Storage;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BioEngine.Core.DB
 {
     public sealed class BioContext : DbContext
     {
-        public static TypesProvider TypesProvider;
-
         // ReSharper disable once SuggestBaseTypeForParameter
         public BioContext(DbContextOptions<BioContext> options) : base(options)
         {
@@ -57,35 +57,39 @@ namespace BioEngine.Core.DB
                 BindingFlags.Instance | BindingFlags.NonPublic);
             var sectionConversionsRegistrationMethod = GetType().GetMethod(nameof(RegisterSectionEntityConversions),
                 BindingFlags.Instance | BindingFlags.NonPublic);
-            foreach (var sectionType in TypesProvider.GetSectionTypes())
+            var metadataEntities = this.GetInfrastructure().GetServices<EntityMetadata>()?.ToArray();
+            if (metadataEntities != null)
             {
-                Console.WriteLine($"Register section type {sectionType}");
-                RegisterDiscriminator<Section, int>(modelBuilder, sectionType.type, sectionType.discriminator);
-                dataConversionRegistrationMethod?.MakeGenericMethod(sectionType.type, sectionType.dataType)
-                    .Invoke(this, new object[] {modelBuilder});
-                if (Database.IsInMemory())
+                foreach (var sectionType in metadataEntities.Where(m => m.EntityType == EntityMetadataType.Section))
                 {
-                    siteConversionsRegistrationMethod?.MakeGenericMethod(sectionType.type,
-                            sectionType.type.GetProperty("Id")?.PropertyType)
+                    Console.WriteLine($"Register section type {sectionType}");
+                    RegisterDiscriminator<Section, int>(modelBuilder, sectionType.Type, sectionType.Discriminator);
+                    dataConversionRegistrationMethod?.MakeGenericMethod(sectionType.Type, sectionType.DataType)
                         .Invoke(this, new object[] {modelBuilder});
+                    if (Database.IsInMemory())
+                    {
+                        siteConversionsRegistrationMethod?.MakeGenericMethod(sectionType.Type,
+                                sectionType.Type.GetProperty("Id")?.PropertyType)
+                            .Invoke(this, new object[] {modelBuilder});
+                    }
                 }
-            }
 
-            foreach (var contentType in TypesProvider.GetContentTypes())
-            {
-                Console.WriteLine($"Register content type {contentType}");
-                RegisterDiscriminator<ContentItem, int>(modelBuilder, contentType.type,
-                    contentType.discriminator);
-                dataConversionRegistrationMethod?.MakeGenericMethod(contentType.type, contentType.dataType)
-                    .Invoke(this, new object[] {modelBuilder});
-                if (Database.IsInMemory())
+                foreach (var contentType in metadataEntities.Where(m => m.EntityType == EntityMetadataType.ContentItem))
                 {
-                    siteConversionsRegistrationMethod?.MakeGenericMethod(contentType.type,
-                            contentType.type.GetProperty("Id")?.PropertyType)
+                    Console.WriteLine($"Register content type {contentType}");
+                    RegisterDiscriminator<ContentItem, int>(modelBuilder, contentType.Type,
+                        contentType.Discriminator);
+                    dataConversionRegistrationMethod?.MakeGenericMethod(contentType.Type, contentType.DataType)
                         .Invoke(this, new object[] {modelBuilder});
-                    sectionConversionsRegistrationMethod?.MakeGenericMethod(contentType.type,
-                            contentType.type.GetProperty("Id")?.PropertyType)
-                        .Invoke(this, new object[] {modelBuilder});
+                    if (Database.IsInMemory())
+                    {
+                        siteConversionsRegistrationMethod?.MakeGenericMethod(contentType.Type,
+                                contentType.Type.GetProperty("Id")?.PropertyType)
+                            .Invoke(this, new object[] {modelBuilder});
+                        sectionConversionsRegistrationMethod?.MakeGenericMethod(contentType.Type,
+                                contentType.Type.GetProperty("Id")?.PropertyType)
+                            .Invoke(this, new object[] {modelBuilder});
+                    }
                 }
             }
         }

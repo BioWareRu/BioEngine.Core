@@ -9,55 +9,50 @@ namespace BioEngine.Core.Tests
 {
     public class SectionEntityTest : CoreTest
     {
-        public SectionEntityTest(CoreTestFixture testFixture, ITestOutputHelper testOutputHelper) : base(testFixture,
-            testOutputHelper)
+        public SectionEntityTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
         [Fact]
         public async Task SaveWithoutSectionIdsFails()
         {
-            using (var context = CreateDbContext())
+            var context = CreateDbContext();
+            var repository = GetContentRepository(context);
+
+            var content = new TestContent
             {
-                var repository = GetContentRepository(context);
+                Title = "Test Content 2",
+                Url = "content2"
+            };
 
-                var content = new TestContent
-                {
-                    Title = "Test Content 2",
-                    Url = "content2"
-                };
-
-                var result = await repository.Add(content);
-                Assert.False(result.IsSuccess);
-                Assert.True(result.Errors.Any(e => e.PropertyName == nameof(content.SectionIds)));
-            }
+            var result = await repository.Add(content);
+            Assert.False(result.IsSuccess);
+            Assert.True(result.Errors.Any(e => e.PropertyName == nameof(content.SectionIds)));
         }
 
         [Fact]
         public async Task SiteIdsAutoFillFromSections()
         {
-            using (var context = CreateDbContext())
+            var context = CreateDbContext();
+            var repository = GetContentRepository(context);
+            var sectionRepository = GetSectionsRepository(context);
+            var section = (await sectionRepository.GetAll(new QueryContext<TestSection, int>())).items.First();
+
+            Assert.NotEmpty(section.SiteIds);
+
+            var content = new TestContent
             {
-                var repository = GetContentRepository(context);
-                var sectionRepository = GetSectionsRepository(context);
-                var section = (await sectionRepository.GetAll(new QueryContext<TestSection, int>())).items.First();
+                Title = "Test Content 2",
+                Url = "content2",
+                SectionIds = new[] {section.Id},
+                AuthorId = 1
+            };
 
-                Assert.NotEmpty(section.SiteIds);
-
-                var content = new TestContent
-                {
-                    Title = "Test Content 2",
-                    Url = "content2",
-                    SectionIds = new[] {section.Id},
-                    AuthorId = 1
-                };
-
-                Assert.Empty(content.SiteIds);
-                var result = await repository.Add(content);
-                Assert.True(result.IsSuccess, $"Errors: {result.ErrorsString}");
-                Assert.NotEmpty(content.SiteIds);
-                Assert.Equal(section.SiteIds, content.SiteIds);
-            }
+            Assert.Empty(content.SiteIds);
+            var result = await repository.Add(content);
+            Assert.True(result.IsSuccess, $"Errors: {result.ErrorsString}");
+            Assert.NotEmpty(content.SiteIds);
+            Assert.Equal(section.SiteIds, content.SiteIds);
         }
     }
 }

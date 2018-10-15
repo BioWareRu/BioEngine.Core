@@ -8,28 +8,25 @@ namespace BioEngine.Core.Tests
 {
     public class SiteEntityTests : CoreTest
     {
-        public SiteEntityTests(CoreTestFixture testFixture, ITestOutputHelper testOutputHelper) : base(testFixture,
-            testOutputHelper)
+        public SiteEntityTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
         [Fact]
         public async Task SaveWithoutSiteIdsFails()
         {
-            using (var context = CreateDbContext())
+            var context = CreateDbContext();
+            var repository = GetSectionsRepository(context);
+
+            var section = new TestSection
             {
-                var repository = GetSectionsRepository(context);
+                Title = "Test Section 2",
+                Url = "test2"
+            };
 
-                var section = new TestSection
-                {
-                    Title = "Test Section 2",
-                    Url = "test2"
-                };
-
-                var result = await repository.Add(section);
-                Assert.False(result.IsSuccess);
-                Assert.True(result.Errors.Any(e => e.PropertyName == nameof(section.SiteIds)));
-            }
+            var result = await repository.Add(section);
+            Assert.False(result.IsSuccess);
+            Assert.True(result.Errors.Any(e => e.PropertyName == nameof(section.SiteIds)));
         }
     }
 }
