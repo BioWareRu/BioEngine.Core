@@ -17,10 +17,4 @@ namespace BioEngine.Core.DB
         public Type DataType { get; }
         public EntityMetadataType EntityType { get; }
     }
-
-    public enum EntityMetadataType
-    {
-        Section = 1,
-        ContentItem = 2
-    }
 }
