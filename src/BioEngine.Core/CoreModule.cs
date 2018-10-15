@@ -8,6 +8,7 @@ using BioEngine.Core.Modules;
 using BioEngine.Core.Providers;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Storage;
+using BioEngine.Core.Web;
 using FluentValidation;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
@@ -46,6 +47,8 @@ namespace BioEngine.Core
             {
                 AddS3Storage(builderContext, services);
             }
+            
+            services.AddScoped(typeof(BaseControllerContext<,>));
         }
 
         private static void AddS3Storage(WebHostBuilderContext context, IServiceCollection services)
