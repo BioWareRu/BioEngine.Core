@@ -15,6 +15,10 @@ namespace BioEngine.Core.Modules
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
         }
+
+        public virtual void ConfigureHostBuilder(IWebHostBuilder hostBuilder)
+        {
+        }
     }
 
     public abstract class BioEngineModule<TConfig> : BioEngineModule, IBioEngineModule<TConfig> where TConfig : new()

@@ -9,6 +9,7 @@ namespace BioEngine.Core.Interfaces
     {
         void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services);
         void Configure(IApplicationBuilder app, IHostingEnvironment env);
+        void ConfigureHostBuilder(IWebHostBuilder hostBuilder);
     }
 
     public interface IBioEngineModule<out TConfig> : IBioEngineModule where TConfig : new()
