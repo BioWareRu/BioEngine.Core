@@ -8,10 +8,12 @@ using BioEngine.Core.Providers;
 using BioEngine.Core.Validation;
 using FluentValidation;
 using FluentValidation.Results;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
+    [PublicAPI]
     public abstract class BioRepository<T, TId> : IBioRepository where T : class, IEntity<TId>
     {
         internal readonly BioContext DbContext;
@@ -129,20 +131,38 @@ namespace BioEngine.Core.Repository
             return new AddOrUpdateOperationResult<T, TId>(item, validationResult.errors);
         }
 
+        public PropertyChange[] GetChanges(T item)
+        {
+            var changes = new List<PropertyChange>();
+            foreach (var propertyEntry in DbContext.Entry(item).Properties)
+            {
+                if (propertyEntry.IsModified)
+                {
+                    var name = propertyEntry.Metadata.Name;
+                    var originalValue = propertyEntry.OriginalValue;
+                    var value = propertyEntry.CurrentValue;
+                    changes.Add(new PropertyChange(name, originalValue, value));
+                }
+            }
+
+            return changes.ToArray();
+        }
+
         public virtual async Task<AddOrUpdateOperationResult<T, TId>> Update(T item)
         {
+            var changes = GetChanges(item);
             item.DateUpdated = DateTimeOffset.UtcNow;
             (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
-            if (await BeforeValidate(item, validationResult))
+            if (await BeforeValidate(item, validationResult, changes))
             {
-                validationResult = await Validate(item);
+                validationResult = await Validate(item, changes);
                 if (validationResult.isValid)
                 {
-                    if (await BeforeSave(item, validationResult))
+                    if (await BeforeSave(item, validationResult, changes))
                     {
                         DbContext.Update(item);
                         await DbContext.SaveChangesAsync();
-                        await AfterSave(item);
+                        await AfterSave(item, changes);
                     }
                 }
             }
@@ -154,14 +174,18 @@ namespace BioEngine.Core.Repository
         {
             item.IsPublished = true;
             item.DatePublished = DateTimeOffset.UtcNow;
+            var changes = GetChanges(item);
             await Update(item);
+            await AfterSave(item, changes);
         }
 
         public virtual async Task UnPublish(T item)
         {
             item.IsPublished = false;
             item.DatePublished = null;
+            var changes = GetChanges(item);
             await Update(item);
+            await AfterSave(item, changes);
         }
 
         public virtual async Task<bool> Delete(TId id)
@@ -177,7 +201,8 @@ namespace BioEngine.Core.Repository
             throw new ArgumentException();
         }
 
-        public virtual async Task<(bool isValid, IList<ValidationFailure> errors)> Validate(T entity)
+        public virtual async Task<(bool isValid, IList<ValidationFailure> errors)> Validate(T entity,
+            PropertyChange[] changes = null)
         {
             var failures = new List<ValidationFailure>();
             if (Validators != null)
@@ -230,13 +255,14 @@ namespace BioEngine.Core.Repository
         }
 
         protected virtual async Task<bool> BeforeValidate(T item,
-            (bool isValid, IList<ValidationFailure> errors) validationResult)
+            (bool isValid, IList<ValidationFailure> errors) validationResult,
+            PropertyChange[] changes = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeValidate<T, TId>(item, validationResult))
+                if (!await repositoryFilter.BeforeValidate<T, TId>(item, validationResult, changes))
                 {
                     result = false;
                 }
@@ -246,13 +272,14 @@ namespace BioEngine.Core.Repository
         }
 
         protected virtual async Task<bool> BeforeSave(T item,
-            (bool isValid, IList<ValidationFailure> errors) validationResult)
+            (bool isValid, IList<ValidationFailure> errors) validationResult,
+            PropertyChange[] changes = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeSave<T, TId>(item, validationResult))
+                if (!await repositoryFilter.BeforeSave<T, TId>(item, validationResult, changes))
                 {
                     result = false;
                 }
@@ -261,13 +288,13 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        protected virtual async Task<bool> AfterSave(T item)
+        protected virtual async Task<bool> AfterSave(T item, PropertyChange[] changes = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.AfterSave<T, TId>(item))
+                if (!await repositoryFilter.AfterSave<T, TId>(item, changes))
                 {
                     result = false;
                 }
@@ -283,5 +310,19 @@ namespace BioEngine.Core.Repository
 
             return result;
         }
+    }
+
+    public struct PropertyChange
+    {
+        public PropertyChange(string name, object originalValue, object currentValue)
+        {
+            Name = name;
+            OriginalValue = originalValue;
+            CurrentValue = currentValue;
+        }
+
+        public string Name { get; }
+        public object OriginalValue { get; }
+        public object CurrentValue { get; }
     }
 }

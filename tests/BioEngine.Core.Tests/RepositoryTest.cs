@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
@@ -109,6 +110,30 @@ namespace BioEngine.Core.Tests
                 queryContext.IncludeUnpublished = true;
                 result = await repository.GetAll(queryContext);
                 Assert.Equal(count + 1, result.itemsCount);
+            }
+        }
+
+        [Fact]
+        public async Task Changes()
+        {
+            using (var context = CreateDbContext())
+            {
+                var repository = GetSitesRepository(context);
+                var site = await context.Sites.FirstAsync();
+
+                var originalTitle = site.Title;
+                var newTitle = "Another title";
+                site.Title = newTitle;
+
+                var changes = repository.GetChanges(site);
+
+                Assert.NotEmpty(changes);
+                Assert.True(changes.Any(x => x.Name == nameof(site.Title)));
+
+                var change = changes.First(x => x.Name == nameof(site.Title));
+
+                Assert.Equal(originalTitle, change.OriginalValue);
+                Assert.Equal(newTitle, change.CurrentValue);
             }
         }
     }
