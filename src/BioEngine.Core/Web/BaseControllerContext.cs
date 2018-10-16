@@ -4,13 +4,13 @@ using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Core.Web
 {
-    public abstract class BaseControllerContext
+    public class BaseControllerContext
     {
         public readonly IStorage Storage;
         public readonly SettingsProvider SettingsProvider;
         public ILogger Logger { get; }
 
-        protected BaseControllerContext(ILoggerFactory loggerFactory, IStorage storage, SettingsProvider settingsProvider)
+        public BaseControllerContext(ILoggerFactory loggerFactory, IStorage storage, SettingsProvider settingsProvider)
         {
             Storage = storage;
             SettingsProvider = settingsProvider;
