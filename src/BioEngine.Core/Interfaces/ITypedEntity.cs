@@ -7,6 +7,7 @@ namespace BioEngine.Core.Interfaces
     public interface IEntity
     {
         object GetId();
+        List<SettingsEntry> Settings { get; set; }
     }
 
     public interface IEntity<TId> : IEntity
@@ -16,7 +17,6 @@ namespace BioEngine.Core.Interfaces
         DateTimeOffset DateUpdated { get; set; }
         bool IsPublished { get; set; }
         DateTimeOffset? DatePublished { get; set; }
-        List<SettingsEntry> Settings { get; set; }
     }
 
     public interface ISiteEntity<TId>
@@ -39,7 +39,6 @@ namespace BioEngine.Core.Interfaces
         int AuthorId { get; set; }
         string Title { get; set; }
         string Url { get; set; }
-        string Description { get; set; }
         bool IsPinned { get; set; }
     }
 
