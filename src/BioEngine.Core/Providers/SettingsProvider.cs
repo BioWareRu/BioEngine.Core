@@ -130,12 +130,17 @@ namespace BioEngine.Core.Providers
         public async Task<TSettings> Get<TSettings>(IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
-            var settings = new TSettings();
-            var settingsRecord =
-                await LoadFromDatabase(settings, entity, siteId);
-            if (settingsRecord != null)
+            var settings = entity.Settings.FirstOrDefault(x => x.Key == typeof(TSettings).FullName)?.Settings
+                .FirstOrDefault(x => x.SiteId == siteId)?.Value as TSettings;
+            if (settings == null)
             {
-                settings = JsonConvert.DeserializeObject<TSettings>(settingsRecord.Data);
+                settings = new TSettings();
+                var settingsRecord =
+                    await LoadFromDatabase(settings, entity, siteId);
+                if (settingsRecord != null)
+                {
+                    settings = JsonConvert.DeserializeObject<TSettings>(settingsRecord.Data);
+                }
             }
 
             return settings;
@@ -204,7 +209,7 @@ namespace BioEngine.Core.Providers
             return _dbContext.Settings.FirstOrDefaultAsync(s =>
                 s.Key == settings.GetType().FullName
                 && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString() &&
-                siteId == null || s.SiteId == siteId);
+                (siteId == null || s.SiteId == siteId));
         }
 
         public async Task LoadSettings<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
