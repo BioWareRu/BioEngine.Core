@@ -18,7 +18,6 @@ namespace BioEngine.Core.Entities
         [Required] public virtual int AuthorId { get; set; }
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }
-        public virtual string Description { get; set; }
         [Required] public virtual DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
         [Required] public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         public virtual DateTimeOffset? DatePublished { get; set; }
