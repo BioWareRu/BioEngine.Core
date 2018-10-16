@@ -1,6 +1,5 @@
 ﻿using System;
 using BioEngine.Core.Interfaces;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,10 +8,6 @@ namespace BioEngine.Core.Modules
     public abstract class BioEngineModule : IBioEngineModule
     {
         public virtual void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services)
-        {
-        }
-
-        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
         }
 

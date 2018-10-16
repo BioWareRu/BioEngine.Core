@@ -31,10 +31,6 @@ namespace BioEngine.Core
         {
             module.ConfigureHostBuilder(webHostBuilder);
             webHostBuilder.ConfigureServices(module.ConfigureServices);
-            webHostBuilder.Configure(app =>
-            {
-                module.Configure(app, app.ApplicationServices.GetRequiredService<IHostingEnvironment>());
-            });
         }
     }
 

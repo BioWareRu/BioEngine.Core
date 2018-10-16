@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +7,6 @@ namespace BioEngine.Core.Interfaces
     public interface IBioEngineModule
     {
         void ConfigureServices(WebHostBuilderContext builderContext, IServiceCollection services);
-        void Configure(IApplicationBuilder app, IHostingEnvironment env);
         void ConfigureHostBuilder(IWebHostBuilder hostBuilder);
     }
 

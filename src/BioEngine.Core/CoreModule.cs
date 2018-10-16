@@ -48,6 +48,7 @@ namespace BioEngine.Core
                 AddS3Storage(builderContext, services);
             }
             
+            services.AddScoped<BaseControllerContext>();
             services.AddScoped(typeof(BaseControllerContext<,>));
         }
 
