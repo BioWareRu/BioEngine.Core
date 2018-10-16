@@ -35,7 +35,7 @@ namespace BioEngine.Core.Interfaces
     public interface IContentEntity<TId>
     {
         TId Id { get; set; }
-        int Type { get; set; }
+        string Type { get; set; }
         int AuthorId { get; set; }
         string Title { get; set; }
         string Url { get; set; }
@@ -44,7 +44,7 @@ namespace BioEngine.Core.Interfaces
 
     public interface ITypedEntity
     {
-        int Type { get; set; }
+        string Type { get; set; }
         string TypeTitle { get; set; }
     }
 

@@ -129,13 +129,13 @@ namespace BioEngine.Core.Tests
         {
             var connBuilder = new NpgsqlConnectionStringBuilder
             {
-                Host = _configuration["BIO_POSTGRES_HOST"] ?? "localhost",
+                Host = _configuration["BE_POSTGRES_HOST"] ?? "localhost",
                 Port =
-                    !string.IsNullOrEmpty(_configuration["BIO_POSTGRES_PORT"])
-                        ? int.Parse(_configuration["BIO_POSTGRES_PORT"])
+                    !string.IsNullOrEmpty(_configuration["BE_POSTGRES_PORT"])
+                        ? int.Parse(_configuration["BE_POSTGRES_PORT"])
                         : 5432,
-                Username = _configuration["BIO_POSTGRES_USERNAME"] ?? "postgres",
-                Password = _configuration["BIO_POSTGRES_PASSWORD"] ?? "",
+                Username = _configuration["BE_POSTGRES_USERNAME"] ?? "postgres",
+                Password = _configuration["BE_POSTGRES_PASSWORD"] ?? "",
                 Database = databaseName,
                 Pooling = false
             };

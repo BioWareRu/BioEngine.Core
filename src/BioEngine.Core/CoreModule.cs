@@ -160,14 +160,14 @@ namespace BioEngine.Core
         {
             var connBuilder = new NpgsqlConnectionStringBuilder
             {
-                Host = context.Configuration["BIO_POSTGRES_HOST"] ?? "localhost",
+                Host = context.Configuration["BE_POSTGRES_HOST"] ?? "localhost",
                 Port =
-                    !string.IsNullOrEmpty(context.Configuration["BIO_POSTGRES_PORT"])
-                        ? int.Parse(context.Configuration["BIO_POSTGRES_PORT"])
+                    !string.IsNullOrEmpty(context.Configuration["BE_POSTGRES_PORT"])
+                        ? int.Parse(context.Configuration["BE_POSTGRES_PORT"])
                         : 5432,
-                Username = context.Configuration["BIO_POSTGRES_USERNAME"] ?? "postgres",
-                Password = context.Configuration["BIO_POSTGRES_PASSWORD"] ?? "",
-                Database = context.Configuration["BIO_POSTGRES_DATABASE"] ?? "postgres",
+                Username = context.Configuration["BE_POSTGRES_USERNAME"] ?? "postgres",
+                Password = context.Configuration["BE_POSTGRES_PASSWORD"] ?? "",
+                Database = context.Configuration["BE_POSTGRES_DATABASE"] ?? "postgres",
                 Pooling = false
             };
 
@@ -190,10 +190,14 @@ namespace BioEngine.Core
             // collect defined types
             var assembliesList = new List<Assembly>(Config.Assemblies)
                 {Config.MigrationsAssembly, typeof(BioContext).Assembly};
-            var types = new List<TypeInfo>();
+            var types = new HashSet<TypeInfo>();
             foreach (var assembly in assembliesList)
             {
-                types.AddRange(assembly.DefinedTypes);
+                
+                foreach (var definedType in assembly.DefinedTypes)
+                {
+                    types.Add(definedType);    
+                }
             }
 
             services.Scan(s =>

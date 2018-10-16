@@ -14,7 +14,7 @@ namespace BioEngine.Core.Entities
         public object GetId() => Id;
 
         [Key] public virtual int Id { get; set; }
-        public virtual int Type { get; set; }
+        public virtual string Type { get; set; }
         [Required] public virtual int AuthorId { get; set; }
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }
@@ -27,8 +27,7 @@ namespace BioEngine.Core.Entities
         public virtual int[] SiteIds { get; set; } = new int[0];
         public virtual int[] TagIds { get; set; } = new int[0];
 
-        [NotMapped]
-        public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
+        [NotMapped] public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
 
         [NotMapped] public string PublicUrl => $"/content/{Id}-{Url}.html";
     }
@@ -37,20 +36,5 @@ namespace BioEngine.Core.Entities
     {
         public virtual T Data { get; set; } = new T();
         [NotMapped] public abstract string TypeTitle { get; set; }
-    }
-
-    public abstract class ContentData
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class TypedEntityAttribute : Attribute
-    {
-        public int Type { get; }
-
-        public TypedEntityAttribute(int type)
-        {
-            Type = type;
-        }
     }
 }

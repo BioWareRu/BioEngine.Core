@@ -14,7 +14,7 @@ namespace BioEngine.Core.Entities
         public object GetId() => Id;
 
         [Key] public virtual int Id { get; set; }
-        [Required] public virtual int Type { get; set; }
+        [Required] public virtual string Type { get; set; }
         public virtual int? ParentId { get; set; }
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }

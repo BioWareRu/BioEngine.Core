@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
@@ -43,34 +42,19 @@ namespace BioEngine.Core
                 return services;
             }
 
-            EntityMetadataType metadataType;
-            if (typeof(Section).IsAssignableFrom(entityType))
-            {
-                metadataType = EntityMetadataType.Section;
-            }
-            else if (typeof(ContentItem).IsAssignableFrom(entityType))
-            {
-                metadataType = EntityMetadataType.ContentItem;
-            }
-            else
+            if (!typeof(Section).IsAssignableFrom(entityType) && !typeof(ContentItem).IsAssignableFrom(entityType))
             {
                 return services;
             }
 
-            var metaData = GetTypeMetadata(entityType, metadataType);
+            var metaData = GetTypeMetadata(entityType);
             services.AddSingleton(typeof(EntityMetadata), metaData);
 
             return services;
         }
 
-        private static EntityMetadata GetTypeMetadata(Type type, EntityMetadataType entityType)
+        private static EntityMetadata GetTypeMetadata(Type type)
         {
-            var attr = type.GetCustomAttribute<TypedEntityAttribute>();
-            if (attr == null)
-            {
-                throw new ArgumentException($"Entity type without type attribute: {type}");
-            }
-
             var dataType = type.BaseType?.GenericTypeArguments[0];
 
             if (dataType == null)
@@ -78,7 +62,7 @@ namespace BioEngine.Core
                 throw new ArgumentException($"Entity type without data type: {type}");
             }
 
-            return new EntityMetadata(type, attr.Type, dataType, entityType);
+            return new EntityMetadata(type, dataType);
         }
     }
 }

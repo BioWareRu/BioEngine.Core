@@ -4,17 +4,13 @@ namespace BioEngine.Core.DB
 {
     public struct EntityMetadata
     {
-        public EntityMetadata(Type type, int discriminator, Type dataType, EntityMetadataType entityType)
+        public EntityMetadata(Type entityType, Type dataType)
         {
-            Type = type;
-            Discriminator = discriminator;
-            DataType = dataType;
             EntityType = entityType;
+            DataType = dataType;
         }
 
-        public Type Type { get; }
-        public int Discriminator { get; }
+        public Type EntityType { get; }
         public Type DataType { get; }
-        public EntityMetadataType EntityType { get; }
     }
 }
