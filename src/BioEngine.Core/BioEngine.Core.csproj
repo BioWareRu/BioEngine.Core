@@ -23,4 +23,7 @@
         <PackageReference Include="FluentValidation" Version="8.0.100" />
         <PackageReference Include="xunit" Version="2.4.0" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Providers" />
+    </ItemGroup>
 </Project>

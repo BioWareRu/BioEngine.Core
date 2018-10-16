@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 
 namespace BioEngine.Core.Interfaces
 {

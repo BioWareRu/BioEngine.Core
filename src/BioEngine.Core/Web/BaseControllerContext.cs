@@ -1,5 +1,5 @@
 ﻿using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Core.Web

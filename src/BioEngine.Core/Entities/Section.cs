@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using BioEngine.Core.Storage;
 
 namespace BioEngine.Core.Entities

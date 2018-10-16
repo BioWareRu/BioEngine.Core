@@ -2,7 +2,7 @@
 using System.Linq;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Providers;
+using BioEngine.Core.Settings;
 using FluentValidation;
 
 namespace BioEngine.Core.Repository
