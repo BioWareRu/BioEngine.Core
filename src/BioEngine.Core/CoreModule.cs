@@ -56,7 +56,7 @@ namespace BioEngine.Core
         {
             services.Configure<S3StorageOptions>(o =>
             {
-                var uri = context.Configuration["BRC_STORAGE_PUBLIC_URI"];
+                var uri = context.Configuration["BE_STORAGE_PUBLIC_URI"];
                 if (string.IsNullOrEmpty(uri))
                 {
                     throw new ArgumentException("Storage url is empty");
@@ -68,25 +68,25 @@ namespace BioEngine.Core
                     throw new ArgumentException($"URI {uri} is not proper URI");
                 }
 
-                var serverUriStr = context.Configuration["BRC_STORAGE_S3_SERVER_URI"];
+                var serverUriStr = context.Configuration["BE_STORAGE_S3_SERVER_URI"];
                 if (string.IsNullOrEmpty(serverUriStr))
                 {
                     throw new ArgumentException("S3 server url is empty");
                 }
 
-                var bucketName = context.Configuration["BRC_STORAGE_S3_BUCKET"];
+                var bucketName = context.Configuration["BE_STORAGE_S3_BUCKET"];
                 if (string.IsNullOrEmpty(bucketName))
                 {
                     throw new ArgumentException("S3 bucketName is empty");
                 }
 
-                var accessKey = context.Configuration["BRC_STORAGE_S3_ACCESS_KEY"];
+                var accessKey = context.Configuration["BE_STORAGE_S3_ACCESS_KEY"];
                 if (string.IsNullOrEmpty(accessKey))
                 {
                     throw new ArgumentException("S3 access key is empty");
                 }
 
-                var secretKey = context.Configuration["BRC_STORAGE_S3_SECRET_KEY"];
+                var secretKey = context.Configuration["BE_STORAGE_S3_SECRET_KEY"];
                 if (string.IsNullOrEmpty(secretKey))
                 {
                     throw new ArgumentException("S3 secret key is empty");
@@ -111,13 +111,13 @@ namespace BioEngine.Core
         {
             services.Configure<FileStorageOptions>(o =>
             {
-                var path = context.Configuration["BRC_STORAGE_FILE_PATH"];
+                var path = context.Configuration["BE_STORAGE_FILE_PATH"];
                 if (string.IsNullOrEmpty(path))
                 {
                     throw new ArgumentException("File storage path is empty");
                 }
 
-                var uri = context.Configuration["BRC_STORAGE_PUBLIC_URI"];
+                var uri = context.Configuration["BE_STORAGE_PUBLIC_URI"];
                 if (string.IsNullOrEmpty(uri))
                 {
                     throw new ArgumentException("Storage url is empty");
