@@ -1,23 +1,56 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Huyn.PluralNet;
-using Huyn.PluralNet.Utils;
+using Jeffijoe.MessageFormat;
 
 namespace BioEngine.Core.Helpers
 {
     public static class PluralizeHelper
     {
-        public static string Pluralize(int number, Dictionary<PluralTypeEnum, string> forms)
-        {
-            var pluralType = PluralTypeEnum.ZERO;
-            if (number > 0)
-            {
-                var provider = PluralHelper.GetPluralChooser(CultureInfo.CurrentCulture);
+        private static readonly Dictionary<CultureInfo, MessageFormatter> Formatters =
+            new Dictionary<CultureInfo, MessageFormatter>();
 
-                pluralType = provider.ComputePlural(number);
+        private static MessageFormatter GetMessageFormatter()
+        {
+            if (!Formatters.ContainsKey(CultureInfo.CurrentCulture))
+            {
+                var mf = new MessageFormatter(true, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+                mf.Pluralizers["ru"] = n =>
+                {
+                    var nTen = n % 10;
+                    var nHundred = n % 100;
+                    if (Math.Abs(nTen - 1) < double.Epsilon && Math.Abs(nHundred - 11) > double.Epsilon)
+                        return "one";
+                    if (nTen >= 2 && nTen <= 4 && !(nHundred >= 12 && nHundred <= 14))
+                        return "few";
+                    if (Math.Abs(nTen) < double.Epsilon || (nTen >= 5 && nTen <= 9) ||
+                        (nHundred >= 11 && nHundred <= 14))
+                        return "many";
+                    return "other";
+                };
+                Formatters.Add(CultureInfo.CurrentCulture, mf);
             }
 
-            return forms.ContainsKey(pluralType) ? string.Format(forms[pluralType], number) : number.ToString();
+            return Formatters[CultureInfo.CurrentCulture];
+        }
+
+
+        public static string Pluralize(this string message, int number)
+        {
+            var formatted = GetMessageFormatter().FormatMessage(message, new Dictionary<string, object>
+            {
+                {"n", number},
+            });
+            return formatted;
+        }
+
+        public static string Pluralize(this string message, double number)
+        {
+            var formatted = GetMessageFormatter().FormatMessage(message, new Dictionary<string, object>
+            {
+                {"n", number},
+            });
+            return formatted;
         }
     }
 }
