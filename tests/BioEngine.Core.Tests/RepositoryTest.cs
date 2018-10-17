@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
@@ -9,6 +10,7 @@ using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
 {
+    [SuppressMessage("AsyncUsage.CSharp.Naming", "UseAsyncSuffix", Justification = "Reviewed.")]
     public class RepositoryTest : CoreTest
     {
         public RepositoryTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -20,17 +22,17 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext(init: false);
             var repository = GetSitesRepository(context);
-            var count = await repository.Count();
+            var count = await repository.CountAsync();
             Assert.Equal(0, count);
             var site = new Site
             {
                 Title = "New site",
                 Url = "https://site.ru"
             };
-            var result = await repository.Add(site);
+            var result = await repository.AddAsync(site);
             Assert.True(result.IsSuccess);
             Assert.True(result.Entity.Id > 0);
-            count = await repository.Count();
+            count = await repository.CountAsync();
             Assert.Equal(1, count);
         }
 
@@ -39,7 +41,7 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var site = await repository.GetById(1);
+            var site = await repository.GetByIdAsync(1);
             Assert.NotNull(site);
             Assert.Equal(1, site.Id);
         }
@@ -49,11 +51,11 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var site = await repository.GetById(1);
+            var site = await repository.GetByIdAsync(1);
             const string newTitle = "Test new";
             var oldDate = site.DateUpdated;
             site.Title = newTitle;
-            await repository.Update(site);
+            await repository.UpdateAsync(site);
             Assert.True(site.DateUpdated > oldDate);
             var siteFromDb = await context.Sites.FirstAsync(s => s.Id == site.Id);
             Assert.Equal(newTitle, siteFromDb.Title);
@@ -66,7 +68,7 @@ namespace BioEngine.Core.Tests
             var repository = GetSitesRepository(context);
             var count = await context.Sites.CountAsync();
             var site = await context.Sites.FirstAsync();
-            await repository.Delete(site.Id);
+            await repository.DeleteAsync(site.Id);
             var newCount = await context.Sites.CountAsync();
             Assert.Equal(count - 1, newCount);
         }
@@ -77,7 +79,7 @@ namespace BioEngine.Core.Tests
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
             var queryContext = new QueryContext<Site, int>();
-            var result = await repository.GetAll(queryContext);
+            var result = await repository.GetAllAsync(queryContext);
             var count = await context.Sites.CountAsync();
             Assert.NotEmpty(result.items);
             Assert.Equal(count, result.itemsCount);
@@ -89,15 +91,15 @@ namespace BioEngine.Core.Tests
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
             var site = await context.Sites.FirstAsync();
-            await repository.UnPublish(site);
+            await repository.UnPublishAsync(site);
             var count = await context.Sites.CountAsync(s => s.IsPublished);
 
             var queryContext = new QueryContext<Site, int>();
-            var result = await repository.GetAll(queryContext);
+            var result = await repository.GetAllAsync(queryContext);
             Assert.Equal(count, result.itemsCount);
 
             queryContext.IncludeUnpublished = true;
-            result = await repository.GetAll(queryContext);
+            result = await repository.GetAllAsync(queryContext);
             Assert.Equal(count + 1, result.itemsCount);
         }
 

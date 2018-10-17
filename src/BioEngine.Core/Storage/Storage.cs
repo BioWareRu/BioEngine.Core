@@ -19,7 +19,7 @@ namespace BioEngine.Core.Storage
             _options = options.Value;
         }
 
-        public async Task<StorageItem> SaveFile(byte[] file, string fileName, string path)
+        public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path)
         {
             var destinationName = GetStorageFileName(fileName);
             var destinationPath = $"{path}/{destinationName}";
@@ -43,15 +43,15 @@ namespace BioEngine.Core.Storage
 
             TryProcessImage(storageItem, tmpPath);
 
-            await DoSave(destinationPath, tmpPath);
+            await DoSaveAsync(destinationPath, tmpPath);
 
             return storageItem;
         }
 
-        protected abstract Task<bool> DoSave(string path, string tmpPath);
+        protected abstract Task<bool> DoSaveAsync(string path, string tmpPath);
 
 
-        public abstract Task<bool> DeleteFile(string filePath);
+        public abstract Task<bool> DeleteFileAsync(string filePath);
 
         protected string GetStorageFileName(string fileName)
         {

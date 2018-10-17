@@ -41,10 +41,10 @@ namespace BioEngine.Core.Repository
             Validators.Add(new EntityValidator<TId>());
         }
 
-        public virtual async Task<(List<T> items, int itemsCount)> GetAll(QueryContext<T, TId> queryContext = null,
+        public virtual async Task<(List<T> items, int itemsCount)> GetAllAsync(QueryContext<T, TId> queryContext = null,
             Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
         {
-            var itemsCount = await Count(queryContext, addConditionsCallback);
+            var itemsCount = await CountAsync(queryContext, addConditionsCallback);
 
             var query = GetBaseQuery(queryContext);
             if (addConditionsCallback != null)
@@ -66,17 +66,17 @@ namespace BioEngine.Core.Repository
             }
 
             var items = await query.ToListAsync();
-            await AfterLoad(items);
+            await AfterLoadAsync(items);
 
             return (items, itemsCount);
         }
 
-        protected virtual async Task AfterLoad(IEnumerable<T> entities)
+        protected virtual async Task AfterLoadAsync(IEnumerable<T> entities)
         {
-            await SettingsProvider.LoadSettings<T, TId>(entities);
+            await SettingsProvider.LoadSettingsAsync<T, TId>(entities);
         }
 
-        public virtual async Task<int> Count(QueryContext<T, TId> queryContext = null,
+        public virtual async Task<int> CountAsync(QueryContext<T, TId> queryContext = null,
             Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
         {
             var query = GetBaseQuery(queryContext);
@@ -89,41 +89,41 @@ namespace BioEngine.Core.Repository
             return await query.CountAsync();
         }
 
-        public virtual async Task<T> GetById(TId id, QueryContext<T, TId> queryContext = null)
+        public virtual async Task<T> GetByIdAsync(TId id, QueryContext<T, TId> queryContext = null)
         {
             var item = await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
-            await AfterLoad(new[] {item});
+            await AfterLoadAsync(new[] {item});
             return item;
         }
 
-        public virtual async Task<T> New()
+        public virtual async Task<T> NewAsync()
         {
             var item = Activator.CreateInstance<T>();
-            await AfterLoad(new[] {item});
+            await AfterLoadAsync(new[] {item});
             return item;
         }
 
-        public virtual async Task<IEnumerable<T>> GetByIds(TId[] ids, QueryContext<T, TId> queryContext = null)
+        public virtual async Task<IEnumerable<T>> GetByIdsAsync(TId[] ids, QueryContext<T, TId> queryContext = null)
         {
             var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToListAsync();
-            await AfterLoad(items);
+            await AfterLoadAsync(items);
 
             return items;
         }
 
-        public virtual async Task<AddOrUpdateOperationResult<T, TId>> Add(T item)
+        public virtual async Task<AddOrUpdateOperationResult<T, TId>> AddAsync(T item)
         {
             (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
-            if (await BeforeValidate(item, validationResult))
+            if (await BeforeValidateAsync(item, validationResult))
             {
-                validationResult = await Validate(item);
+                validationResult = await ValidateAsync(item);
                 if (validationResult.isValid)
                 {
-                    if (await BeforeSave(item, validationResult))
+                    if (await BeforeSaveAsync(item, validationResult))
                     {
                         DbContext.Add(item);
                         await DbContext.SaveChangesAsync();
-                        await AfterSave(item);
+                        await AfterSaveAsync(item);
                     }
                 }
             }
@@ -148,21 +148,21 @@ namespace BioEngine.Core.Repository
             return changes.ToArray();
         }
 
-        public virtual async Task<AddOrUpdateOperationResult<T, TId>> Update(T item)
+        public virtual async Task<AddOrUpdateOperationResult<T, TId>> UpdateAsync(T item)
         {
             var changes = GetChanges(item);
             item.DateUpdated = DateTimeOffset.UtcNow;
             (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
-            if (await BeforeValidate(item, validationResult, changes))
+            if (await BeforeValidateAsync(item, validationResult, changes))
             {
-                validationResult = await Validate(item, changes);
+                validationResult = await ValidateAsync(item, changes);
                 if (validationResult.isValid)
                 {
-                    if (await BeforeSave(item, validationResult, changes))
+                    if (await BeforeSaveAsync(item, validationResult, changes))
                     {
                         DbContext.Update(item);
                         await DbContext.SaveChangesAsync();
-                        await AfterSave(item, changes);
+                        await AfterSaveAsync(item, changes);
                     }
                 }
             }
@@ -170,27 +170,27 @@ namespace BioEngine.Core.Repository
             return new AddOrUpdateOperationResult<T, TId>(item, validationResult.errors);
         }
 
-        public virtual async Task Publish(T item)
+        public virtual async Task PublishAsync(T item)
         {
             item.IsPublished = true;
             item.DatePublished = DateTimeOffset.UtcNow;
             var changes = GetChanges(item);
-            await Update(item);
-            await AfterSave(item, changes);
+            await UpdateAsync(item);
+            await AfterSaveAsync(item, changes);
         }
 
-        public virtual async Task UnPublish(T item)
+        public virtual async Task UnPublishAsync(T item)
         {
             item.IsPublished = false;
             item.DatePublished = null;
             var changes = GetChanges(item);
-            await Update(item);
-            await AfterSave(item, changes);
+            await UpdateAsync(item);
+            await AfterSaveAsync(item, changes);
         }
 
-        public virtual async Task<bool> Delete(TId id)
+        public virtual async Task<bool> DeleteAsync(TId id)
         {
-            var item = await GetById(id);
+            var item = await GetByIdAsync(id);
             if (item != null)
             {
                 DbContext.Remove(item);
@@ -201,7 +201,7 @@ namespace BioEngine.Core.Repository
             throw new ArgumentException();
         }
 
-        protected virtual async Task<(bool isValid, IList<ValidationFailure> errors)> Validate(T entity,
+        protected virtual async Task<(bool isValid, IList<ValidationFailure> errors)> ValidateAsync(T entity,
             PropertyChange[] changes = null)
         {
             var failures = new List<ValidationFailure>();
@@ -254,7 +254,7 @@ namespace BioEngine.Core.Repository
             return query;
         }
 
-        protected virtual async Task<bool> BeforeValidate(T item,
+        protected virtual async Task<bool> BeforeValidateAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null)
         {
@@ -262,7 +262,7 @@ namespace BioEngine.Core.Repository
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeValidate<T, TId>(item, validationResult, changes))
+                if (!await repositoryFilter.BeforeValidateAsync<T, TId>(item, validationResult, changes))
                 {
                     result = false;
                 }
@@ -271,7 +271,7 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        protected virtual async Task<bool> BeforeSave(T item,
+        protected virtual async Task<bool> BeforeSaveAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null)
         {
@@ -279,7 +279,7 @@ namespace BioEngine.Core.Repository
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeSave<T, TId>(item, validationResult, changes))
+                if (!await repositoryFilter.BeforeSaveAsync<T, TId>(item, validationResult, changes))
                 {
                     result = false;
                 }
@@ -288,13 +288,13 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        protected virtual async Task<bool> AfterSave(T item, PropertyChange[] changes = null)
+        protected virtual async Task<bool> AfterSaveAsync(T item, PropertyChange[] changes = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.AfterSave<T, TId>(item, changes))
+                if (!await repositoryFilter.AfterSaveAsync<T, TId>(item, changes))
                 {
                     result = false;
                 }
@@ -304,7 +304,7 @@ namespace BioEngine.Core.Repository
             {
                 foreach (var val in itemSetting.Settings)
                 {
-                    await SettingsProvider.Set(val.Value, item, val.SiteId);
+                    await SettingsProvider.SetAsync(val.Value, item, val.SiteId);
                 }
             }
 

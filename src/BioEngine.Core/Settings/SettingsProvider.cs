@@ -78,11 +78,11 @@ namespace BioEngine.Core.Settings
         }
 
         [PublicAPI]
-        public async Task<TSettings> Get<TSettings>() where TSettings : SettingsBase, new()
+        public async Task<TSettings> GetAsync<TSettings>() where TSettings : SettingsBase, new()
         {
             var settings = new TSettings();
             var settingsRecord =
-                await LoadFromDatabase<TSettings>();
+                await LoadFromDatabaseAsync<TSettings>();
             if (settingsRecord != null)
             {
                 settings = JsonConvert.DeserializeObject<TSettings>(settingsRecord.Data);
@@ -92,7 +92,7 @@ namespace BioEngine.Core.Settings
         }
 
         [PublicAPI]
-        public async Task<TSettings> Get<TSettings>(IEntity entity, int? siteId = null)
+        public async Task<TSettings> GetAsync<TSettings>(IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
             var settings = entity.Settings.FirstOrDefault(x => x.Key == typeof(TSettings).FullName)?.Settings
@@ -101,7 +101,7 @@ namespace BioEngine.Core.Settings
             {
                 settings = new TSettings();
                 var settingsRecord =
-                    await LoadFromDatabase(settings, entity, siteId);
+                    await LoadFromDatabaseAsync(settings, entity, siteId);
                 if (settingsRecord != null)
                 {
                     settings = JsonConvert.DeserializeObject<TSettings>(settingsRecord.Data);
@@ -112,10 +112,10 @@ namespace BioEngine.Core.Settings
         }
 
         [PublicAPI]
-        public async Task<bool> Set<TSettings>(TSettings settings)
+        public async Task<bool> SetAsync<TSettings>(TSettings settings)
             where TSettings : SettingsBase, new()
         {
-            var record = await LoadFromDatabase<TSettings>();
+            var record = await LoadFromDatabaseAsync<TSettings>();
             if (record == null)
             {
                 record = new SettingsRecord
@@ -134,10 +134,10 @@ namespace BioEngine.Core.Settings
         }
 
         [PublicAPI]
-        public async Task<bool> Set<TSettings>(TSettings settings, IEntity entity, int? siteId = null)
+        public async Task<bool> SetAsync<TSettings>(TSettings settings, IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
-            var record = await LoadFromDatabase(settings, entity);
+            var record = await LoadFromDatabaseAsync(settings, entity);
             if (record == null)
             {
                 record = new SettingsRecord
@@ -162,7 +162,7 @@ namespace BioEngine.Core.Settings
             return true;
         }
 
-        private Task<SettingsRecord> LoadFromDatabase<TSettings>()
+        private Task<SettingsRecord> LoadFromDatabaseAsync<TSettings>()
             where TSettings : SettingsBase, new()
         {
             return _dbContext.Settings.FirstOrDefaultAsync(s =>
@@ -170,7 +170,7 @@ namespace BioEngine.Core.Settings
                 && s.EntityType == null && s.EntityId == null);
         }
 
-        private Task<SettingsRecord> LoadFromDatabase<TSettings>(TSettings settings, IEntity entity, int? siteId = null)
+        private Task<SettingsRecord> LoadFromDatabaseAsync<TSettings>(TSettings settings, IEntity entity, int? siteId = null)
             where TSettings : SettingsBase, new()
         {
             return _dbContext.Settings.FirstOrDefaultAsync(s =>
@@ -179,7 +179,7 @@ namespace BioEngine.Core.Settings
                 (siteId == null || s.SiteId == siteId));
         }
 
-        public async Task LoadSettings<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
+        public async Task LoadSettingsAsync<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
         {
             var entitiesArray = entities as T[] ?? entities.ToArray();
             if (entitiesArray.Any())

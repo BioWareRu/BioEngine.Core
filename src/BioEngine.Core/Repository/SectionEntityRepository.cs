@@ -35,17 +35,17 @@ namespace BioEngine.Core.Repository
             return base.ApplyContext(query, queryContext);
         }
 
-        protected override async Task<bool> BeforeValidate(T item,
+        protected override async Task<bool> BeforeValidateAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null)
         {
-            var result = await base.BeforeValidate(item, validationResult, changes);
+            var result = await base.BeforeValidateAsync(item, validationResult, changes);
 
             if (!result) return false;
 
             if (item.SectionIds != null && item.SectionIds.Any())
             {
-                var sections = (await _sectionsRepository.GetByIds(item.SectionIds)).ToArray();
+                var sections = (await _sectionsRepository.GetByIdsAsync(item.SectionIds)).ToArray();
 
                 if (sections.Any())
                 {

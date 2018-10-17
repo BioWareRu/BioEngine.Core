@@ -17,7 +17,7 @@ namespace BioEngine.Core.Storage
             _options = options.Value;
         }
 
-        protected override Task<bool> DoSave(string path, string tmpPath)
+        protected override Task<bool> DoSaveAsync(string path, string tmpPath)
         {
             var dirPath = Path.GetDirectoryName(path);
             if (!Directory.Exists(dirPath))
@@ -29,7 +29,7 @@ namespace BioEngine.Core.Storage
             return Task.FromResult(true);
         }
 
-        public override Task<bool> DeleteFile(string filePath)
+        public override Task<bool> DeleteFileAsync(string filePath)
         {
             var path = _options.StoragePath + '/' + filePath;
             if (File.Exists(path))

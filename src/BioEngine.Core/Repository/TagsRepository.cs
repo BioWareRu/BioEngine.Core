@@ -11,7 +11,7 @@ namespace BioEngine.Core.Repository
         {
         }
 
-        public override async Task<AddOrUpdateOperationResult<Tag, int>> Add(Tag item)
+        public override async Task<AddOrUpdateOperationResult<Tag, int>> AddAsync(Tag item)
         {
             var existingTag = await DbContext.Tags.FirstOrDefaultAsync(t => t.Name == item.Name);
             if (existingTag != null)
@@ -19,7 +19,7 @@ namespace BioEngine.Core.Repository
                 return new AddOrUpdateOperationResult<Tag, int>(existingTag, new ValidationFailure[0]);
             }
 
-            return await base.Add(item);
+            return await base.AddAsync(item);
         }
     }
 }

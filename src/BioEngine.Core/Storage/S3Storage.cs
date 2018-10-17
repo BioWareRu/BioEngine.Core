@@ -35,7 +35,7 @@ namespace BioEngine.Core.Storage
             _client = new AmazonS3Client(_options.AccessKey, _options.SecretKey, config);
         }
 
-        private async Task<bool> CreateBucket(string bucketName)
+        private async Task<bool> CreateBucketAsync(string bucketName)
         {
             try
             {
@@ -60,9 +60,9 @@ namespace BioEngine.Core.Storage
             return true;
         }
 
-        protected override async Task<bool> DoSave(string path, string tmpPath)
+        protected override async Task<bool> DoSaveAsync(string path, string tmpPath)
         {
-            await CreateBucket(_options.Bucket);
+            await CreateBucketAsync(_options.Bucket);
             var fileTransferUtility =
                 new TransferUtility(_client);
             try
@@ -83,7 +83,7 @@ namespace BioEngine.Core.Storage
             }
         }
 
-        public override async Task<bool> DeleteFile(string filePath)
+        public override async Task<bool> DeleteFileAsync(string filePath)
         {
             try
             {

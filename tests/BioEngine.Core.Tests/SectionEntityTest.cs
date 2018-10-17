@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
@@ -7,6 +8,7 @@ using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
 {
+    [SuppressMessage("AsyncUsage.CSharp.Naming", "UseAsyncSuffix", Justification = "Reviewed.")]
     public class SectionEntityTest : CoreTest
     {
         public SectionEntityTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -25,7 +27,7 @@ namespace BioEngine.Core.Tests
                 Url = "content2"
             };
 
-            var result = await repository.Add(content);
+            var result = await repository.AddAsync(content);
             Assert.False(result.IsSuccess);
             var error = result.Errors.FirstOrDefault(e => e.PropertyName == nameof(content.SectionIds));
             Assert.NotNull(error);
@@ -37,7 +39,7 @@ namespace BioEngine.Core.Tests
             var context = CreateDbContext();
             var repository = GetContentRepository(context);
             var sectionRepository = GetSectionsRepository(context);
-            var section = (await sectionRepository.GetAll(new QueryContext<TestSection, int>())).items.First();
+            var section = (await sectionRepository.GetAllAsync(new QueryContext<TestSection, int>())).items.First();
 
             Assert.NotEmpty(section.SiteIds);
 
@@ -50,7 +52,7 @@ namespace BioEngine.Core.Tests
             };
 
             Assert.Empty(content.SiteIds);
-            var result = await repository.Add(content);
+            var result = await repository.AddAsync(content);
             Assert.True(result.IsSuccess, $"Errors: {result.ErrorsString}");
             Assert.NotEmpty(content.SiteIds);
             Assert.Equal(section.SiteIds, content.SiteIds);

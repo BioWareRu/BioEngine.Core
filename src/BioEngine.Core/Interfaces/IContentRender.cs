@@ -5,6 +5,6 @@ namespace BioEngine.Core.Interfaces
 {
     public interface IContentRender
     {
-        Task<string> RenderHtml(ContentItem contentItem);
+        Task<string> RenderHtmlAsync(ContentItem contentItem);
     }
 }

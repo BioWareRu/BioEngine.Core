@@ -6,8 +6,8 @@ namespace BioEngine.Core.Interfaces
 {
     public interface IStorage
     {
-        Task<StorageItem> SaveFile(byte[] file, string fileName, string path);
-        Task<bool> DeleteFile(string filePath);
+        Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path);
+        Task<bool> DeleteFileAsync(string filePath);
     }
 
     public interface IStorageOptions

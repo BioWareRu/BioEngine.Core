@@ -6,6 +6,6 @@ namespace BioEngine.Core.Settings
     public interface ISettingsOptionsResolver
     {
         bool CanResolve(SettingsBase settings);
-        Task<List<SettingsOption>> Resolve(SettingsBase settings, string property);
+        Task<List<SettingsOption>> ResolveAsync(SettingsBase settings, string property);
     }
 }

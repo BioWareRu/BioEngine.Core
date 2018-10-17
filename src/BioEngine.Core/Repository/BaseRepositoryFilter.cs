@@ -10,21 +10,21 @@ namespace BioEngine.Core.Repository
     {
         public abstract bool CanProcess(Type type);
 
-        public virtual Task<bool> BeforeValidate<T, TId>(T item,
+        public virtual Task<bool> BeforeValidateAsync<T, TId>(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null) where T : class, IEntity<TId>
         {
             return Task.FromResult(true);
         }
 
-        public virtual Task<bool> BeforeSave<T, TId>(T item,
+        public virtual Task<bool> BeforeSaveAsync<T, TId>(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null) where T : class, IEntity<TId>
         {
             return Task.FromResult(true);
         }
 
-        public virtual Task<bool> AfterSave<T, TId>(T item, PropertyChange[] changes = null)
+        public virtual Task<bool> AfterSaveAsync<T, TId>(T item, PropertyChange[] changes = null)
             where T : class, IEntity<TId>
         {
             return Task.FromResult(true);
