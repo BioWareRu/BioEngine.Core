@@ -27,7 +27,8 @@ namespace BioEngine.Core.Tests
 
             var result = await repository.Add(content);
             Assert.False(result.IsSuccess);
-            Assert.True(result.Errors.Any(e => e.PropertyName == nameof(content.SectionIds)));
+            var error = result.Errors.FirstOrDefault(e => e.PropertyName == nameof(content.SectionIds));
+            Assert.NotNull(error);
         }
 
         [Fact]

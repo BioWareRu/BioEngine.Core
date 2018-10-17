@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Repository;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
@@ -115,10 +116,9 @@ namespace BioEngine.Core.Tests
             var changes = repository.GetChanges(site);
 
             Assert.NotEmpty(changes);
-            Assert.True(changes.Any(x => x.Name == nameof(site.Title)));
 
-            var change = changes.First(x => x.Name == nameof(site.Title));
-
+            var change = changes.FirstOrDefault(x => x.Name == nameof(site.Title));
+            Assert.NotEqual(default(PropertyChange), change);
             Assert.Equal(originalTitle, change.OriginalValue);
             Assert.Equal(newTitle, change.CurrentValue);
         }
