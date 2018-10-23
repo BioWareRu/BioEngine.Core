@@ -1,21 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BioEngine.Core.Interfaces;
-using BioEngine.Core.Settings;
 
 namespace BioEngine.Core.Entities
 {
-    public class SettingsRecord : IEntity<int>
+    public class SettingsRecord : BaseEntity<int>
     {
-        public object GetId() => Id;
-
-        [Key] public int Id { get; set; }
-        [Required] public DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
-        [Required] public DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
-        public bool IsPublished { get; set; } = true;
-        public DateTimeOffset? DatePublished { get; set; } = DateTimeOffset.UtcNow;
         [Required] public string Key { get; set; }
         public string EntityType { get; set; }
         public string EntityId { get; set; }
@@ -24,7 +13,5 @@ namespace BioEngine.Core.Entities
         [Column(TypeName = "jsonb")]
         [Required]
         public string Data { get; set; }
-
-        [NotMapped] public List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
     }
 }
