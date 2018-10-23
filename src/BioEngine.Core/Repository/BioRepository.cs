@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
@@ -249,6 +250,32 @@ namespace BioEngine.Core.Repository
                         ? query.OrderByDescending(e => EF.Property<T>(e, sortQuery.propertyName))
                         : query.OrderBy(e => EF.Property<T>(e, sortQuery.propertyName));
                 }
+            }
+            
+            if (queryContext.ConditionsGroups.Any())
+            {
+                var where = new List<string>();
+                var valueIndex = 0;
+                var values = new List<object>();
+                foreach (var conditionsGroup in queryContext.ConditionsGroups)
+                {
+                    var groupWhere = new List<string>();
+                    foreach (var condition in conditionsGroup.Conditions)
+                    {
+                        var expression = condition.GetExpression(valueIndex);
+                        if (!string.IsNullOrEmpty(expression))
+                        {
+                            groupWhere.Add(expression);
+                            values.Add(condition.Value);
+                            valueIndex++;
+                        }
+                    }
+
+                    where.Add($"({string.Join(" OR ", groupWhere)})");
+                }
+
+                var whereStr = string.Join(" AND ", where);
+                query = query.Where(whereStr, values.ToArray());
             }
 
             return query;

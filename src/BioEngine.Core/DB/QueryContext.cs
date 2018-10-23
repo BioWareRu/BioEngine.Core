@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,9 @@ namespace BioEngine.Core.DB
 
         internal List<(string propertyName, bool isDescending)> SortQueries { get; private set; } =
             new List<(string propertyName, bool isDescending)>();
+        
+        internal List<QueryContextConditionsGroup> ConditionsGroups { get; } =
+            new List<QueryContextConditionsGroup>();
 
         public void SetSite(Site site)
         {
@@ -31,7 +35,7 @@ namespace BioEngine.Core.DB
         {
             SectionId = section.Id;
         }
-        
+
         public void SetTag(Tag tag)
         {
             TagId = tag.Id;
@@ -67,30 +71,93 @@ namespace BioEngine.Core.DB
                         p = p.Substring(1);
                     }
 
-                    var propertyName = FieldsResolver.GetPropertyName<T>(p);
-                    if (!string.IsNullOrEmpty(propertyName))
+                    var propertyName = FieldsResolver.GetPropertyInfo<T>(p);
+                    if (propertyName.HasValue)
                     {
-                        sortParameters.Add((propertyName, isDescending));
+                        sortParameters.Add((propertyName.Value.name, isDescending));
                     }
                 });
             }
 
             return sortParameters;
         }
+
+        public void SetWhere(IEnumerable<QueryContextConditionsGroup> conditionsGroups)
+        {
+            if (conditionsGroups == null) return;
+            foreach (var conditionsGroup in conditionsGroups)
+            {
+                var group = new QueryContextConditionsGroup(new List<QueryContextCondition>());
+                foreach (var condition in conditionsGroup.Conditions)
+                {
+                    var propertyInfo = FieldsResolver.GetPropertyInfo<T>(condition.Property);
+                    if (propertyInfo != null)
+                    {
+                        condition.Property = propertyInfo.Value.name;
+                        condition.ValueType = propertyInfo.Value.type;
+                        condition.Value = ParsePropertyValue(condition.ValueType, condition.Value);
+                        group.Conditions.Add(condition);
+                    }
+                }
+
+                if (group.Conditions.Any())
+                {
+                    ConditionsGroups.Add(group);
+                }
+            }
+        }
+
+        private static object ParsePropertyValue(Type propertyType, object value)
+        {
+            if (value == null) return null;
+            object parsedValue = null;
+            if (propertyType.IsNullable())
+            {
+                propertyType = Nullable.GetUnderlyingType(propertyType);
+            }
+
+            if (propertyType.IsEnum)
+            {
+                var enumType = propertyType;
+                var parsed = int.TryParse(value.ToString(), out var intValue);
+
+                if (Enum.IsDefined(enumType, value.ToString()) || (parsed && Enum.IsDefined(enumType, intValue)))
+                    parsedValue = Enum.Parse(enumType, value.ToString());
+            }
+
+            else if (propertyType == typeof(bool))
+                parsedValue = value.ToString() == "1" ||
+                              value.ToString() == "true" ||
+                              value.ToString() == "on" ||
+                              value.ToString() == "checked";
+            else if (propertyType == typeof(Uri))
+                parsedValue = new Uri(Convert.ToString(value));
+            else if (propertyType == typeof(DateTimeOffset) || propertyType == typeof(DateTimeOffset?))
+            {
+                if (DateTimeOffset.TryParse(value.ToString(), out var dto))
+                {
+                    parsedValue = dto;
+                }
+            }
+            else parsedValue = Convert.ChangeType(value.ToString(), propertyType);
+
+            return parsedValue;
+        }
     }
 
     internal static class FieldsResolver
     {
-        private static readonly ConcurrentDictionary<string, Dictionary<string, string>> Properties =
-            new ConcurrentDictionary<string, Dictionary<string, string>>();
+        private static readonly ConcurrentDictionary<string, Dictionary<string, (string name, Type type)>> Properties =
+            new ConcurrentDictionary<string, Dictionary<string, (string name, Type type)>>();
 
-        internal static string GetPropertyName<T>(string name)
+        internal static (string name, Type type)? GetPropertyInfo<T>(string name)
         {
             var typeName = typeof(T).Name;
             if (!Properties.ContainsKey(typeName))
             {
                 Properties.TryAdd(typeName,
-                    typeof(T).GetProperties().ToDictionary(p => p.Name.ToLowerInvariant(), p => p.Name));
+                    typeof(T).GetProperties()
+                        .ToDictionary(p => p.Name.ToLowerInvariant(), p => (p.Name, p.PropertyType)));
             }
 
             name = name.ToLowerInvariant();
@@ -120,5 +187,85 @@ namespace BioEngine.Core.DB
             Name = name;
             SortDirection = sortDirection;
         }
+    }
+
+    public enum QueryContextOperator
+    {
+        Equal = 1,
+        NotEqual = 2,
+        Greater = 3,
+        GreaterOrEqual = 4,
+        Less = 5,
+        LessOrEqual = 6,
+        Contains = 7,
+        StartsWith = 8,
+        EndsWith = 9
+    }
+
+    public class QueryContextConditionsGroup
+    {
+        public QueryContextConditionsGroup(List<QueryContextCondition> conditions)
+        {
+            Conditions = conditions;
+        }
+
+        public List<QueryContextCondition> Conditions { get; }
+    }
+
+    public class QueryContextCondition
+    {
+        public string Property { get; set; }
+        public QueryContextOperator Operator { get; set; }
+        public object Value { get; set; }
+        public Type ValueType { get; set; }
+
+        public string GetExpression(int valueIndex)
+        {
+            switch (Operator)
+            {
+                case QueryContextOperator.Equal:
+                    return $"{Property} == @{valueIndex}";
+                case QueryContextOperator.NotEqual:
+                    return $"{Property} != @{valueIndex}";
+                case QueryContextOperator.Greater:
+                    return $"{Property} > @{valueIndex}";
+                case QueryContextOperator.GreaterOrEqual:
+                    return $"{Property} >= @{valueIndex}";
+                case QueryContextOperator.Less:
+                    return $"{Property} < @{valueIndex}";
+                case QueryContextOperator.LessOrEqual:
+                    return $"{Property} <= @{valueIndex}";
+                case QueryContextOperator.Contains:
+                    if (ValueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(ValueType))
+                    {
+                        return $"{Property}.Contains(@{valueIndex})";
+                    }
+
+                    break;
+                case QueryContextOperator.StartsWith:
+                    if (ValueType == typeof(string))
+                    {
+                        return $"{Property}.StartsWith(@{valueIndex})";
+                    }
+
+                    break;
+                case QueryContextOperator.EndsWith:
+                    if (ValueType == typeof(string))
+                    {
+                        return $"{Property}.EndsWith(@{valueIndex})";
+                    }
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return null;
+        }
+    }
+
+    public static class TypeExtensions
+    {
+        public static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
     }
 }
