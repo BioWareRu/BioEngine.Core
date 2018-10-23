@@ -22,7 +22,7 @@ namespace BioEngine.Core.DB
 
         internal List<(string propertyName, bool isDescending)> SortQueries { get; private set; } =
             new List<(string propertyName, bool isDescending)>();
-        
+
         internal List<QueryContextConditionsGroup> ConditionsGroups { get; } =
             new List<QueryContextConditionsGroup>();
 
@@ -111,9 +111,10 @@ namespace BioEngine.Core.DB
         {
             if (value == null) return null;
             object parsedValue = null;
-            if (propertyType.IsNullable())
+            var nullableType = Nullable.GetUnderlyingType(propertyType);
+            if (nullableType != null)
             {
-                propertyType = Nullable.GetUnderlyingType(propertyType);
+                propertyType = nullableType;
             }
 
             if (propertyType.IsEnum)
@@ -262,10 +263,5 @@ namespace BioEngine.Core.DB
 
             return null;
         }
-    }
-
-    public static class TypeExtensions
-    {
-        public static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
     }
 }
