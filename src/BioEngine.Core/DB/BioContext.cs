@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,6 +25,7 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Site> Sites { get; set; }
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
+        [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<SettingsRecord> Settings { get; set; }
@@ -35,6 +37,7 @@ namespace BioEngine.Core.DB
 
             RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.Logo);
             RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.LogoSmall);
+            RegisterJsonConversion<Menu, List<MenuItem>>(modelBuilder, s => s.Items);
             if (Database.IsInMemory())
             {
                 RegisterSiteEntityConversions<Page, int>(modelBuilder);
