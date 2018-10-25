@@ -2,8 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
-using BioEngine.Core.Settings;
 using BioEngine.Core.Tests.Fixtures;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,35 +80,35 @@ namespace BioEngine.Core.Tests
             return GetDbContext(databaseName, init);
         }
 
-        private SettingsProvider GetSettingsProvider(BioContext dbContext)
+        private PropertiesProvider GetPropertiesProvider(BioContext dbContext)
         {
-            var provider = new SettingsProvider(dbContext);
-            //init settings
+            var provider = new PropertiesProvider(dbContext);
+            //init properties
             return provider;
         }
 
         protected SitesRepository GetSitesRepository(BioContext context)
         {
-            var settingsProvider = GetSettingsProvider(context);
-            var repositoryContext = new BioRepositoryContext<Site, int>(context, settingsProvider);
+            var propertiesProvider = GetPropertiesProvider(context);
+            var repositoryContext = new BioRepositoryContext<Site, int>(context, propertiesProvider);
             var repository = new SitesRepository(repositoryContext);
             return repository;
         }
 
         protected SectionRepository GetSectionsRepository(BioContext context)
         {
-            var settingsProvider = GetSettingsProvider(context);
-            var repositoryContext = new BioRepositoryContext<TestSection, int>(context, settingsProvider);
+            var propertiesProvider = GetPropertiesProvider(context);
+            var repositoryContext = new BioRepositoryContext<TestSection, int>(context, propertiesProvider);
             var repository = new SectionRepository(repositoryContext);
             return repository;
         }
 
         protected ContentRepository GetContentRepository(BioContext context)
         {
-            var settingsProvider = GetSettingsProvider(context);
-            var repositoryContext = new BioRepositoryContext<TestContent, int>(context, settingsProvider);
+            var propertiesProvider = GetPropertiesProvider(context);
+            var repositoryContext = new BioRepositoryContext<TestContent, int>(context, propertiesProvider);
             var repository = new ContentRepository(repositoryContext,
-                new SectionsRepository(new BioRepositoryContext<Section, int>(context, settingsProvider)));
+                new SectionsRepository(new BioRepositoryContext<Section, int>(context, propertiesProvider)));
             return repository;
         }
     }

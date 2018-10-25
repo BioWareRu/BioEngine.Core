@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Interfaces
 {
     public interface IEntity
     {
         object GetId();
-        List<SettingsEntry> Settings { get; set; }
+        List<PropertiesEntry> Properties { get; set; }
     }
 
     public interface IEntity<TId> : IEntity

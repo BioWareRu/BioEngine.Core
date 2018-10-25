@@ -1,6 +1,6 @@
-namespace BioEngine.Core.Settings
+namespace BioEngine.Core.Properties
 {
-    public enum SettingType
+    public enum PropertyElementType
     {
         String = 1,
         HtmlString = 2,

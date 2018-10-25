@@ -1,11 +1,11 @@
 using JetBrains.Annotations;
 
-namespace BioEngine.Core.Settings
+namespace BioEngine.Core.Properties
 {
     [PublicAPI]
-    public class SettingsOption
+    public class PropertiesOption
     {
-        public SettingsOption(string title, object value, string group)
+        public PropertiesOption(string title, object value, string group)
         {
             Title = title;
             Value = value;

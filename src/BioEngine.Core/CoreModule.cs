@@ -5,9 +5,9 @@ using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Modules;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Seo;
-using BioEngine.Core.Settings;
 using BioEngine.Core.Storage;
 using BioEngine.Core.Web;
 using FluentValidation;
@@ -138,10 +138,10 @@ namespace BioEngine.Core
 
         private static void AddSeo()
         {
-            SettingsProvider.RegisterBioEngineSectionSettings<SeoSettings>();
-            SettingsProvider.RegisterBioEngineContentSettings<SeoSettings>();
-            SettingsProvider.RegisterBioEngineSettings<SeoSettings, Site>();
-            SettingsProvider.RegisterBioEngineSettings<SeoSettings, Page>();
+            PropertiesProvider.RegisterBioEngineSectionProperties<SeoPropertiesSet>();
+            PropertiesProvider.RegisterBioEngineContentProperties<SeoPropertiesSet>();
+            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Site>();
+            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Page>();
         }
 
         private void AddValidation(IServiceCollection services)
@@ -186,7 +186,7 @@ namespace BioEngine.Core
                 }
             });
 
-            services.AddScoped<SettingsProvider>();
+            services.AddScoped<PropertiesProvider>();
 
             // collect defined types
             var assembliesList = new List<Assembly>(Config.Assemblies)

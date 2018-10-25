@@ -1,8 +1,8 @@
-namespace BioEngine.Core.Settings
+namespace BioEngine.Core.Properties
 {
-    public class SettingsPropertySchema
+    public class PropertiesElementSchema
     {
-        public SettingsPropertySchema(string key, string name, SettingType type, bool isRequired)
+        public PropertiesElementSchema(string key, string name, PropertyElementType type, bool isRequired)
         {
             Key = key;
             Name = name;
@@ -12,7 +12,7 @@ namespace BioEngine.Core.Settings
 
         public string Key { get; set; }
         public string Name { get; set; }
-        public SettingType Type { get; set; }
+        public PropertyElementType Type { get; set; }
         public bool IsRequired { get; set; }
     }
 }

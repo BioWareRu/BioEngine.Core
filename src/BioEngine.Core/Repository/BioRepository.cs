@@ -5,7 +5,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Validation;
 using FluentValidation;
 using FluentValidation.Results;
@@ -20,14 +20,14 @@ namespace BioEngine.Core.Repository
         internal readonly BioContext DbContext;
         protected readonly List<IValidator<T>> Validators;
         protected readonly List<IRepositoryFilter> Filters;
-        protected readonly SettingsProvider SettingsProvider;
+        protected readonly PropertiesProvider PropertiesProvider;
 
         protected BioRepository(BioRepositoryContext<T, TId> repositoryContext)
         {
             DbContext = repositoryContext.DbContext;
             Validators = repositoryContext.Validators ?? new List<IValidator<T>>();
             Filters = repositoryContext.Filters ?? new List<IRepositoryFilter>();
-            SettingsProvider = repositoryContext.SettingsProvider;
+            PropertiesProvider = repositoryContext.PropertiesProvider;
 
             Init();
         }
@@ -74,7 +74,7 @@ namespace BioEngine.Core.Repository
 
         protected virtual async Task AfterLoadAsync(IEnumerable<T> entities)
         {
-            await SettingsProvider.LoadSettingsAsync<T, TId>(entities);
+            await PropertiesProvider.LoadPropertiesAsync<T, TId>(entities);
         }
 
         public virtual async Task<int> CountAsync(QueryContext<T, TId> queryContext = null,
@@ -327,11 +327,11 @@ namespace BioEngine.Core.Repository
                 }
             }
 
-            foreach (var itemSetting in item.Settings)
+            foreach (var propertiesEntry in item.Properties)
             {
-                foreach (var val in itemSetting.Settings)
+                foreach (var val in propertiesEntry.Properties)
                 {
-                    await SettingsProvider.SetAsync(val.Value, item, val.SiteId);
+                    await PropertiesProvider.SetAsync(val.Value, item, val.SiteId);
                 }
             }
 

@@ -28,7 +28,7 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
-        public DbSet<SettingsRecord> Settings { get; set; }
+        public DbSet<PropertiesRecord> Properties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

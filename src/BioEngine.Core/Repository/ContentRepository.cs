@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Users;
 using JetBrains.Annotations;
 
 namespace BioEngine.Core.Repository
 {
     [UsedImplicitly]
-    public class ContentRepository : SectionEntityRepository<ContentItem, int>
+    public class ContentRepository : ContentItemRepository<ContentItem, int>
     {
         public ContentRepository(BioRepositoryContext<ContentItem, int> repositoryContext,
-            SectionsRepository sectionsRepository) : base(repositoryContext,
-            sectionsRepository)
+            SectionsRepository sectionsRepository, IUserDataProvider userDataProvider = null) : base(repositoryContext,
+            sectionsRepository, userDataProvider)
         {
         }
 

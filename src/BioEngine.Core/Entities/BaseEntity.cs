@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Settings;
+using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Entities
 {
@@ -17,7 +17,7 @@ namespace BioEngine.Core.Entities
 
         public virtual object GetId() => Id;
 
-        [NotMapped] public virtual List<SettingsEntry> Settings { get; set; } = new List<SettingsEntry>();
+        [NotMapped] public virtual List<PropertiesEntry> Properties { get; set; } = new List<PropertiesEntry>();
     }
 
     public abstract class BaseSiteEntity<T> : BaseEntity<T>, ISiteEntity<T>

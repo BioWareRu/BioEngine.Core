@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BioEngine.Core.Entities
 {
-    public class SettingsRecord : BaseEntity<int>
+    public class PropertiesRecord : BaseEntity<int>
     {
         [Required] public string Key { get; set; }
         public string EntityType { get; set; }
