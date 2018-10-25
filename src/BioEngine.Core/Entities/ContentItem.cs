@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Users;
 
 namespace BioEngine.Core.Entities
 {
@@ -17,6 +18,7 @@ namespace BioEngine.Core.Entities
         public virtual int[] TagIds { get; set; } = new int[0];
 
         [NotMapped] public string PublicUrl => $"/content/{Id}-{Url}.html";
+        [NotMapped] public UserData Author { get; set; }
     }
 
     public abstract class ContentItem<T> : ContentItem, ITypedEntity<T> where T : TypedData, new()

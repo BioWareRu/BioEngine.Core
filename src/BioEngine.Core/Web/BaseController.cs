@@ -1,5 +1,6 @@
 ﻿using BioEngine.Core.Interfaces;
 using BioEngine.Core.Settings;
+using BioEngine.Core.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
