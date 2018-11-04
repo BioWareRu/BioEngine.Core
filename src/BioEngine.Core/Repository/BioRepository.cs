@@ -72,6 +72,11 @@ namespace BioEngine.Core.Repository
             return (items, itemsCount);
         }
 
+        protected virtual Task AfterLoadAsync(T entity)
+        {
+            return entity != null ? AfterLoadAsync(new[] {entity}) : Task.CompletedTask;
+        }
+
         protected virtual async Task AfterLoadAsync(IEnumerable<T> entities)
         {
             await PropertiesProvider.LoadPropertiesAsync<T, TId>(entities);
@@ -93,14 +98,14 @@ namespace BioEngine.Core.Repository
         public virtual async Task<T> GetByIdAsync(TId id, QueryContext<T, TId> queryContext = null)
         {
             var item = await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
-            await AfterLoadAsync(new[] {item});
+            await AfterLoadAsync(item);
             return item;
         }
 
         public virtual async Task<T> NewAsync()
         {
             var item = Activator.CreateInstance<T>();
-            await AfterLoadAsync(new[] {item});
+            await AfterLoadAsync(item);
             return item;
         }
 
@@ -251,7 +256,7 @@ namespace BioEngine.Core.Repository
                         : query.OrderBy(e => EF.Property<T>(e, sortQuery.propertyName));
                 }
             }
-            
+
             if (queryContext.ConditionsGroups.Any())
             {
                 var where = new List<string>();
