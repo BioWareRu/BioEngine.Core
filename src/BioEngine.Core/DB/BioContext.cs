@@ -56,11 +56,11 @@ namespace BioEngine.Core.DB
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.Type);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url);
 
-            var dataConversionRegistrationMethod = GetType().GetMethod(nameof(RegisterDataConversion),
+            var dataConversionRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterDataConversion),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-            var siteConversionsRegistrationMethod = GetType().GetMethod(nameof(RegisterSiteEntityConversions),
+            var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-            var sectionConversionsRegistrationMethod = GetType().GetMethod(nameof(RegisterSectionEntityConversions),
+            var sectionConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSectionEntityConversions),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             var metadataEntities = this.GetInfrastructure().GetServices<EntityMetadata>()?.ToArray();
             if (metadataEntities != null)
