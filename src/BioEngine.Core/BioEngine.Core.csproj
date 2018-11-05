@@ -15,7 +15,7 @@
         <PackageReference Include="Roslynator.CodeFixes" Version="2.0.0" />
         <PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" />
         <PackageReference Include="PublicApiAnalyzer" Version="1.0.0-beta001" />
-        <PackageReference Include="ReflectionAnalyzers" Version="0.1.16-dev" />
+        <PackageReference Include="ReflectionAnalyzers" Version="0.1.17-dev" />
         <PackageReference Include="Scrutor" Version="3.0.1" />
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
