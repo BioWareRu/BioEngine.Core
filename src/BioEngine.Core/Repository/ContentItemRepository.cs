@@ -26,7 +26,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new ContentItemValidator<T>());
         }
 
-        protected override async Task AfterLoadAsync(IEnumerable<T> entities)
+        protected override async Task AfterLoadAsync(T[] entities)
         {
             if (_userDataProvider != null)
             {

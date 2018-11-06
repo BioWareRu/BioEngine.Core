@@ -32,7 +32,7 @@ namespace BioEngine.Core.Repository
             return base.ApplyContext(query, queryContext);
         }
 
-        public override async Task<(List<T> items, int itemsCount)> GetAllAsync(QueryContext<T, TId> queryContext = null,
+        public override async Task<(T[] items, int itemsCount)> GetAllAsync(QueryContext<T, TId> queryContext = null,
             Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
         {
             var entities = await base.GetAllAsync(queryContext, addConditionsCallback);

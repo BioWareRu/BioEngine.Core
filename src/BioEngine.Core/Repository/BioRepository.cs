@@ -42,7 +42,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new EntityValidator<TId>());
         }
 
-        public virtual async Task<(List<T> items, int itemsCount)> GetAllAsync(QueryContext<T, TId> queryContext = null,
+        public virtual async Task<(T[] items, int itemsCount)> GetAllAsync(QueryContext<T, TId> queryContext = null,
             Func<IQueryable<T>, IQueryable<T>> addConditionsCallback = null)
         {
             var itemsCount = await CountAsync(queryContext, addConditionsCallback);
@@ -66,7 +66,7 @@ namespace BioEngine.Core.Repository
                 }
             }
 
-            var items = await query.ToListAsync();
+            var items = await query.ToArrayAsync();
             await AfterLoadAsync(items);
 
             return (items, itemsCount);
@@ -77,7 +77,7 @@ namespace BioEngine.Core.Repository
             return entity != null ? AfterLoadAsync(new[] {entity}) : Task.CompletedTask;
         }
 
-        protected virtual async Task AfterLoadAsync(IEnumerable<T> entities)
+        protected virtual async Task AfterLoadAsync(T[] entities)
         {
             await PropertiesProvider.LoadPropertiesAsync<T, TId>(entities);
         }
@@ -109,9 +109,9 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
-        public virtual async Task<IEnumerable<T>> GetByIdsAsync(TId[] ids, QueryContext<T, TId> queryContext = null)
+        public virtual async Task<T[]> GetByIdsAsync(TId[] ids, QueryContext<T, TId> queryContext = null)
         {
-            var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToListAsync();
+            var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToArrayAsync();
             await AfterLoadAsync(items);
 
             return items;

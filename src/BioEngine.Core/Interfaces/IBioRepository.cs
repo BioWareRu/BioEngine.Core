@@ -13,7 +13,7 @@ namespace BioEngine.Core.Interfaces
 
     public interface IBioRepository<TEntity, TPk> : IBioRepository where TEntity : class, IEntity<TPk>
     {
-        Task<(List<TEntity> items, int itemsCount)> GetAllAsync(QueryContext<TEntity, TPk> queryContext = null,
+        Task<(TEntity[] items, int itemsCount)> GetAllAsync(QueryContext<TEntity, TPk> queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> addConditionsCallback = null);
 
         Task<int> CountAsync(QueryContext<TEntity, TPk> queryContext = null,
@@ -23,7 +23,7 @@ namespace BioEngine.Core.Interfaces
 
         Task<TEntity> NewAsync();
 
-        Task<IEnumerable<TEntity>> GetByIdsAsync(TPk[] ids, QueryContext<TEntity, TPk> queryContext = null);
+        Task<TEntity[]> GetByIdsAsync(TPk[] ids, QueryContext<TEntity, TPk> queryContext = null);
 
         Task<AddOrUpdateOperationResult<TEntity, TPk>> AddAsync(TEntity item);
 
