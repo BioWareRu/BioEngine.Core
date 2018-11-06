@@ -30,6 +30,6 @@ steps:
     inputs:
       command: push
       nuGetFeedType: 'internal'
-      publishVstsFeed: 'BW'
+      publishVstsFeed: 'BioEngine'
       versioningScheme: byEnvVar
       versionEnvVar: 'Version'
