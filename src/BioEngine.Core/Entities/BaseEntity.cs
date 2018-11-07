@@ -24,4 +24,9 @@ namespace BioEngine.Core.Entities
     {
         public virtual int[] SiteIds { get; set; } = new int[0];
     }
+    
+    public abstract class BaseSingleSiteEntity<T> : BaseEntity<T>, ISingleSiteEntity<T>
+    {
+        public virtual int SiteId { get; set; }
+    }
 }

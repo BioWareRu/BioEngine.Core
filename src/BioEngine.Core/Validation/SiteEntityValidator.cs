@@ -12,4 +12,13 @@ namespace BioEngine.Core.Validation
             RuleFor(e => e.SiteIds).NotEmpty();
         }
     }
+    
+    [UsedImplicitly]
+    internal class SingleSiteEntityValidator<T, TId> : AbstractValidator<T> where T : ISingleSiteEntity<TId>
+    {
+        public SingleSiteEntityValidator()
+        {
+            RuleFor(e => e.SiteId).NotEmpty().GreaterThan(0);
+        }
+    }
 }

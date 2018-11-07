@@ -24,6 +24,12 @@ namespace BioEngine.Core.Interfaces
         TId Id { get; set; }
         int[] SiteIds { get; set; }
     }
+    
+    public interface ISingleSiteEntity<TId>
+    {
+        TId Id { get; set; }
+        int SiteId { get; set; }
+    }
 
     public interface ISectionEntity<TId>
     {
