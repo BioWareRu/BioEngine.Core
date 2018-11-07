@@ -41,7 +41,6 @@ namespace BioEngine.Core.DB
             if (Database.IsInMemory())
             {
                 RegisterSiteEntityConversions<Page, int>(modelBuilder);
-                RegisterSiteEntityConversions<Menu, int>(modelBuilder);
             }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
