@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
+using BioEngine.Core.Entities;
+using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Tests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,7 +24,7 @@ namespace BioEngine.Core.Tests
             var context = CreateDbContext();
             var repository = GetContentRepository(context);
 
-            var content = new TestContent
+            var content = new Post
             {
                 Title = "Test Content 2",
                 Url = "content2"
@@ -43,12 +46,22 @@ namespace BioEngine.Core.Tests
 
             Assert.NotEmpty(section.SiteIds);
 
-            var content = new TestContent
+            var content = new Post
             {
                 Title = "Test Content 2",
                 Url = "content2",
                 SectionIds = new[] {section.Id},
-                AuthorId = 1
+                AuthorId = 1,
+                Blocks = new List<PostBlock>
+                {
+                    new TextBlock
+                    {
+                        Data = new TextBlockData
+                        {
+                            Text = "Bla"
+                        }
+                    }
+                }
             };
 
             Assert.Empty(content.SiteIds);

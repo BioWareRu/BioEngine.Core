@@ -41,7 +41,6 @@ namespace BioEngine.Core.Interfaces
     public interface IContentEntity<TId>
     {
         TId Id { get; set; }
-        string Type { get; set; }
         int AuthorId { get; set; }
         string Title { get; set; }
         string Url { get; set; }

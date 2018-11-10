@@ -7,16 +7,16 @@ using JetBrains.Annotations;
 namespace BioEngine.Core.Repository
 {
     [UsedImplicitly]
-    public class ContentRepository : ContentItemRepository<ContentItem, int>
+    public class ContentRepository : ContentItemRepository<Post, int>
     {
-        public ContentRepository(BioRepositoryContext<ContentItem, int> repositoryContext,
+        public ContentRepository(BioRepositoryContext<Post, int> repositoryContext,
             SectionsRepository sectionsRepository, IUserDataProvider userDataProvider = null) : base(repositoryContext,
             sectionsRepository, userDataProvider)
         {
         }
 
-        protected override IQueryable<ContentItem> ApplyContext(IQueryable<ContentItem> query,
-            QueryContext<ContentItem, int> queryContext)
+        protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
+            QueryContext<Post, int> queryContext)
         {
             if ((queryContext?.TagId).HasValue)
             {

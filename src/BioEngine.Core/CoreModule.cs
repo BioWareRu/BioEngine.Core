@@ -194,7 +194,6 @@ namespace BioEngine.Core
             var types = new HashSet<TypeInfo>();
             foreach (var assembly in assembliesList)
             {
-                
                 foreach (var definedType in assembly.DefinedTypes)
                 {
                     types.Add(definedType);    
