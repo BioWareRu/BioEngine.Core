@@ -26,7 +26,7 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
-
+        public DbSet<PostBlock> Blocks { get; set; }
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<PropertiesRecord> Properties { get; set; }
 
@@ -41,6 +41,8 @@ namespace BioEngine.Core.DB
             if (Database.IsInMemory())
             {
                 RegisterSiteEntityConversions<Page, int>(modelBuilder);
+                RegisterSiteEntityConversions<Post, int>(modelBuilder);
+                RegisterSectionEntityConversions<Post, int>(modelBuilder);
             }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
@@ -48,18 +50,15 @@ namespace BioEngine.Core.DB
             modelBuilder.Entity<Section>().HasIndex(s => s.Type);
             modelBuilder.Entity<Section>().HasIndex(s => s.Url);
 
-            modelBuilder.Entity<ContentItem>().HasIndex(i => i.SiteIds);
-            modelBuilder.Entity<ContentItem>().HasIndex(i => i.TagIds);
-            modelBuilder.Entity<ContentItem>().HasIndex(i => i.SectionIds);
-            modelBuilder.Entity<ContentItem>().HasIndex(i => i.IsPublished);
-            modelBuilder.Entity<ContentItem>().HasIndex(i => i.Type);
-            modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url);
+            modelBuilder.Entity<Post>().HasIndex(i => i.SiteIds);
+            modelBuilder.Entity<Post>().HasIndex(i => i.TagIds);
+            modelBuilder.Entity<Post>().HasIndex(i => i.SectionIds);
+            modelBuilder.Entity<Post>().HasIndex(i => i.IsPublished);
+            modelBuilder.Entity<Post>().HasIndex(i => i.Url);
 
             var dataConversionRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterDataConversion),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-            var sectionConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSectionEntityConversions),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             var metadataEntities = this.GetInfrastructure().GetServices<EntityMetadata>()?.ToArray();
             if (metadataEntities != null)
@@ -71,33 +70,32 @@ namespace BioEngine.Core.DB
                         Console.WriteLine($"Register section type {entityMetadata}");
                         RegisterDiscriminator<Section>(modelBuilder, entityMetadata.EntityType,
                             entityMetadata.EntityType.FullName);
-                    }
-                    else if (typeof(ContentItem).IsAssignableFrom(entityMetadata.EntityType))
-                    {
-                        Console.WriteLine($"Register content type {entityMetadata}");
-                        RegisterDiscriminator<ContentItem>(modelBuilder, entityMetadata.EntityType,
-                            entityMetadata.EntityType.FullName);
-
+                        
                         if (Database.IsInMemory())
                         {
-                            sectionConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType,
+                            siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType,
                                     entityMetadata.EntityType.GetProperty("Id")?.PropertyType)
                                 .Invoke(this, new object[] {modelBuilder});
                         }
+                    }
+                    else if (typeof(PostBlock).IsAssignableFrom(entityMetadata.EntityType))
+                    {
+                        Console.WriteLine($"Register content block type {entityMetadata.EntityType} ({entityMetadata.DataType})");
+                        RegisterDiscriminator<PostBlock>(modelBuilder, entityMetadata.EntityType,
+                            entityMetadata.EntityType.FullName);
+
+                        
                     }
 
                     dataConversionRegistrationMethod
                         ?.MakeGenericMethod(entityMetadata.EntityType, entityMetadata.DataType)
                         .Invoke(this, new object[] {modelBuilder});
 
-                    if (Database.IsInMemory())
-                    {
-                        siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType,
-                                entityMetadata.EntityType.GetProperty("Id")?.PropertyType)
-                            .Invoke(this, new object[] {modelBuilder});
-                    }
+                    
                 }
             }
+            
+            Console.WriteLine("Done registering");
         }
 
         private void RegisterDiscriminator<TBase>(ModelBuilder modelBuilder, Type sectionType, string discriminator)

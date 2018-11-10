@@ -42,7 +42,7 @@ namespace BioEngine.Core
                 return services;
             }
 
-            if (!typeof(Section).IsAssignableFrom(entityType) && !typeof(ContentItem).IsAssignableFrom(entityType))
+            if (!typeof(Section).IsAssignableFrom(entityType) && !typeof(PostBlock).IsAssignableFrom(entityType))
             {
                 return services;
             }

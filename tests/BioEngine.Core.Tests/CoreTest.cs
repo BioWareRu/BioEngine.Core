@@ -2,13 +2,13 @@ using System;
 using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
-using ContentRepository = BioEngine.Core.Tests.Fixtures.ContentRepository;
 
 namespace BioEngine.Core.Tests
 {
@@ -38,7 +38,7 @@ namespace BioEngine.Core.Tests
             dbContext.Add(section);
             dbContext.SaveChanges();
 
-            var content = new TestContent
+            var content = new Post
             {
                 Title = "Test content",
                 Url = "test",
@@ -64,7 +64,7 @@ namespace BioEngine.Core.Tests
         protected override IServiceCollection ConfigureServices(IServiceCollection services)
         {
             services.RegisterEntityType(typeof(TestSection));
-            services.RegisterEntityType(typeof(TestContent));
+            services.RegisterEntityType(typeof(TextBlock));
             return base.ConfigureServices(services);
         }
     }
@@ -106,7 +106,7 @@ namespace BioEngine.Core.Tests
         protected ContentRepository GetContentRepository(BioContext context)
         {
             var propertiesProvider = GetPropertiesProvider(context);
-            var repositoryContext = new BioRepositoryContext<TestContent, int>(context, propertiesProvider);
+            var repositoryContext = new BioRepositoryContext<Post, int>(context, propertiesProvider);
             var repository = new ContentRepository(repositoryContext,
                 new SectionsRepository(new BioRepositoryContext<Section, int>(context, propertiesProvider)));
             return repository;

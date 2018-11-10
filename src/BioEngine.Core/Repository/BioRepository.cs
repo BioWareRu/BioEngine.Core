@@ -332,11 +332,14 @@ namespace BioEngine.Core.Repository
                 }
             }
 
-            foreach (var propertiesEntry in item.Properties)
+            if (item.Properties != null)
             {
-                foreach (var val in propertiesEntry.Properties)
+                foreach (var propertiesEntry in item.Properties)
                 {
-                    await PropertiesProvider.SetAsync(val.Value, item, val.SiteId);
+                    foreach (var val in propertiesEntry.Properties)
+                    {
+                        await PropertiesProvider.SetAsync(val.Value, item, val.SiteId);
+                    }
                 }
             }
 

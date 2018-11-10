@@ -1,15 +1,16 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
 using BioEngine.Core.Users;
 using BioEngine.Core.Validation;
+using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
     public abstract class ContentItemRepository<T, TId> : SectionEntityRepository<T, TId>
-        where T : ContentItem, IEntity<TId>, ISiteEntity<TId>, ISectionEntity<TId>
+        where T : Post, IEntity<TId>, ISiteEntity<TId>, ISectionEntity<TId>
     {
         private readonly IUserDataProvider _userDataProvider;
 
@@ -20,21 +21,34 @@ namespace BioEngine.Core.Repository
             _userDataProvider = userDataProvider;
         }
 
+        protected override IQueryable<T> GetBaseQuery(QueryContext<T, TId> queryContext = null)
+        {
+            return base.GetBaseQuery(queryContext).Include(c => c.Blocks);
+        }
+
+        protected override Task AfterLoadAsync(T entity)
+        {
+            if (entity?.Blocks != null && entity.Blocks.Any())
+            {
+                entity.Blocks = entity.Blocks.OrderBy(x => x.Position).ToList();
+            }
+            return base.AfterLoadAsync(entity);
+        }
+
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new ContentItemValidator<T>());
+            Validators.Add(new PostValidator<T>());
         }
 
         protected override async Task AfterLoadAsync(T[] entities)
         {
-            if (_userDataProvider != null)
+            if (_userDataProvider != null && entities != null && entities.Length > 0)
             {
-                var entitiesArray = entities as T[] ?? entities.ToArray();
-                await base.AfterLoadAsync(entitiesArray);
-                var userIds = entitiesArray.Select(e => e.AuthorId).Distinct().ToArray();
+                await base.AfterLoadAsync(entities);
+                var userIds = entities.Select(e => e.AuthorId).Distinct().ToArray();
                 var data = await _userDataProvider.GetDataAsync(userIds);
-                foreach (var entity in entitiesArray)
+                foreach (var entity in entities)
                 {
                     entity.Author = data.FirstOrDefault(d => d.Id == entity.AuthorId);
                 }
