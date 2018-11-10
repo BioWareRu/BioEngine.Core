@@ -12,6 +12,7 @@ namespace BioEngine.Core.Entities
         [Key] public int Id { get; set; }
         [Required] private int PostId { get; set; }
         [Required] public string Type { get; set; }
+        [Required] public int Position { get; set; }
         [NotMapped]
         public abstract string TypeTitle { get; set; }
 

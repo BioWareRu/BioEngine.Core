@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BioEngine.Core.Validation
 {
-    public class ContentItemValidator<T> : AbstractValidator<T> where T : Post
+    public class PostValidator<T> : AbstractValidator<T> where T : Post
     {
-        public ContentItemValidator()
+        public PostValidator()
         {
             RuleFor(e => e.Title).NotEmpty();
             RuleFor(e => e.Url).NotEmpty();

@@ -26,7 +26,7 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
-
+        public DbSet<PostBlock> Blocks { get; set; }
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<PropertiesRecord> Properties { get; set; }
 

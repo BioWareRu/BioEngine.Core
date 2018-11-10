@@ -26,10 +26,19 @@ namespace BioEngine.Core.Repository
             return base.GetBaseQuery(queryContext).Include(c => c.Blocks);
         }
 
+        protected override Task AfterLoadAsync(T entity)
+        {
+            if (entity?.Blocks != null && entity.Blocks.Any())
+            {
+                entity.Blocks = entity.Blocks.OrderBy(x => x.Position).ToList();
+            }
+            return base.AfterLoadAsync(entity);
+        }
+
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new ContentItemValidator<T>());
+            Validators.Add(new PostValidator<T>());
         }
 
         protected override async Task AfterLoadAsync(T[] entities)
