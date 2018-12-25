@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -15,6 +16,21 @@ namespace BioEngine.Core.Storage
         public FileStorage(IOptions<FileStorageOptions> options, ILogger<FileStorage> logger) : base(options, logger)
         {
             _options = options.Value;
+        }
+
+        public override Task<IEnumerable<StorageItem>> ListItemsAsync(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<string>> ListDirectoriesAsync(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task CreateDirectoryAsync(string path)
+        {
+            throw new NotImplementedException();
         }
 
         protected override Task<bool> DoSaveAsync(string path, string tmpPath)

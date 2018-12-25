@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using BioEngine.Core.Interfaces;
@@ -18,6 +19,10 @@ namespace BioEngine.Core.Storage
             _logger = logger;
             _options = options.Value;
         }
+
+        public abstract Task<IEnumerable<StorageItem>> ListItemsAsync(string path);
+        public abstract Task<IEnumerable<string>> ListDirectoriesAsync(string path);
+        public abstract Task CreateDirectoryAsync(string path);
 
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path)
         {

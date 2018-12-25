@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.S3;
@@ -58,6 +60,77 @@ namespace BioEngine.Core.Storage
             }
 
             return true;
+        }
+
+        public override async Task<IEnumerable<StorageItem>> ListItemsAsync(string path)
+        {
+            var request = new ListObjectsRequest
+            {
+                BucketName = _options.Bucket,
+                Prefix = path
+            };
+
+            var items = new List<StorageItem>();
+            while (request != null)
+            {
+                var response = await _client.ListObjectsAsync(request);
+
+                items.AddRange(response.S3Objects.Where(o => o.Size > 0).Select(obj => new StorageItem
+                {
+                    FileName = obj.Key.Substring(obj.Key.LastIndexOf('/')),
+                    FileSize = obj.Size,
+                    FilePath = obj.Key,
+                    PublicUri = new Uri($"{_options.PublicUri}/{obj.Key}")
+                }));
+
+                if (response.IsTruncated)
+                {
+                    request.Marker = response.NextMarker;
+                }
+                else
+                {
+                    request = null;
+                }
+            }
+
+            return items;
+        }
+
+        public override async Task<IEnumerable<string>> ListDirectoriesAsync(string path)
+        {
+            var request = new ListObjectsV2Request
+            {
+                BucketName = _options.Bucket,
+                Prefix = ""
+            };
+
+            var items = new List<string>();
+            while (request != null)
+            {
+                var response = await _client.ListObjectsV2Async(request);
+
+                items.AddRange(response.S3Objects.Where(o => o.Key.EndsWith("/") && o.Size == 0)
+                    .Select(obj => obj.Key.Substring(obj.Key.LastIndexOf('/'))));
+
+                if (response.IsTruncated)
+                {
+                    request.StartAfter = response.StartAfter;
+                }
+                else
+                {
+                    request = null;
+                }
+            }
+
+            return items;
+        }
+
+        public override async Task CreateDirectoryAsync(string path)
+        {
+            await CreateBucketAsync(_options.Bucket);
+            var request = new PutObjectRequest
+                {BucketName = _options.Bucket, Key = $"{path}/.dir", ContentBody = string.Empty};
+            await _client.PutObjectAsync(request);
         }
 
         protected override async Task<bool> DoSaveAsync(string path, string tmpPath)
