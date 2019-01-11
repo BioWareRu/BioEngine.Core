@@ -24,7 +24,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
         <PackageReference Include="FluentValidation" Version="8.1.2" />
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.9" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.9.2" />
         <PackageReference Include="xunit" Version="2.4.1" />
     </ItemGroup>
     <ItemGroup>
