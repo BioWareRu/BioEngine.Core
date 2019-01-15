@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Storage;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -27,6 +26,8 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
         public DbSet<PostBlock> Blocks { get; set; }
+        public DbSet<StorageItem> StorageItems { get; set; }
+
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<PropertiesRecord> Properties { get; set; }
 
@@ -35,9 +36,10 @@ namespace BioEngine.Core.DB
             base.OnModelCreating(modelBuilder);
             modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
 
-            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.Logo);
-            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.LogoSmall);
             RegisterJsonConversion<Menu, List<MenuItem>>(modelBuilder, s => s.Items);
+            RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(modelBuilder, s => s.PictureInfo);
+            modelBuilder.Entity<StorageItem>().Property(i => i.PublicUri)
+                .HasConversion(u => u.ToString(), s => new Uri(s));
             if (Database.IsInMemory())
             {
                 RegisterSiteEntityConversions<Page, int>(modelBuilder);
@@ -70,7 +72,7 @@ namespace BioEngine.Core.DB
                         Console.WriteLine($"Register section type {entityMetadata}");
                         RegisterDiscriminator<Section>(modelBuilder, entityMetadata.EntityType,
                             entityMetadata.EntityType.FullName);
-                        
+
                         if (Database.IsInMemory())
                         {
                             siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType,
@@ -80,21 +82,18 @@ namespace BioEngine.Core.DB
                     }
                     else if (typeof(PostBlock).IsAssignableFrom(entityMetadata.EntityType))
                     {
-                        Console.WriteLine($"Register content block type {entityMetadata.EntityType} ({entityMetadata.DataType})");
+                        Console.WriteLine(
+                            $"Register content block type {entityMetadata.EntityType} ({entityMetadata.DataType})");
                         RegisterDiscriminator<PostBlock>(modelBuilder, entityMetadata.EntityType,
                             entityMetadata.EntityType.FullName);
-
-                        
                     }
 
                     dataConversionRegistrationMethod
                         ?.MakeGenericMethod(entityMetadata.EntityType, entityMetadata.DataType)
                         .Invoke(this, new object[] {modelBuilder});
-
-                    
                 }
             }
-            
+
             Console.WriteLine("Done registering");
         }
 

@@ -1,6 +1,4 @@
-﻿using BioEngine.Core.Storage;
-
-namespace BioEngine.Core.Entities.Blocks
+﻿namespace BioEngine.Core.Entities.Blocks
 {
     public class GalleryBlock : PostBlock<GalleryBlockData>
     {
@@ -9,7 +7,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class GalleryBlockData : ContentBlockData
     {
-        public StorageItem[] Pictures { get; set; }
-        public string Text { get; set; }
+        public int[] PictureIds { get; set; }
     }
 }

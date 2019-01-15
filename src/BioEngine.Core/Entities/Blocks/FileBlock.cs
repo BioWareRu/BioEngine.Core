@@ -1,6 +1,4 @@
-﻿using BioEngine.Core.Storage;
-
-namespace BioEngine.Core.Entities.Blocks
+﻿namespace BioEngine.Core.Entities.Blocks
 {
     public class FileBlock : PostBlock<FileBlockData>
     {
@@ -10,6 +8,6 @@ namespace BioEngine.Core.Entities.Blocks
     public class FileBlockData : ContentBlockData
     {
         public string Text { get; set; }
-        public StorageItem File { get; set; }
+        public int FileId { get; set; }
     }
 }

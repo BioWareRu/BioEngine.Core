@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Storage;
 
 namespace BioEngine.Core.Interfaces
 {
     public interface IStorage
     {
-        Task<IEnumerable<StorageItem>> ListItemsAsync(string path);
-        Task<IEnumerable<string>> ListDirectoriesAsync(string path);
-
-        Task CreateDirectoryAsync(string path);
-
-        Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path);
-        Task<bool> DeleteFileAsync(string filePath);
+        Task<IEnumerable<StorageNode>> ListItemsAsync(string path, string root = "/");
+        Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/");
+        Task<bool> DeleteAsync(StorageItem item);
     }
 
     public interface IStorageOptions

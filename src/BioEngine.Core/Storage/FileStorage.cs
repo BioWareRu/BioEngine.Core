@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using BioEngine.Core.Repository;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,26 +13,11 @@ namespace BioEngine.Core.Storage
     {
         private readonly FileStorageOptions _options;
 
-        public FileStorage(IOptions<FileStorageOptions> options, ILogger<FileStorage> logger) : base(options, logger)
+        public FileStorage(IOptions<FileStorageOptions> options, IServiceProvider serviceProvider, ILogger<FileStorage> logger) : base(options, serviceProvider, logger)
         {
             _options = options.Value;
         }
-
-        public override Task<IEnumerable<StorageItem>> ListItemsAsync(string path)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<IEnumerable<string>> ListDirectoriesAsync(string path)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task CreateDirectoryAsync(string path)
-        {
-            throw new NotImplementedException();
-        }
-
+       
         protected override Task<bool> DoSaveAsync(string path, string tmpPath)
         {
             var dirPath = Path.GetDirectoryName(path);
@@ -42,17 +27,6 @@ namespace BioEngine.Core.Storage
             }
 
             File.Move(tmpPath, path);
-            return Task.FromResult(true);
-        }
-
-        public override Task<bool> DeleteFileAsync(string filePath)
-        {
-            var path = _options.StoragePath + '/' + filePath;
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-
             return Task.FromResult(true);
         }
     }
