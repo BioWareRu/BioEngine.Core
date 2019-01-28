@@ -17,7 +17,7 @@
         <PackageReference Include="PublicApiAnalyzer" Version="1.0.0-beta001" />
         <PackageReference Include="ReflectionAnalyzers" Version="0.1.19-dev" />
         <PackageReference Include="Scrutor" Version="3.0.2" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.1" />
         <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
