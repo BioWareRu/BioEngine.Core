@@ -5,7 +5,7 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="AWSSDK.S3" Version="3.3.31.10" />
+        <PackageReference Include="AWSSDK.S3" Version="3.3.31.14" />
         <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" />
         <PackageReference Include="MessageFormat" Version="3.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.1" />
