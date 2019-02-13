@@ -19,7 +19,7 @@
         <PackageReference Include="Scrutor" Version="3.0.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.2" />
         <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
