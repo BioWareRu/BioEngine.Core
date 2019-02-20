@@ -109,12 +109,13 @@ namespace BioEngine.Core.Storage
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
         {
             var destinationName = GetStorageFileName(fileName);
+            var basePath = path;
             if (root != "/")
             {
-                path = Path.Combine(root, path);
+                basePath = path != "/" ? Path.Combine(root, path) : root;
             }
 
-            var destinationPath = Path.Combine(Path.Combine(root, path), destinationName).Replace("\\", "/");
+            var destinationPath = Path.Combine(basePath, destinationName).Replace("\\", "/");
             if (destinationPath.StartsWith("/")) destinationPath = destinationPath.Substring(1);
             var tmpPath = Path.Combine(Path.GetTempPath(), fileName.ToLowerInvariant());
 
@@ -134,7 +135,7 @@ namespace BioEngine.Core.Storage
                 IsPublished = true
             };
 
-            await TryProcessImageAsync(storageItem, tmpPath, path);
+            await TryProcessImageAsync(storageItem, tmpPath, basePath);
 
             await DoSaveAsync(destinationPath, tmpPath);
 
