@@ -12,15 +12,19 @@ namespace BioEngine.Core.Entities
         public virtual int? ParentId { get; set; }
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }
-        [Required] public virtual int LogoId { get; set; }
-        [Required] public virtual int LogoSmallId { get; set; }
+
+        [Required]
+        [Column(TypeName = "jsonb")]
+        public virtual StorageItem Logo { get; set; }
+
+        [Required]
+        [Column(TypeName = "jsonb")]
+        public virtual StorageItem LogoSmall { get; set; }
+
         [Required] public virtual string ShortDescription { get; set; }
         [Required] public virtual string Hashtag { get; set; }
 
         [NotMapped] public string PublicUrl => $"/section/{Id}-{Url}.html";
-
-        [ForeignKey(nameof(LogoId))] public StorageItem Logo { get; set; }
-        [ForeignKey(nameof(LogoSmallId))] public StorageItem LogoSmall { get; set; }
     }
 
     public abstract class Section<T> : Section, ITypedEntity<T> where T : TypedData, new()

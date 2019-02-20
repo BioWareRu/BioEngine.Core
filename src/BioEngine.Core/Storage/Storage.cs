@@ -94,7 +94,7 @@ namespace BioEngine.Core.Storage
                         var node = currentRootNode.Items.FirstOrDefault(i => i.Name == part);
                         if (node == null)
                         {
-                            node = new StorageNode(part, $"{currentRootNode.Path}/{part}");
+                            node = new StorageNode(part, Path.Combine(currentRootNode.Path, part));
                             currentRootNode.Items.Add(node);
                         }
 
@@ -109,10 +109,14 @@ namespace BioEngine.Core.Storage
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
         {
             var destinationName = GetStorageFileName(fileName);
-            path = $"{(root != "/" ? root : "")}/{path}".Replace("//", "/");
-            var destinationPath = $"{path}/{destinationName}";
+            if (root != "/")
+            {
+                path = Path.Combine(root, path);
+            }
 
-            var tmpPath = $"{Path.GetTempPath()}/{fileName.ToLowerInvariant()}";
+            var destinationPath = Path.Combine(Path.Combine(root, path), destinationName).Replace("\\", "/");
+            if (destinationPath.StartsWith("/")) destinationPath = destinationPath.Substring(1);
+            var tmpPath = Path.Combine(Path.GetTempPath(), fileName.ToLowerInvariant());
 
             using (var sourceStream = new FileStream(tmpPath,
                 FileMode.OpenOrCreate, FileAccess.Write, FileShare.None,
@@ -191,9 +195,10 @@ namespace BioEngine.Core.Storage
             thumb.Mutate(i =>
                 i.Resize(image.Width >= image.Height ? maxWidth : 0, image.Height > image.Width ? maxHeight : 0));
             var thumbFileName = $"{thumb.Width}_{thumb.Height}_{fileName}";
-            var tmpPath = $"{Path.GetTempPath()}/{thumbFileName}";
+            var tmpPath = Path.Combine(Path.GetTempPath(), thumbFileName);
             thumb.Save(tmpPath);
-            var thumbPath = $"{destinationPath}/thumb/{thumbFileName}";
+            var thumbPath = Path.Combine(destinationPath, "thumb", thumbFileName).Replace("\\", "/");
+            if (thumbPath.StartsWith("/")) thumbPath = thumbPath.Substring(1);
             await DoSaveAsync(thumbPath, tmpPath);
 
             return new StorageItemPictureThumbnail

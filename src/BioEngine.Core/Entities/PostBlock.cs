@@ -9,7 +9,7 @@ namespace BioEngine.Core.Entities
     [Table("PostBlocks")]
     public abstract class PostBlock : ITypedEntity
     {
-        [Key] public int Id { get; set; }
+        [Key] public Guid Id { get; set; }
         [Required] private int PostId { get; set; }
         [Required] public string Type { get; set; }
         [Required] public int Position { get; set; }

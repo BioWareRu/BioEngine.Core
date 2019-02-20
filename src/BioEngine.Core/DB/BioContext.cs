@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
+using BioEngine.Core.Storage;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -37,6 +38,8 @@ namespace BioEngine.Core.DB
             modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
 
             RegisterJsonConversion<Menu, List<MenuItem>>(modelBuilder, s => s.Items);
+            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.Logo);
+            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.LogoSmall);
             RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(modelBuilder, s => s.PictureInfo);
             modelBuilder.Entity<StorageItem>().Property(i => i.PublicUri)
                 .HasConversion(u => u.ToString(), s => new Uri(s));

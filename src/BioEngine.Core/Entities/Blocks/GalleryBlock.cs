@@ -7,6 +7,6 @@
 
     public class GalleryBlockData : ContentBlockData
     {
-        public int[] PictureIds { get; set; }
+        public StorageItem[] Pictures { get; set; }
     }
 }

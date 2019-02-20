@@ -12,10 +12,5 @@ namespace BioEngine.Core.Repository
         public SectionsRepository(BioRepositoryContext<Section, int> repositoryContext) : base(repositoryContext)
         {
         }
-
-        protected override IQueryable<Section> GetBaseQuery(QueryContext<Section, int> queryContext = null)
-        {
-            return base.GetBaseQuery(queryContext).Include(s => s.Logo).Include(s => s.LogoSmall);
-        }
     }
 }
