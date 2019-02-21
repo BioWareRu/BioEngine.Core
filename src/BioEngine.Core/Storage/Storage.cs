@@ -94,7 +94,7 @@ namespace BioEngine.Core.Storage
                         var node = currentRootNode.Items.FirstOrDefault(i => i.Name == part);
                         if (node == null)
                         {
-                            node = new StorageNode(part, Path.Combine(currentRootNode.Path, part));
+                            node = new StorageNode(part, Path.Combine(currentRootNode.Path, part).Replace("\\", "/"));
                             currentRootNode.Items.Add(node);
                         }
 
@@ -109,6 +109,7 @@ namespace BioEngine.Core.Storage
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
         {
             var destinationName = GetStorageFileName(fileName);
+            if (path.StartsWith("/")) path = path.Substring(1);
             var basePath = path;
             if (root != "/")
             {
