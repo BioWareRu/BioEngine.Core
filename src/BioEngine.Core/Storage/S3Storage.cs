@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.S3;
@@ -81,6 +82,20 @@ namespace BioEngine.Core.Storage
             {
                 _logger.LogError(e, e.Message);
                 throw;
+            }
+        }
+
+        protected override async Task<bool> DoDeleteAsync(string path)
+        {
+            try
+            {
+                var result = await _client.DeleteObjectAsync(_options.Bucket, path);
+                return result.HttpStatusCode == HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.ToString());
+                return false;
             }
         }
     }

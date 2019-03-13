@@ -150,12 +150,49 @@ namespace BioEngine.Core.Storage
             return storageItem;
         }
 
-        public Task<bool> DeleteAsync(StorageItem item)
+        public async Task<bool> DeleteAsync(StorageItem item)
         {
-            throw new NotImplementedException();
+            // TODO: Cleanup usages
+
+            await DoDeleteAsync(item.FilePath);
+            if (item.Type == StorageItemType.Picture && item.PictureInfo != null)
+            {
+                if (item.PictureInfo.SmallThumbnail != null)
+                {
+                    await DoDeleteAsync(item.PictureInfo.SmallThumbnail.FilePath);
+                }
+
+                if (item.PictureInfo.MediumThumbnail != null)
+                {
+                    await DoDeleteAsync(item.PictureInfo.MediumThumbnail.FilePath);
+                }
+            }
+
+            await Repository.DeleteAsync(item);
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(IEnumerable<StorageItem> items)
+        {
+            Repository.BeginBatch();
+            foreach (var item in items)
+            {
+                try
+                {
+                    await DeleteAsync(item);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Can't delete storage item {item.Id}: {item.FilePath}: {ex.Message}");
+                }
+            }
+
+            await Repository.FinishBatchAsync();
+            return true;
         }
 
         protected abstract Task<bool> DoSaveAsync(string path, string tmpPath);
+        protected abstract Task<bool> DoDeleteAsync(string path);
 
         private string GetStorageFileName(string fileName)
         {

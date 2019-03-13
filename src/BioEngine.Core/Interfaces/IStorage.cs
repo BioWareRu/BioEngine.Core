@@ -11,6 +11,7 @@ namespace BioEngine.Core.Interfaces
         Task<IEnumerable<StorageNode>> ListItemsAsync(string path, string root = "/");
         Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/");
         Task<bool> DeleteAsync(StorageItem item);
+        Task<bool> DeleteAsync(IEnumerable<StorageItem> items);
     }
 
     public interface IStorageOptions

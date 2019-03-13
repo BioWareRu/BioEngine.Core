@@ -29,6 +29,12 @@ namespace BioEngine.Core.Storage
             File.Move(tmpPath, path);
             return Task.FromResult(true);
         }
+
+        protected override Task<bool> DoDeleteAsync(string path)
+        {
+            File.Delete(path);
+            return Task.FromResult(true);
+        }
     }
 
     public class FileStorageOptions : StorageOptions
