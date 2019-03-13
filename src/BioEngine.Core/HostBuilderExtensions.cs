@@ -29,7 +29,8 @@ namespace BioEngine.Core
         private static void ConfigureModule(IWebHostBuilder webHostBuilder, IBioEngineModule module)
         {
             module.ConfigureHostBuilder(webHostBuilder);
-            webHostBuilder.ConfigureServices(module.ConfigureServices);
+            webHostBuilder.ConfigureServices((context, collection) =>
+                module.ConfigureServices(collection, context.Configuration, context.HostingEnvironment));
         }
     }
 
