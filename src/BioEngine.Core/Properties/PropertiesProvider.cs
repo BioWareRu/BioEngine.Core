@@ -15,12 +15,43 @@ namespace BioEngine.Core.Properties
     public class PropertiesProvider
     {
         private readonly BioContext _dbContext;
+        private bool _batchMode;
+        private bool _checkIfExists = true;
 
         private static readonly Dictionary<Type, PropertiesSchema> Schema = new Dictionary<Type, PropertiesSchema>();
 
         public PropertiesProvider(BioContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public void BeginBatch()
+        {
+            _batchMode = true;
+        }
+
+        public Task FinishBatchAsync()
+        {
+            _batchMode = false;
+            return WriteChangesAsync();
+        }
+
+        private async Task WriteChangesAsync()
+        {
+            if (!_batchMode)
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public void DisableChecks()
+        {
+            _checkIfExists = false;
+        }
+
+        public void EnableChecks()
+        {
+            _checkIfExists = true;
         }
 
         public static void RegisterBioEngineProperties<TProperties, TEntity>() where TProperties : PropertiesSet, new()
@@ -61,7 +92,7 @@ namespace BioEngine.Core.Properties
             var type = Schema.Keys.FirstOrDefault(k => k.FullName == className);
             if (type != null)
             {
-                return (PropertiesSet) Activator.CreateInstance(type);
+                return (PropertiesSet)Activator.CreateInstance(type);
             }
 
             throw new ArgumentException($"Class {className} is not registered in properties provider");
@@ -112,41 +143,11 @@ namespace BioEngine.Core.Properties
         public async Task<bool> SetAsync<TProperties>(TProperties properties)
             where TProperties : PropertiesSet, new()
         {
-            var record = await LoadFromDatabaseAsync<TProperties>();
-            if (record == null)
+            var record = await LoadFromDatabaseAsync<TProperties>() ?? new PropertiesRecord
             {
-                record = new PropertiesRecord
-                {
-                    Key = typeof(TProperties).FullName
-                };
+                Key = typeof(TProperties).FullName
+            };
 
-                _dbContext.Add(record);
-            }
-
-            record.DateUpdated = DateTimeOffset.UtcNow;
-            record.Data = JsonConvert.SerializeObject(properties);
-            _dbContext.Update(record);
-            await _dbContext.SaveChangesAsync();
-            return true;
-        }
-
-        [PublicAPI]
-        public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, int? siteId = null)
-            where TProperties : PropertiesSet, new()
-        {
-            var record = await LoadFromDatabaseAsync(properties, entity);
-            if (record == null)
-            {
-                record = new PropertiesRecord
-                {
-                    Key = properties.GetType().FullName,
-                    EntityType = entity.GetType().FullName,
-                    EntityId = entity.GetId().ToString(),
-                    SiteId = siteId
-                };
-
-                _dbContext.Add(record);
-            }
 
             record.DateUpdated = DateTimeOffset.UtcNow;
             record.Data = JsonConvert.SerializeObject(properties);
@@ -154,27 +155,63 @@ namespace BioEngine.Core.Properties
             {
                 _dbContext.Update(record);
             }
+            else
+            {
+                _dbContext.Add(record);
+            }
 
-            await _dbContext.SaveChangesAsync();
+            await WriteChangesAsync();
+            return true;
+        }
+
+        [PublicAPI]
+        public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, int? siteId = null)
+            where TProperties : PropertiesSet, new()
+        {
+            var record = await LoadFromDatabaseAsync(properties, entity) ?? new PropertiesRecord
+            {
+                Key = properties.GetType().FullName,
+                EntityType = entity.GetType().FullName,
+                EntityId = entity.GetId().ToString(),
+                SiteId = siteId
+            };
+
+
+            record.DateUpdated = DateTimeOffset.UtcNow;
+            record.Data = JsonConvert.SerializeObject(properties);
+            if (record.Id > 0)
+            {
+                _dbContext.Update(record);
+            }
+            else
+            {
+                _dbContext.Add(record);
+            }
+
+            await WriteChangesAsync();
             return true;
         }
 
         private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>()
             where TProperties : PropertiesSet, new()
         {
-            return _dbContext.Properties.FirstOrDefaultAsync(s =>
-                s.Key == typeof(TProperties).FullName
-                && s.EntityType == null && s.EntityId == null);
+            return _checkIfExists
+                ? Task.FromResult((PropertiesRecord)null)
+                : _dbContext.Properties.FirstOrDefaultAsync(s =>
+                    s.Key == typeof(TProperties).FullName
+                    && s.EntityType == null && s.EntityId == null);
         }
 
         private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>(TProperties properties, IEntity entity,
             int? siteId = null)
             where TProperties : PropertiesSet, new()
         {
-            return _dbContext.Properties.FirstOrDefaultAsync(s =>
-                s.Key == properties.GetType().FullName
-                && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString() &&
-                (siteId == null || s.SiteId == siteId));
+            return _checkIfExists
+                ? Task.FromResult((PropertiesRecord)null)
+                : _dbContext.Properties.FirstOrDefaultAsync(s =>
+                    s.Key == properties.GetType().FullName
+                    && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString() &&
+                    (siteId == null || s.SiteId == siteId));
         }
 
         public async Task LoadPropertiesAsync<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
@@ -257,7 +294,7 @@ namespace BioEngine.Core.Properties
 
         private PropertiesSet DeserializeProperties(PropertiesRecord record, PropertiesSchema schema)
         {
-            return (PropertiesSet) JsonConvert.DeserializeObject(record.Data, schema.Type);
+            return (PropertiesSet)JsonConvert.DeserializeObject(record.Data, schema.Type);
         }
     }
 }
