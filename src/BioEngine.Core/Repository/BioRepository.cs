@@ -128,7 +128,7 @@ namespace BioEngine.Core.Repository
                     if (await BeforeSaveAsync(item, validationResult))
                     {
                         DbContext.Add(item);
-                        await DbContext.SaveChangesAsync();
+                        await SaveChangesAsync();
                         await AfterSaveAsync(item);
                     }
                 }
@@ -167,13 +167,19 @@ namespace BioEngine.Core.Repository
                     if (await BeforeSaveAsync(item, validationResult, changes))
                     {
                         DbContext.Update(item);
-                        await DbContext.SaveChangesAsync();
+                        await SaveChangesAsync();
                         await AfterSaveAsync(item, changes);
                     }
                 }
             }
 
             return new AddOrUpdateOperationResult<T, TId>(item, validationResult.errors);
+        }
+
+        public Task FinishBatchAsync()
+        {
+            _batchMode = false;
+            return SaveChangesAsync();
         }
 
         public virtual async Task PublishAsync(T item)
@@ -200,11 +206,36 @@ namespace BioEngine.Core.Repository
             if (item != null)
             {
                 DbContext.Remove(item);
-                await DbContext.SaveChangesAsync();
+                await SaveChangesAsync();
                 return true;
             }
 
             throw new ArgumentException();
+        }
+
+        public Task<bool> DeleteAsync(T item)
+        {
+            DbContext.Attach(item);
+            DbContext.Remove(item);
+            return SaveChangesAsync();
+        }
+
+        protected virtual async Task<bool> SaveChangesAsync()
+        {
+            if (!_batchMode)
+            {
+                await DbContext.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool _batchMode;
+
+        public void BeginBatch()
+        {
+            _batchMode = true;
         }
 
         protected virtual async Task<(bool isValid, IList<ValidationFailure> errors)> ValidateAsync(T entity,

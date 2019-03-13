@@ -30,6 +30,10 @@ namespace BioEngine.Core.Interfaces
         Task<AddOrUpdateOperationResult<TEntity, TPk>> UpdateAsync(TEntity item);
 
         Task<bool> DeleteAsync(TPk id);
+        Task<bool> DeleteAsync(TEntity item);
+
+        void BeginBatch();
+        Task FinishBatchAsync();
 
         Task PublishAsync(TEntity item);
         
