@@ -1,5 +1,3 @@
-using System;
-
 namespace BioEngine.Core.Entities.Blocks
 {
     public class YoutubeBlock : PostBlock<YoutubeBlockData>
@@ -9,6 +7,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class YoutubeBlockData : ContentBlockData
     {
-        public Uri Url { get; set; }
+        public string YoutubeId { get; set; }
     }
 }

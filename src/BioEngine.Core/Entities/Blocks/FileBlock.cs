@@ -7,7 +7,6 @@
 
     public class FileBlockData : ContentBlockData
     {
-        public string Text { get; set; }
-        public int FileId { get; set; }
+        public StorageItem File { get; set; }
     }
 }
