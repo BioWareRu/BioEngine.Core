@@ -22,7 +22,7 @@ namespace BioEngine.Core.Tests
             {
                 Title = "Test type",
                 Url = "testurl",
-                SiteIds = new[] {1}
+                SiteIds = new[] {CoreTestScope.SiteID}
             };
 
             Assert.True(string.IsNullOrEmpty(section.Type));

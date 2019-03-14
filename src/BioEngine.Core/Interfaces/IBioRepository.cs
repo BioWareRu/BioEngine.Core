@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
@@ -11,25 +10,25 @@ namespace BioEngine.Core.Interfaces
     {
     }
 
-    public interface IBioRepository<TEntity, TPk> : IBioRepository where TEntity : class, IEntity<TPk>
+    public interface IBioRepository<TEntity> : IBioRepository where TEntity : class, IEntity
     {
-        Task<(TEntity[] items, int itemsCount)> GetAllAsync(QueryContext<TEntity, TPk> queryContext = null,
+        Task<(TEntity[] items, int itemsCount)> GetAllAsync(QueryContext<TEntity> queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> addConditionsCallback = null);
 
-        Task<int> CountAsync(QueryContext<TEntity, TPk> queryContext = null,
+        Task<int> CountAsync(QueryContext<TEntity> queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> addConditionsCallback = null);
 
-        Task<TEntity> GetByIdAsync(TPk id, QueryContext<TEntity, TPk> queryContext = null);
+        Task<TEntity> GetByIdAsync(Guid id, QueryContext<TEntity> queryContext = null);
 
         Task<TEntity> NewAsync();
 
-        Task<TEntity[]> GetByIdsAsync(TPk[] ids, QueryContext<TEntity, TPk> queryContext = null);
+        Task<TEntity[]> GetByIdsAsync(Guid[] ids, QueryContext<TEntity> queryContext = null);
 
-        Task<AddOrUpdateOperationResult<TEntity, TPk>> AddAsync(TEntity item);
+        Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item);
 
-        Task<AddOrUpdateOperationResult<TEntity, TPk>> UpdateAsync(TEntity item);
+        Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item);
 
-        Task<bool> DeleteAsync(TPk id);
+        Task<bool> DeleteAsync(Guid id);
         Task<bool> DeleteAsync(TEntity item);
 
         void BeginBatch();

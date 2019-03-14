@@ -3,8 +3,8 @@ using FluentValidation;
 
 namespace BioEngine.Core.Validation
 {
-    public sealed class SectionEntityValidator<T, TId> : AbstractValidator<T>
-        where T : ISiteEntity<TId>, ISectionEntity<TId>
+    public sealed class SectionEntityValidator<T> : AbstractValidator<T>
+        where T : ISiteEntity, ISectionEntity
     {
         public SectionEntityValidator()
         {

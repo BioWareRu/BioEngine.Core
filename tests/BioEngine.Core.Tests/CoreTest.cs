@@ -15,10 +15,13 @@ namespace BioEngine.Core.Tests
     [UsedImplicitly]
     public class CoreTestScope : BaseTestScope
     {
+        public static Guid SiteID = Guid.NewGuid();
+
         protected override void InitDbContext(BioContext dbContext)
         {
             var site = new Site
             {
+                Id = SiteID,
                 Title = "Test site",
                 Url = "https://test.ru",
                 DatePublished = DateTimeOffset.Now,
@@ -90,7 +93,7 @@ namespace BioEngine.Core.Tests
         protected SitesRepository GetSitesRepository(BioContext context)
         {
             var propertiesProvider = GetPropertiesProvider(context);
-            var repositoryContext = new BioRepositoryContext<Site, int>(context, propertiesProvider);
+            var repositoryContext = new BioRepositoryContext<Site>(context, propertiesProvider);
             var repository = new SitesRepository(repositoryContext);
             return repository;
         }
@@ -98,7 +101,7 @@ namespace BioEngine.Core.Tests
         protected SectionRepository GetSectionsRepository(BioContext context)
         {
             var propertiesProvider = GetPropertiesProvider(context);
-            var repositoryContext = new BioRepositoryContext<TestSection, int>(context, propertiesProvider);
+            var repositoryContext = new BioRepositoryContext<TestSection>(context, propertiesProvider);
             var repository = new SectionRepository(repositoryContext);
             return repository;
         }
@@ -106,9 +109,9 @@ namespace BioEngine.Core.Tests
         protected ContentRepository GetContentRepository(BioContext context)
         {
             var propertiesProvider = GetPropertiesProvider(context);
-            var repositoryContext = new BioRepositoryContext<Post, int>(context, propertiesProvider);
+            var repositoryContext = new BioRepositoryContext<Post>(context, propertiesProvider);
             var repository = new ContentRepository(repositoryContext,
-                new SectionsRepository(new BioRepositoryContext<Section, int>(context, propertiesProvider)));
+                new SectionsRepository(new BioRepositoryContext<Section>(context, propertiesProvider)));
             return repository;
         }
     }

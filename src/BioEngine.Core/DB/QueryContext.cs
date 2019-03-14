@@ -9,13 +9,13 @@ using BioEngine.Core.Interfaces;
 
 namespace BioEngine.Core.DB
 {
-    public class QueryContext<T, TId> where T : class, IEntity<TId>
+    public class QueryContext<T> where T : class, IEntity
     {
         public int? Limit { get; set; }
         public int? Offset { get; set; }
-        public int? SiteId { get; private set; }
-        public int? SectionId { get; private set; }
-        public int? TagId { get; private set; }
+        public Guid? SiteId { get; private set; }
+        public Guid? SectionId { get; private set; }
+        public Guid? TagId { get; private set; }
         public Expression<Func<T, object>> OrderBy { get; private set; }
         public bool OrderByDescending { get; private set; }
         public bool IncludeUnpublished { get; set; }

@@ -51,7 +51,7 @@ namespace BioEngine.Core
             }
 
             services.AddScoped<BaseControllerContext>();
-            services.AddScoped(typeof(BaseControllerContext<,>));
+            services.AddScoped(typeof(BaseControllerContext<>));
         }
 
         private static void AddS3Storage(IServiceCollection services, IConfiguration configuration)
@@ -210,7 +210,7 @@ namespace BioEngine.Core
                 services.RegisterEntityType(type);
             }
 
-            services.AddScoped(typeof(BioRepositoryContext<,>));
+            services.AddScoped(typeof(BioRepositoryContext<>));
         }
     }
 

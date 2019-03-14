@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BioEngine.Core.Validation
 {
-    public class EntityValidator<TId> : AbstractValidator<IEntity<TId>>
+    public class EntityValidator : AbstractValidator<IEntity>
     {
         public EntityValidator()
         {

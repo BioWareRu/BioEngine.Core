@@ -6,41 +6,37 @@ namespace BioEngine.Core.Interfaces
 {
     public interface IEntity
     {
-        object GetId();
         List<PropertiesEntry> Properties { get; set; }
-    }
 
-    public interface IEntity<TId> : IEntity
-    {
-        TId Id { get; set; }
+        Guid Id { get; set; }
         DateTimeOffset DateAdded { get; set; }
         DateTimeOffset DateUpdated { get; set; }
         bool IsPublished { get; set; }
         DateTimeOffset? DatePublished { get; set; }
     }
 
-    public interface ISiteEntity<TId>
+    public interface ISiteEntity
     {
-        TId Id { get; set; }
-        int[] SiteIds { get; set; }
-    }
-    
-    public interface ISingleSiteEntity<TId>
-    {
-        TId Id { get; set; }
-        int SiteId { get; set; }
+        Guid Id { get; set; }
+        Guid[] SiteIds { get; set; }
     }
 
-    public interface ISectionEntity<TId>
+    public interface ISingleSiteEntity
     {
-        TId Id { get; set; }
-        int[] SectionIds { get; set; }
-        int[] TagIds { get; set; }
+        Guid Id { get; set; }
+        Guid SiteId { get; set; }
     }
 
-    public interface IContentEntity<TId>
+    public interface ISectionEntity
     {
-        TId Id { get; set; }
+        Guid Id { get; set; }
+        Guid[] SectionIds { get; set; }
+        Guid[] TagIds { get; set; }
+    }
+
+    public interface IContentEntity
+    {
+        Guid Id { get; set; }
         int AuthorId { get; set; }
         string Title { get; set; }
         string Url { get; set; }

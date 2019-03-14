@@ -5,10 +5,10 @@ using BioEngine.Core.Validation;
 
 namespace BioEngine.Core.Repository
 {
-    public abstract class SiteEntityRepository<T, TId> : BioRepository<T, TId>
-        where T : class, IEntity<TId>, ISiteEntity<TId>
+    public abstract class SiteEntityRepository<T> : BioRepository<T>
+        where T : class, IEntity, ISiteEntity
     {
-        protected SiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext)
+        protected SiteEntityRepository(BioRepositoryContext<T> repositoryContext)
             : base(repositoryContext)
         {
         }
@@ -16,10 +16,10 @@ namespace BioEngine.Core.Repository
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new SiteEntityValidator<T, TId>());
+            Validators.Add(new SiteEntityValidator<T>());
         }
 
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)
+        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T> queryContext)
         {
             if ((queryContext?.SiteId).HasValue)
             {
@@ -30,10 +30,10 @@ namespace BioEngine.Core.Repository
         }
     }
 
-    public abstract class SingleSiteEntityRepository<T, TId> : BioRepository<T, TId>
-        where T : class, IEntity<TId>, ISingleSiteEntity<TId>
+    public abstract class SingleSiteEntityRepository<T> : BioRepository<T>
+        where T : class, IEntity, ISingleSiteEntity
     {
-        protected SingleSiteEntityRepository(BioRepositoryContext<T, TId> repositoryContext)
+        protected SingleSiteEntityRepository(BioRepositoryContext<T> repositoryContext)
             : base(repositoryContext)
         {
         }
@@ -41,10 +41,10 @@ namespace BioEngine.Core.Repository
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new SingleSiteEntityValidator<T, TId>());
+            Validators.Add(new SingleSiteEntityValidator<T>());
         }
 
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T, TId> queryContext)
+        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T> queryContext)
         {
             if ((queryContext?.SiteId).HasValue)
             {

@@ -122,7 +122,7 @@ namespace BioEngine.Core.Properties
         }
 
         [PublicAPI]
-        public async Task<TProperties> GetAsync<TProperties>(IEntity entity, int? siteId = null)
+        public async Task<TProperties> GetAsync<TProperties>(IEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
             if (!(entity.Properties.FirstOrDefault(x => x.Key == typeof(TProperties).FullName)?.Properties
@@ -151,7 +151,7 @@ namespace BioEngine.Core.Properties
 
             record.DateUpdated = DateTimeOffset.UtcNow;
             record.Data = JsonConvert.SerializeObject(properties);
-            if (record.Id > 0)
+            if (record.Id != Guid.Empty)
             {
                 _dbContext.Update(record);
             }
@@ -165,21 +165,21 @@ namespace BioEngine.Core.Properties
         }
 
         [PublicAPI]
-        public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, int? siteId = null)
+        public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
             var record = await LoadFromDatabaseAsync(properties, entity) ?? new PropertiesRecord
             {
                 Key = properties.GetType().FullName,
                 EntityType = entity.GetType().FullName,
-                EntityId = entity.GetId().ToString(),
+                EntityId = entity.Id,
                 SiteId = siteId
             };
 
 
             record.DateUpdated = DateTimeOffset.UtcNow;
             record.Data = JsonConvert.SerializeObject(properties);
-            if (record.Id > 0)
+            if (record.Id != Guid.Empty)
             {
                 _dbContext.Update(record);
             }
@@ -203,18 +203,18 @@ namespace BioEngine.Core.Properties
         }
 
         private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>(TProperties properties, IEntity entity,
-            int? siteId = null)
+            Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
             return _checkIfExists
                 ? Task.FromResult((PropertiesRecord)null)
                 : _dbContext.Properties.FirstOrDefaultAsync(s =>
                     s.Key == properties.GetType().FullName
-                    && s.EntityType == entity.GetType().FullName && s.EntityId == entity.GetId().ToString() &&
+                    && s.EntityType == entity.GetType().FullName && s.EntityId == entity.Id &&
                     (siteId == null || s.SiteId == siteId));
         }
 
-        public async Task LoadPropertiesAsync<T, TId>(IEnumerable<T> entities) where T : class, IEntity<TId>
+        public async Task LoadPropertiesAsync<T>(IEnumerable<T> entities) where T : class, IEntity
         {
             var entitiesArray = entities as T[] ?? entities.ToArray();
             if (entitiesArray.Any())
@@ -223,7 +223,7 @@ namespace BioEngine.Core.Properties
                 var groups = entitiesArray.GroupBy(e => e.GetType().FullName);
                 foreach (var group in groups)
                 {
-                    var ids = group.Where(e => e.GetId() != default).Select(e => e.GetId().ToString());
+                    var ids = group.Where(e => e.Id != default).Select(e => e.Id);
                     var entityType = group.Key;
                     var groupEntity = group.First();
                     var schemas = Schema.Where(schema => schema.Value.IsRegisteredFor(groupEntity.GetType()))
@@ -251,7 +251,7 @@ namespace BioEngine.Core.Properties
                             var entry = new PropertiesEntry(schema.Key, schema);
 
                             var records = propertiesRecords
-                                .Where(s => s.EntityId == entity.Id.ToString() && s.Key == schema.Key)
+                                .Where(s => s.EntityId == entity.Id && s.Key == schema.Key)
                                 .ToList();
 
                             switch (entry.Schema.Mode)

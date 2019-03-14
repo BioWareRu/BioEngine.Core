@@ -5,7 +5,7 @@ using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository
 {
-    public class AddOrUpdateOperationResult<T, TId> where T : IEntity<TId>
+    public class AddOrUpdateOperationResult<T> where T : IEntity
     {
         public bool IsSuccess { get; }
         public T Entity { get; }

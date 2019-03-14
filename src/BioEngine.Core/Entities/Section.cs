@@ -1,15 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Storage;
 
 namespace BioEngine.Core.Entities
 {
     [Table("Sections")]
-    public abstract class Section : BaseSiteEntity<int>, IRoutable
+    public abstract class Section : BaseSiteEntity, IRoutable
     {
         [Required] public virtual string Type { get; set; }
-        public virtual int? ParentId { get; set; }
+        public virtual Guid? ParentId { get; set; }
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }
 

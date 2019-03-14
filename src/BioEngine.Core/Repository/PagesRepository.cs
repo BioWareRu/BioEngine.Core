@@ -2,9 +2,9 @@
 
 namespace BioEngine.Core.Repository
 {
-    public class PagesRepository : SiteEntityRepository<Page, int>
+    public class PagesRepository : SiteEntityRepository<Page>
     {
-        public PagesRepository(BioRepositoryContext<Page, int> repositoryContext) : base(repositoryContext)
+        public PagesRepository(BioRepositoryContext<Page> repositoryContext) : base(repositoryContext)
         {
         }
     }

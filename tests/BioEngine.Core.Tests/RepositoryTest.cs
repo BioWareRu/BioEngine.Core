@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace BioEngine.Core.Tests
             };
             var result = await repository.AddAsync(site);
             Assert.True(result.IsSuccess);
-            Assert.True(result.Entity.Id > 0);
+            Assert.True(result.Entity.Id != Guid.Empty);
             count = await repository.CountAsync();
             Assert.Equal(1, count);
         }
@@ -41,9 +42,9 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var site = await repository.GetByIdAsync(1);
+            var site = await repository.GetByIdAsync(CoreTestScope.SiteID);
             Assert.NotNull(site);
-            Assert.Equal(1, site.Id);
+            Assert.Equal(CoreTestScope.SiteID, site.Id);
         }
 
         [Fact]
@@ -51,7 +52,7 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var site = await repository.GetByIdAsync(1);
+            var site = await repository.GetByIdAsync(CoreTestScope.SiteID);
             const string newTitle = "Test new";
             var oldDate = site.DateUpdated;
             site.Title = newTitle;
@@ -78,7 +79,7 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var queryContext = new QueryContext<Site, int>();
+            var queryContext = new QueryContext<Site>();
             var result = await repository.GetAllAsync(queryContext);
             var count = await context.Sites.CountAsync();
             Assert.NotEmpty(result.items);
@@ -94,7 +95,7 @@ namespace BioEngine.Core.Tests
             await repository.UnPublishAsync(site);
             var count = await context.Sites.CountAsync(s => s.IsPublished);
 
-            var queryContext = new QueryContext<Site, int>();
+            var queryContext = new QueryContext<Site>();
             var result = await repository.GetAllAsync(queryContext);
             Assert.Equal(count, result.itemsCount);
 

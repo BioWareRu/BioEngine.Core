@@ -7,26 +7,23 @@ using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Entities
 {
-    public abstract class BaseEntity<T> : IEntity<T>
+    public abstract class BaseEntity : IEntity
     {
-        [Key] public virtual T Id { get; set; }
+        [Key] public virtual Guid Id { get; set; } = Guid.Empty;
         [Required] public virtual DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
         [Required] public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         public virtual bool IsPublished { get; set; }
         public virtual DateTimeOffset? DatePublished { get; set; }
-
-        public virtual object GetId() => Id;
-
         [NotMapped] public virtual List<PropertiesEntry> Properties { get; set; } = new List<PropertiesEntry>();
     }
 
-    public abstract class BaseSiteEntity<T> : BaseEntity<T>, ISiteEntity<T>
+    public abstract class BaseSiteEntity : BaseEntity, ISiteEntity
     {
-        public virtual int[] SiteIds { get; set; } = new int[0];
+        public virtual Guid[] SiteIds { get; set; } = new Guid[0];
     }
-    
-    public abstract class BaseSingleSiteEntity<T> : BaseEntity<T>, ISingleSiteEntity<T>
+
+    public abstract class BaseSingleSiteEntity : BaseEntity, ISingleSiteEntity
     {
-        public virtual int SiteId { get; set; }
+        public virtual Guid SiteId { get; set; }
     }
 }

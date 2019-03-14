@@ -10,14 +10,14 @@ namespace BioEngine.Core.Interfaces
     {
         bool CanProcess(Type type);
 
-        Task<bool> BeforeValidateAsync<T, TId>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
+        Task<bool> BeforeValidateAsync<T>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null)
-            where T : class, IEntity<TId>;
+            where T : class, IEntity;
 
-        Task<bool> BeforeSaveAsync<T, TId>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
+        Task<bool> BeforeSaveAsync<T>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null)
-            where T : class, IEntity<TId>;
+            where T : class, IEntity;
 
-        Task<bool> AfterSaveAsync<T, TId>(T item, PropertyChange[] changes = null) where T : class, IEntity<TId>;
+        Task<bool> AfterSaveAsync<T>(T item, PropertyChange[] changes = null) where T : class, IEntity;
     }
 }

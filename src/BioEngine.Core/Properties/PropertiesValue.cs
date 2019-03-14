@@ -1,14 +1,16 @@
+using System;
+
 namespace BioEngine.Core.Properties
 {
     public class PropertiesValue
     {
-        public PropertiesValue(int? siteId, PropertiesSet value)
+        public PropertiesValue(Guid? siteId, PropertiesSet value)
         {
             SiteId = siteId;
             Value = value;
         }
 
-        public int? SiteId { get; set; }
+        public Guid? SiteId { get; set; }
         public PropertiesSet Value { get; set; }
     }
 }

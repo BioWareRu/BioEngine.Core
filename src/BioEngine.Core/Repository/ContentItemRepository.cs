@@ -9,19 +9,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
-    public abstract class ContentItemRepository<T, TId> : SectionEntityRepository<T, TId>
-        where T : Post, IEntity<TId>, ISiteEntity<TId>, ISectionEntity<TId>
+    public abstract class ContentItemRepository<T> : SectionEntityRepository<T>
+        where T : Post, IEntity, ISiteEntity, ISectionEntity
     {
         private readonly IUserDataProvider _userDataProvider;
 
-        protected ContentItemRepository(BioRepositoryContext<T, TId> repositoryContext,
+        protected ContentItemRepository(BioRepositoryContext<T> repositoryContext,
             SectionsRepository sectionsRepository, IUserDataProvider userDataProvider = null) : base(repositoryContext,
             sectionsRepository)
         {
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<T> GetBaseQuery(QueryContext<T, TId> queryContext = null)
+        protected override IQueryable<T> GetBaseQuery(QueryContext<T> queryContext = null)
         {
             return base.GetBaseQuery(queryContext).Include(c => c.Blocks);
         }

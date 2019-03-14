@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
-    public class MenuRepository : SingleSiteEntityRepository<Menu, int>
+    public class MenuRepository : SingleSiteEntityRepository<Menu>
     {
-        public MenuRepository(BioRepositoryContext<Menu, int> repositoryContext) : base(repositoryContext)
+        public MenuRepository(BioRepositoryContext<Menu> repositoryContext) : base(repositoryContext)
         {
         }
 

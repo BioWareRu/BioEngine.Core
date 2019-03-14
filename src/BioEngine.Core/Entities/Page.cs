@@ -2,7 +2,7 @@
 
 namespace BioEngine.Core.Entities
 {
-    public class Page : BaseSiteEntity<int>
+    public class Page : BaseSiteEntity
     {
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }

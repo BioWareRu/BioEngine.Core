@@ -18,14 +18,14 @@ namespace BioEngine.Core.Web
         }
     }
 
-    public class BaseControllerContext<TEntity, TEntityPk> : BaseControllerContext
-        where TEntity : class, IEntity<TEntityPk>
+    public class BaseControllerContext<TEntity> : BaseControllerContext
+        where TEntity : class, IEntity
     {
-        public IBioRepository<TEntity, TEntityPk> Repository { get; }
+        public IBioRepository<TEntity> Repository { get; }
 
         public BaseControllerContext(ILoggerFactory loggerFactory, IStorage storage,
             PropertiesProvider propertiesProvider,
-            IBioRepository<TEntity, TEntityPk> repository) : base(loggerFactory, storage, propertiesProvider)
+            IBioRepository<TEntity> repository) : base(loggerFactory, storage, propertiesProvider)
         {
             Repository = repository;
         }

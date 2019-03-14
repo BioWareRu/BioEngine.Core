@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
-using BioEngine.Core.Storage;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -43,12 +42,12 @@ namespace BioEngine.Core.DB
             RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(modelBuilder, s => s.PictureInfo);
             modelBuilder.Entity<StorageItem>().Property(i => i.PublicUri)
                 .HasConversion(u => u.ToString(), s => new Uri(s));
-            if (Database.IsInMemory())
-            {
-                RegisterSiteEntityConversions<Page, int>(modelBuilder);
-                RegisterSiteEntityConversions<Post, int>(modelBuilder);
-                RegisterSectionEntityConversions<Post, int>(modelBuilder);
-            }
+//            if (Database.IsInMemory())
+//            {
+//                RegisterSiteEntityConversions<Page, int>(modelBuilder);
+//                RegisterSiteEntityConversions<Post, int>(modelBuilder);
+//                RegisterSectionEntityConversions<Post, int>(modelBuilder);
+//            }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
             modelBuilder.Entity<Section>().HasIndex(s => s.IsPublished);
@@ -63,8 +62,8 @@ namespace BioEngine.Core.DB
 
             var dataConversionRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterDataConversion),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-            var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+//            var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
+//                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             var metadataEntities = this.GetInfrastructure().GetServices<EntityMetadata>()?.ToArray();
             if (metadataEntities != null)
             {
@@ -78,9 +77,9 @@ namespace BioEngine.Core.DB
 
                         if (Database.IsInMemory())
                         {
-                            siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType,
-                                    entityMetadata.EntityType.GetProperty("Id")?.PropertyType)
-                                .Invoke(this, new object[] {modelBuilder});
+//                            siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType,
+//                                    entityMetadata.EntityType.GetProperty("Id")?.PropertyType)
+//                                .Invoke(this, new object[] {modelBuilder});
                         }
                     }
                     else if (typeof(PostBlock).IsAssignableFrom(entityMetadata.EntityType))
@@ -138,35 +137,35 @@ namespace BioEngine.Core.DB
         }
 
 
-        private void RegisterSiteEntityConversions<TEntity, TPk>(ModelBuilder modelBuilder)
-            where TEntity : class, ISiteEntity<TPk>
-        {
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(s => s.SiteIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<int[]>(v));
-        }
+//        private void RegisterSiteEntityConversions<TEntity>(ModelBuilder modelBuilder)
+//            where TEntity : class, ISiteEntity
+//        {
+//            modelBuilder
+//                .Entity<TEntity>()
+//                .Property(s => s.SiteIds)
+//                .HasColumnType("jsonb")
+//                .HasConversion(
+//                    v => JsonConvert.SerializeObject(v),
+//                    v => JsonConvert.DeserializeObject<Guid[]>(v));
+//        }
 
-        private void RegisterSectionEntityConversions<TEntity, TPk>(ModelBuilder modelBuilder)
-            where TEntity : class, ISectionEntity<TPk>
-        {
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(s => s.SectionIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<int[]>(v));
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(s => s.TagIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<int[]>(v));
-        }
+//        private void RegisterSectionEntityConversions<TEntity, TPk>(ModelBuilder modelBuilder)
+//            where TEntity : class, ISectionEntity
+//        {
+//            modelBuilder
+//                .Entity<TEntity>()
+//                .Property(s => s.SectionIds)
+//                .HasColumnType("jsonb")
+//                .HasConversion(
+//                    v => JsonConvert.SerializeObject(v),
+//                    v => JsonConvert.DeserializeObject<int[]>(v));
+//            modelBuilder
+//                .Entity<TEntity>()
+//                .Property(s => s.TagIds)
+//                .HasColumnType("jsonb")
+//                .HasConversion(
+//                    v => JsonConvert.SerializeObject(v),
+//                    v => JsonConvert.DeserializeObject<int[]>(v));
+//        }
     }
 }

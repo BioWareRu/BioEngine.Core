@@ -7,7 +7,7 @@ using FluentValidation;
 
 namespace BioEngine.Core.Repository
 {
-    public class BioRepositoryContext<T, TId> where T : class, IEntity<TId>
+    public class BioRepositoryContext<T> where T : class, IEntity
     {
         internal BioContext DbContext { get; }
         public List<IRepositoryFilter> Filters { get; }

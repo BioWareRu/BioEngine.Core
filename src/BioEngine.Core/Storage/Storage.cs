@@ -127,14 +127,12 @@ namespace BioEngine.Core.Storage
                 await sourceStream.WriteAsync(file, 0, file.Length);
             }
 
-            var storageItem = new StorageItem
-            {
-                FileName = fileName,
-                FileSize = file.LongLength,
-                FilePath = destinationPath,
-                PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}"),
-                IsPublished = true
-            };
+            var storageItem = await Repository.NewAsync();
+            storageItem.FileName = fileName;
+            storageItem.FileSize = file.LongLength;
+            storageItem.FilePath = destinationPath;
+            storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
+            storageItem.IsPublished = true;
 
             await TryProcessImageAsync(storageItem, tmpPath, basePath);
 

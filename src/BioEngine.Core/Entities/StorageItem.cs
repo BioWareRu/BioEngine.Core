@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BioEngine.Core.Entities
 {
     [Table("StorageItems")]
-    public class StorageItem : BaseEntity<int>
+    public class StorageItem : BaseEntity
     {
         public string FileName { get; set; }
         public long FileSize { get; set; }

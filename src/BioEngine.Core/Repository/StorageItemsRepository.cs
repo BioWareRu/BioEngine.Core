@@ -2,9 +2,9 @@ using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Repository
 {
-    public class StorageItemsRepository : BioRepository<StorageItem, int>
+    public class StorageItemsRepository : BioRepository<StorageItem>
     {
-        public StorageItemsRepository(BioRepositoryContext<StorageItem, int> repositoryContext) : base(
+        public StorageItemsRepository(BioRepositoryContext<StorageItem> repositoryContext) : base(
             repositoryContext)
         {
         }

@@ -1,5 +1,3 @@
-using BioEngine.Core.Interfaces;
-
 namespace BioEngine.Core.Entities.Blocks
 {
     public class TwitterBlock : PostBlock<TwitterBlockData>

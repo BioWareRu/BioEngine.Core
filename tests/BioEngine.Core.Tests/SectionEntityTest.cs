@@ -42,7 +42,7 @@ namespace BioEngine.Core.Tests
             var context = CreateDbContext();
             var repository = GetContentRepository(context);
             var sectionRepository = GetSectionsRepository(context);
-            var section = (await sectionRepository.GetAllAsync(new QueryContext<TestSection, int>())).items.First();
+            var section = (await sectionRepository.GetAllAsync(new QueryContext<TestSection>())).items.First();
 
             Assert.NotEmpty(section.SiteIds);
 
