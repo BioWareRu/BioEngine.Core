@@ -15,38 +15,29 @@ namespace BioEngine.Core.Interfaces
         DateTimeOffset? DatePublished { get; set; }
     }
 
-    public interface ISiteEntity
+    public interface ISiteEntity : IEntity
     {
-        Guid Id { get; set; }
         Guid[] SiteIds { get; set; }
     }
 
-    public interface ISingleSiteEntity
+    public interface ISingleSiteEntity : IEntity
     {
-        Guid Id { get; set; }
         Guid SiteId { get; set; }
     }
 
-    public interface ISectionEntity
+    public interface ISectionEntity : IEntity
     {
-        Guid Id { get; set; }
         Guid[] SectionIds { get; set; }
         Guid[] TagIds { get; set; }
     }
 
-    public interface IContentEntity
+    public interface IContentEntity : IEntity
     {
-        Guid Id { get; set; }
-        int AuthorId { get; set; }
-        string Title { get; set; }
-        string Url { get; set; }
-        bool IsPinned { get; set; }
     }
 
     public interface ITypedEntity
     {
-        string Type { get; set; }
-        string TypeTitle { get; set; }
+        string TypeTitle { get; }
     }
 
     public interface ITypedEntity<T> : ITypedEntity where T : TypedData, new()
