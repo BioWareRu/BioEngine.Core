@@ -11,6 +11,15 @@ namespace BioEngine.Core.Entities
 
         public int ChangeAuthorId { get; set; }
 
+        public void SetPost(Post post)
+        {
+            Data = JsonConvert.SerializeObject(post,
+                new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore, TypeNameHandling = TypeNameHandling.Auto
+                });
+        }
+
         public Post GetPost()
         {
             return JsonConvert.DeserializeObject<Post>(Data,

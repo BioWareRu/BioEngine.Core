@@ -8,7 +8,6 @@ using BioEngine.Core.Interfaces;
 using BioEngine.Core.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace BioEngine.Core.Repository
 {
@@ -35,31 +34,20 @@ namespace BioEngine.Core.Repository
         protected override async Task<bool> AfterSaveAsync(Post item, PropertyChange[] changes = null,
             Post oldItem = null, IBioRepositoryOperationContext operationContext = null)
         {
-            if (oldItem != null && changes != null && changes.Any())
+            var version = new PostVersion
             {
-                var version = new PostVersion
-                {
-                    Id = Guid.NewGuid(),
-                    PostId = oldItem.Id,
-                    IsPublished = true,
-                    DatePublished = DateTimeOffset.UtcNow,
-                    Data = JsonConvert.SerializeObject(oldItem,
-                        new JsonSerializerSettings
-                        {
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                            TypeNameHandling = TypeNameHandling.Auto
-                        })
-                };
-                if (operationContext?.User != null)
-                {
-                    version.ChangeAuthorId = operationContext.User.Id;
-                }
-
-                DbContext.Add(version);
-                await DbContext.SaveChangesAsync();
+                Id = Guid.NewGuid(), PostId = item.Id, IsPublished = true, DatePublished = DateTimeOffset.UtcNow,
+            };
+            version.SetPost(item);
+            if (operationContext?.User != null)
+            {
+                version.ChangeAuthorId = operationContext.User.Id;
             }
 
-            return await base.AfterSaveAsync(item, changes, oldItem);
+            DbContext.Add(version);
+            await DbContext.SaveChangesAsync();
+
+            return await base.AfterSaveAsync(item, changes, oldItem, operationContext);
         }
 
         public async Task<List<PostVersion>> GetVersionsAsync(Guid itemId)
