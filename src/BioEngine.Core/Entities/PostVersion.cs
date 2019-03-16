@@ -7,5 +7,7 @@ namespace BioEngine.Core.Entities
     {
         public Guid PostId { get; set; }
         [Column(TypeName = "jsonb")] public string Data { get; set; }
+        
+        public int ChangeAuthorId { get; set; }
     }
 }

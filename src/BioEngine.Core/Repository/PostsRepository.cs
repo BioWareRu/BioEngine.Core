@@ -46,6 +46,11 @@ namespace BioEngine.Core.Repository
                     Data = JsonConvert.SerializeObject(oldItem,
                         new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore})
                 };
+                if (operationContext?.User != null)
+                {
+                    version.ChangeAuthorId = operationContext.User.Id;
+                }
+
                 DbContext.Add(version);
                 await DbContext.SaveChangesAsync();
             }
