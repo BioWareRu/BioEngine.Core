@@ -1,10 +1,13 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Interfaces;
 using BioEngine.Core.Users;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace BioEngine.Core.Repository
@@ -30,7 +33,7 @@ namespace BioEngine.Core.Repository
         }
 
         protected override async Task<bool> AfterSaveAsync(Post item, PropertyChange[] changes = null,
-            Post oldItem = null)
+            Post oldItem = null, IBioRepositoryOperationContext operationContext = null)
         {
             if (oldItem != null && changes != null && changes.Any())
             {
@@ -38,10 +41,8 @@ namespace BioEngine.Core.Repository
                 {
                     Id = Guid.NewGuid(),
                     PostId = oldItem.Id,
-                    DateAdded = oldItem.DateAdded,
-                    DateUpdated = oldItem.DateUpdated,
-                    IsPublished = oldItem.IsPublished,
-                    DatePublished = oldItem.DatePublished,
+                    IsPublished = true,
+                    DatePublished = DateTimeOffset.UtcNow,
                     Data = JsonConvert.SerializeObject(oldItem,
                         new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore})
                 };

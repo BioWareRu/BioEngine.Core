@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Interfaces;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,8 @@ namespace BioEngine.Core.Repository
         {
         }
 
-        public override async Task<AddOrUpdateOperationResult<Tag>> AddAsync(Tag item)
+        public override async Task<AddOrUpdateOperationResult<Tag>> AddAsync(Tag item,
+            IBioRepositoryOperationContext operationContext = null)
         {
             var existingTag = await DbContext.Tags.FirstOrDefaultAsync(t => t.Name == item.Name);
             if (existingTag != null)
@@ -19,7 +21,7 @@ namespace BioEngine.Core.Repository
                 return new AddOrUpdateOperationResult<Tag>(existingTag, new ValidationFailure[0]);
             }
 
-            return await base.AddAsync(item);
+            return await base.AddAsync(item, operationContext);
         }
     }
 }

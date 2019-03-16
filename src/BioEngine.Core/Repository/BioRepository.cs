@@ -117,7 +117,8 @@ namespace BioEngine.Core.Repository
             return items;
         }
 
-        public virtual async Task<AddOrUpdateOperationResult<T>> AddAsync(T item)
+        public virtual async Task<AddOrUpdateOperationResult<T>> AddAsync(T item,
+            IBioRepositoryOperationContext operationContext = null)
         {
             if (item.Id == Guid.Empty)
             {
@@ -125,16 +126,16 @@ namespace BioEngine.Core.Repository
             }
 
             (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
-            if (await BeforeValidateAsync(item, validationResult))
+            if (await BeforeValidateAsync(item, validationResult, null, operationContext))
             {
                 validationResult = await ValidateAsync(item);
                 if (validationResult.isValid)
                 {
-                    if (await BeforeSaveAsync(item, validationResult))
+                    if (await BeforeSaveAsync(item, validationResult, null, operationContext))
                     {
                         DbContext.Add(item);
                         await SaveChangesAsync();
-                        await AfterSaveAsync(item);
+                        await AfterSaveAsync(item, null, null, operationContext);
                     }
                 }
             }
@@ -174,22 +175,23 @@ namespace BioEngine.Core.Repository
             return changes.ToArray();
         }
 
-        public virtual async Task<AddOrUpdateOperationResult<T>> UpdateAsync(T item)
+        public virtual async Task<AddOrUpdateOperationResult<T>> UpdateAsync(T item,
+            IBioRepositoryOperationContext operationContext = null)
         {
             var oldItem = GetBaseQuery().Where(e => e.Id == item.Id).AsNoTracking().First();
             var changes = GetChanges(item, oldItem);
             item.DateUpdated = DateTimeOffset.UtcNow;
             (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
-            if (await BeforeValidateAsync(item, validationResult, changes))
+            if (await BeforeValidateAsync(item, validationResult, changes, operationContext))
             {
                 validationResult = await ValidateAsync(item, changes);
                 if (validationResult.isValid)
                 {
-                    if (await BeforeSaveAsync(item, validationResult, changes))
+                    if (await BeforeSaveAsync(item, validationResult, changes, operationContext))
                     {
                         DbContext.Update(item);
                         await SaveChangesAsync();
-                        await AfterSaveAsync(item, changes, oldItem);
+                        await AfterSaveAsync(item, changes, oldItem, operationContext);
                     }
                 }
             }
@@ -203,26 +205,21 @@ namespace BioEngine.Core.Repository
             return SaveChangesAsync();
         }
 
-        public virtual async Task PublishAsync(T item)
+        public virtual async Task PublishAsync(T item, IBioRepositoryOperationContext operationContext = null)
         {
             item.IsPublished = true;
             item.DatePublished = DateTimeOffset.UtcNow;
-            var changes = GetChanges(item, await GetBaseQuery().Where(i => i.Id == item.Id).AsNoTracking().FirstAsync());
-            await UpdateAsync(item);
-            await AfterSaveAsync(item, changes);
+            await UpdateAsync(item, operationContext);
         }
 
-        public virtual async Task UnPublishAsync(T item)
+        public virtual async Task UnPublishAsync(T item, IBioRepositoryOperationContext operationContext = null)
         {
             item.IsPublished = false;
             item.DatePublished = null;
-            var changes = GetChanges(item,
-                await GetBaseQuery().Where(i => i.Id == item.Id).AsNoTracking().FirstAsync());
-            await UpdateAsync(item);
-            await AfterSaveAsync(item, changes);
+            await UpdateAsync(item, operationContext);
         }
 
-        public virtual async Task<bool> DeleteAsync(Guid id)
+        public virtual async Task<bool> DeleteAsync(Guid id, IBioRepositoryOperationContext operationContext = null)
         {
             var item = await GetByIdAsync(id);
             if (item != null)
@@ -235,7 +232,7 @@ namespace BioEngine.Core.Repository
             throw new ArgumentException();
         }
 
-        public Task<bool> DeleteAsync(T item)
+        public Task<bool> DeleteAsync(T item, IBioRepositoryOperationContext operationContext = null)
         {
             DbContext.Attach(item);
             DbContext.Remove(item);
@@ -345,13 +342,13 @@ namespace BioEngine.Core.Repository
 
         protected virtual async Task<bool> BeforeValidateAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null)
+            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeValidateAsync(item, validationResult, changes))
+                if (!await repositoryFilter.BeforeValidateAsync(item, validationResult, changes, operationContext))
                 {
                     result = false;
                 }
@@ -362,13 +359,13 @@ namespace BioEngine.Core.Repository
 
         protected virtual async Task<bool> BeforeSaveAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null)
+            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeSaveAsync(item, validationResult, changes))
+                if (!await repositoryFilter.BeforeSaveAsync(item, validationResult, changes, operationContext))
                 {
                     result = false;
                 }
@@ -377,13 +374,14 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        protected virtual async Task<bool> AfterSaveAsync(T item, PropertyChange[] changes = null, T oldItem = null)
+        protected virtual async Task<bool> AfterSaveAsync(T item, PropertyChange[] changes = null, T oldItem = null,
+            IBioRepositoryOperationContext operationContext = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)
             {
                 if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.AfterSaveAsync(item, changes))
+                if (!await repositoryFilter.AfterSaveAsync(item, changes, operationContext))
                 {
                     result = false;
                 }
@@ -402,19 +400,5 @@ namespace BioEngine.Core.Repository
 
             return result;
         }
-    }
-
-    public struct PropertyChange
-    {
-        public PropertyChange(string name, object originalValue, object currentValue)
-        {
-            Name = name;
-            OriginalValue = originalValue;
-            CurrentValue = currentValue;
-        }
-
-        public string Name { get; }
-        public object OriginalValue { get; }
-        public object CurrentValue { get; }
     }
 }

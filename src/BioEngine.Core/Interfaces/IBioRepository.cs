@@ -24,19 +24,21 @@ namespace BioEngine.Core.Interfaces
 
         Task<TEntity[]> GetByIdsAsync(Guid[] ids, QueryContext<TEntity> queryContext = null);
 
-        Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item);
+        Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item,
+            IBioRepositoryOperationContext operationContext = null);
 
-        Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item);
+        Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item,
+            IBioRepositoryOperationContext operationContext = null);
 
-        Task<bool> DeleteAsync(Guid id);
-        Task<bool> DeleteAsync(TEntity item);
+        Task<bool> DeleteAsync(Guid id, IBioRepositoryOperationContext operationContext = null);
+        Task<bool> DeleteAsync(TEntity item, IBioRepositoryOperationContext operationContext = null);
 
         void BeginBatch();
         Task FinishBatchAsync();
 
-        Task PublishAsync(TEntity item);
-        
-        Task UnPublishAsync(TEntity item);
+        Task PublishAsync(TEntity item, IBioRepositoryOperationContext operationContext = null);
+
+        Task UnPublishAsync(TEntity item, IBioRepositoryOperationContext operationContext = null);
 
         PropertyChange[] GetChanges(TEntity item, TEntity oldEntity);
     }

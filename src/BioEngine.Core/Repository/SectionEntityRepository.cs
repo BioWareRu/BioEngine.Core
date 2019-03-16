@@ -37,9 +37,9 @@ namespace BioEngine.Core.Repository
 
         protected override async Task<bool> BeforeValidateAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null)
+            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
         {
-            var result = await base.BeforeValidateAsync(item, validationResult, changes);
+            var result = await base.BeforeValidateAsync(item, validationResult, changes, operationContext);
 
             if (!result) return false;
 
