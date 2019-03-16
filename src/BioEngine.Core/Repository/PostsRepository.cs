@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,7 +44,11 @@ namespace BioEngine.Core.Repository
                     IsPublished = true,
                     DatePublished = DateTimeOffset.UtcNow,
                     Data = JsonConvert.SerializeObject(oldItem,
-                        new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore})
+                        new JsonSerializerSettings
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                            TypeNameHandling = TypeNameHandling.Auto
+                        })
                 };
                 if (operationContext?.User != null)
                 {
@@ -56,6 +60,17 @@ namespace BioEngine.Core.Repository
             }
 
             return await base.AfterSaveAsync(item, changes, oldItem);
+        }
+
+        public async Task<List<PostVersion>> GetVersionsAsync(Guid itemId)
+        {
+            return await DbContext.PostVersions.Where(v => v.PostId == itemId).ToListAsync();
+        }
+
+        public async Task<PostVersion> GetVersionAsync(Guid itemId, Guid versionId)
+        {
+            return await DbContext.PostVersions.Where(v => v.PostId == itemId && v.Id == versionId)
+                .FirstOrDefaultAsync();
         }
     }
 }
