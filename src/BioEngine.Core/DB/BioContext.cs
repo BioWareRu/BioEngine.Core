@@ -28,6 +28,7 @@ namespace BioEngine.Core.DB
         public DbSet<PostBlock> Blocks { get; set; }
         [UsedImplicitly]
         public DbSet<StorageItem> StorageItems { get; set; }
+        public DbSet<PostVersion> PostVersions { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<PropertiesRecord> Properties { get; set; }

@@ -111,12 +111,13 @@ namespace BioEngine.Core.Tests
 
             var repository = GetSitesRepository(context);
             var site = await context.Sites.FirstAsync();
+            var oldSite = await context.Sites.AsNoTracking().FirstAsync();
 
             var originalTitle = site.Title;
             var newTitle = "Another title";
             site.Title = newTitle;
 
-            var changes = repository.GetChanges(site);
+            var changes = repository.GetChanges(site, oldSite);
 
             Assert.NotEmpty(changes);
 

@@ -106,11 +106,11 @@ namespace BioEngine.Core.Tests
             return repository;
         }
 
-        protected ContentRepository GetContentRepository(BioContext context)
+        protected PostsRepository GetContentRepository(BioContext context)
         {
             var propertiesProvider = GetPropertiesProvider(context);
             var repositoryContext = new BioRepositoryContext<Post>(context, propertiesProvider);
-            var repository = new ContentRepository(repositoryContext,
+            var repository = new PostsRepository(repositoryContext,
                 new SectionsRepository(new BioRepositoryContext<Section>(context, propertiesProvider)));
             return repository;
         }

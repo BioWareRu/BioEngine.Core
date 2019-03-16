@@ -142,7 +142,7 @@ namespace BioEngine.Core.Repository
             return new AddOrUpdateOperationResult<T>(item, validationResult.errors);
         }
 
-        public PropertyChange[] GetChanges(T item)
+        public PropertyChange[] GetChanges(T item, T oldEntity)
         {
             var changes = new List<PropertyChange>();
             foreach (var propertyEntry in DbContext.Entry(item).Properties)
@@ -156,12 +156,28 @@ namespace BioEngine.Core.Repository
                 }
             }
 
+            foreach (var navigationEntry in DbContext.Entry(item).Navigations)
+            {
+                var property = item.GetType().GetProperty(navigationEntry.Metadata.Name);
+                if (property != null)
+                {
+                    var value = property.GetValue(item);
+                    var originalValue = property.GetValue(oldEntity);
+                    if (value == null && originalValue != null || value != null && !value.Equals(originalValue))
+                    {
+                        var name = navigationEntry.Metadata.Name;
+                        changes.Add(new PropertyChange(name, originalValue, value));
+                    }
+                }
+            }
+
             return changes.ToArray();
         }
 
         public virtual async Task<AddOrUpdateOperationResult<T>> UpdateAsync(T item)
         {
-            var changes = GetChanges(item);
+            var oldItem = GetBaseQuery().Where(e => e.Id == item.Id).AsNoTracking().First();
+            var changes = GetChanges(item, oldItem);
             item.DateUpdated = DateTimeOffset.UtcNow;
             (bool isValid, IList<ValidationFailure> errors) validationResult = (false, new List<ValidationFailure>());
             if (await BeforeValidateAsync(item, validationResult, changes))
@@ -173,7 +189,7 @@ namespace BioEngine.Core.Repository
                     {
                         DbContext.Update(item);
                         await SaveChangesAsync();
-                        await AfterSaveAsync(item, changes);
+                        await AfterSaveAsync(item, changes, oldItem);
                     }
                 }
             }
@@ -191,7 +207,7 @@ namespace BioEngine.Core.Repository
         {
             item.IsPublished = true;
             item.DatePublished = DateTimeOffset.UtcNow;
-            var changes = GetChanges(item);
+            var changes = GetChanges(item, await GetBaseQuery().Where(i => i.Id == item.Id).AsNoTracking().FirstAsync());
             await UpdateAsync(item);
             await AfterSaveAsync(item, changes);
         }
@@ -200,7 +216,8 @@ namespace BioEngine.Core.Repository
         {
             item.IsPublished = false;
             item.DatePublished = null;
-            var changes = GetChanges(item);
+            var changes = GetChanges(item,
+                await GetBaseQuery().Where(i => i.Id == item.Id).AsNoTracking().FirstAsync());
             await UpdateAsync(item);
             await AfterSaveAsync(item, changes);
         }
@@ -360,7 +377,7 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        protected virtual async Task<bool> AfterSaveAsync(T item, PropertyChange[] changes = null)
+        protected virtual async Task<bool> AfterSaveAsync(T item, PropertyChange[] changes = null, T oldItem = null)
         {
             var result = true;
             foreach (var repositoryFilter in Filters)

@@ -38,6 +38,6 @@ namespace BioEngine.Core.Interfaces
         
         Task UnPublishAsync(TEntity item);
 
-        PropertyChange[] GetChanges(TEntity item);
+        PropertyChange[] GetChanges(TEntity item, TEntity oldEntity);
     }
 }
