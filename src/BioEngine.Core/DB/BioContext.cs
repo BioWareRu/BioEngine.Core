@@ -26,8 +26,7 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
         public DbSet<PostBlock> Blocks { get; set; }
-        [UsedImplicitly]
-        public DbSet<StorageItem> StorageItems { get; set; }
+        [UsedImplicitly] public DbSet<StorageItem> StorageItems { get; set; }
         public DbSet<PostVersion> PostVersions { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
@@ -60,7 +59,7 @@ namespace BioEngine.Core.DB
             modelBuilder.Entity<Post>().HasIndex(i => i.TagIds);
             modelBuilder.Entity<Post>().HasIndex(i => i.SectionIds);
             modelBuilder.Entity<Post>().HasIndex(i => i.IsPublished);
-            modelBuilder.Entity<Post>().HasIndex(i => i.Url);
+            modelBuilder.Entity<Post>().HasIndex(i => i.Url).IsUnique();
 
             var dataConversionRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterDataConversion),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
