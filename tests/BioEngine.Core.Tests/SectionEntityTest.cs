@@ -52,7 +52,7 @@ namespace BioEngine.Core.Tests
                 Url = "content2",
                 SectionIds = new[] {section.Id},
                 AuthorId = 1,
-                Blocks = new List<PostBlock>
+                Blocks = new List<ContentBlock>
                 {
                     new TextBlock
                     {

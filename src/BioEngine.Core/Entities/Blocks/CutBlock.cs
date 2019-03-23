@@ -1,6 +1,6 @@
 namespace BioEngine.Core.Entities.Blocks
 {
-    public class CutBlock : PostBlock<CutBlockData>
+    public class CutBlock : ContentBlock<CutBlockData>
     {
         public override string TypeTitle { get; set; } = "Кат";
     }

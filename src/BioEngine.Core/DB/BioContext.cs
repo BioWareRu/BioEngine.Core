@@ -25,7 +25,7 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
-        public DbSet<PostBlock> Blocks { get; set; }
+        public DbSet<ContentBlock> Blocks { get; set; }
         [UsedImplicitly] public DbSet<StorageItem> StorageItems { get; set; }
         public DbSet<PostVersion> PostVersions { get; set; }
 
@@ -82,11 +82,11 @@ namespace BioEngine.Core.DB
                                 .Invoke(this, new object[] {modelBuilder});
                         }
                     }
-                    else if (typeof(PostBlock).IsAssignableFrom(entityMetadata.EntityType))
+                    else if (typeof(ContentBlock).IsAssignableFrom(entityMetadata.EntityType))
                     {
                         Console.WriteLine(
                             $"Register content block type {entityMetadata.EntityType} ({entityMetadata.DataType})");
-                        RegisterDiscriminator<PostBlock>(modelBuilder, entityMetadata.EntityType,
+                        RegisterDiscriminator<ContentBlock>(modelBuilder, entityMetadata.EntityType,
                             entityMetadata.EntityType.FullName);
                     }
 

@@ -1,6 +1,6 @@
 namespace BioEngine.Core.Entities.Blocks
 {
-    public class TwitterBlock : PostBlock<TwitterBlockData>
+    public class TwitterBlock : ContentBlock<TwitterBlockData>
     {
         public override string TypeTitle { get; set; } = "Twitter";
     }

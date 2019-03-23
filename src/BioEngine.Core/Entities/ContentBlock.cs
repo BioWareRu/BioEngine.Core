@@ -6,24 +6,26 @@ using Newtonsoft.Json;
 
 namespace BioEngine.Core.Entities
 {
-    [Table("PostBlocks")]
-    public abstract class PostBlock : ITypedEntity
+    [Table("ContentBlocks")]
+    public abstract class ContentBlock : ITypedEntity
     {
         [Key] public Guid Id { get; set; }
-        [Required] private Guid PostId { get; set; }
+        [Required] public Guid ContentId { get; set; }
         [Required] public string Type { get; set; }
         [Required] public int Position { get; set; }
         [NotMapped]
         public abstract string TypeTitle { get; set; }
 
-        [ForeignKey(nameof(PostId))]
-        public Post Post { get; set; }
-
         public abstract object GetData();
         public abstract void SetData(object data);
+        
+        [ForeignKey(nameof(ContentId))]
+        public Post Post { get; set; }
+        [ForeignKey(nameof(ContentId))]
+        public Page Page { get; set; }
     }
 
-    public abstract class PostBlock<T> : PostBlock, ITypedEntity<T> where T : ContentBlockData, new()
+    public abstract class ContentBlock<T> : ContentBlock, ITypedEntity<T> where T : ContentBlockData, new()
     {
         public T Data { get; set; }
 

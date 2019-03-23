@@ -42,9 +42,9 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var site = await repository.GetByIdAsync(CoreTestScope.SiteID);
+            var site = await repository.GetByIdAsync(CoreTestScope.SiteId);
             Assert.NotNull(site);
-            Assert.Equal(CoreTestScope.SiteID, site.Id);
+            Assert.Equal(CoreTestScope.SiteId, site.Id);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace BioEngine.Core.Tests
         {
             var context = CreateDbContext();
             var repository = GetSitesRepository(context);
-            var site = await repository.GetByIdAsync(CoreTestScope.SiteID);
+            var site = await repository.GetByIdAsync(CoreTestScope.SiteId);
             const string newTitle = "Test new";
             var oldDate = site.DateUpdated;
             site.Title = newTitle;

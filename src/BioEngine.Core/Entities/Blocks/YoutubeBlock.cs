@@ -1,6 +1,6 @@
 namespace BioEngine.Core.Entities.Blocks
 {
-    public class YoutubeBlock : PostBlock<YoutubeBlockData>
+    public class YoutubeBlock : ContentBlock<YoutubeBlockData>
     {
         public override string TypeTitle { get; set; } = "Youtube";
     }

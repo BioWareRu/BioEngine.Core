@@ -17,8 +17,8 @@ namespace BioEngine.Core.Entities
         public virtual Guid[] SectionIds { get; set; } = new Guid[0];
         public virtual Guid[] TagIds { get; set; } = new Guid[0];
 
-        [InverseProperty(nameof(PostBlock.Post))]
-        public List<PostBlock> Blocks { get; set; }
+        [InverseProperty(nameof(ContentBlock.Post))]
+        public List<ContentBlock> Blocks { get; set; }
         
         [NotMapped] public string PublicUrl => $"/content/{Id}-{Url}.html";
         [NotMapped] public IUser Author { get; set; }

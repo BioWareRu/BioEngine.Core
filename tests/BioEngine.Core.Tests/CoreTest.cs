@@ -15,13 +15,13 @@ namespace BioEngine.Core.Tests
     [UsedImplicitly]
     public class CoreTestScope : BaseTestScope
     {
-        public static Guid SiteID = Guid.NewGuid();
+        public static Guid SiteId = Guid.NewGuid();
 
         protected override void InitDbContext(BioContext dbContext)
         {
             var site = new Site
             {
-                Id = SiteID,
+                Id = SiteId,
                 Title = "Test site",
                 Url = "https://test.ru",
                 DatePublished = DateTimeOffset.Now,
@@ -56,9 +56,9 @@ namespace BioEngine.Core.Tests
             {
                 Title = "Test page",
                 Url = "test",
-                Text = "Bla-bla",
                 DatePublished = DateTimeOffset.Now,
-                IsPublished = true
+                IsPublished = true,
+                SiteIds = new[] {site.Id}
             };
             dbContext.Add(page);
             dbContext.SaveChanges();

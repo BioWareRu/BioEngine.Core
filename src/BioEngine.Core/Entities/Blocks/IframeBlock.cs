@@ -1,6 +1,6 @@
 namespace BioEngine.Core.Entities.Blocks
 {
-    public class IframeBlock : PostBlock<IframeBlockData>
+    public class IframeBlock : ContentBlock<IframeBlockData>
     {
         public override string TypeTitle { get; set; } = "Iframe";
     }

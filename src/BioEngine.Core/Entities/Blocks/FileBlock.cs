@@ -1,6 +1,6 @@
 ﻿namespace BioEngine.Core.Entities.Blocks
 {
-    public class FileBlock : PostBlock<FileBlockData>
+    public class FileBlock : ContentBlock<FileBlockData>
     {
         public override string TypeTitle { get; set; } = "Файл";
     }
