@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace BioEngine.Core.DB
 {
@@ -110,6 +111,19 @@ namespace BioEngine.Core.DB
         private static object ParsePropertyValue(Type propertyType, object value)
         {
             if (value == null) return null;
+            if (value is JArray arr)
+            {
+                var values = Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyType)) as IList;
+                if (values != null)
+                {
+                    foreach (var child in arr.Children())
+                    {
+                        values.Add(ParsePropertyValue(propertyType, child));
+                    }
+                }
+
+                return values;
+            }
             object parsedValue = null;
             var nullableType = Nullable.GetUnderlyingType(propertyType);
             if (nullableType != null)
@@ -136,6 +150,13 @@ namespace BioEngine.Core.DB
             else if (propertyType == typeof(DateTimeOffset) || propertyType == typeof(DateTimeOffset?))
             {
                 if (DateTimeOffset.TryParse(value.ToString(), out var dto))
+                {
+                    parsedValue = dto;
+                }
+            }
+            else if (propertyType == typeof(Guid))
+            {
+                if (Guid.TryParse(value.ToString(), out var dto))
                 {
                     parsedValue = dto;
                 }
@@ -200,7 +221,8 @@ namespace BioEngine.Core.DB
         LessOrEqual = 6,
         Contains = 7,
         StartsWith = 8,
-        EndsWith = 9
+        EndsWith = 9,
+        In = 10
     }
 
     public class QueryContextConditionsGroup
@@ -257,6 +279,8 @@ namespace BioEngine.Core.DB
                     }
 
                     break;
+                case QueryContextOperator.In:
+                    return $"@{valueIndex}.Contains({Property})";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
