@@ -1,4 +1,4 @@
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Entities;
 using FluentValidation;
 
 namespace BioEngine.Core.Validation

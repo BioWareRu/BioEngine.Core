@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using BioEngine.Core.Properties;
 
-namespace BioEngine.Core.Interfaces
+namespace BioEngine.Core.Entities
 {
     public interface IEntity
     {

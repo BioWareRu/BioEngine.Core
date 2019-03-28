@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BioEngine.Core.DB;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Properties;
 using FluentValidation;
 

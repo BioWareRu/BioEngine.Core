@@ -1,5 +1,5 @@
 using System;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Users;
 
 namespace BioEngine.Core.Repository
 {

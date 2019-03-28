@@ -27,4 +27,7 @@
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.11" />
         <PackageReference Include="xunit" Version="2.4.1" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Search" />
+    </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BioEngine.Core.Interfaces
+namespace BioEngine.Core.Modules
 {
     public interface IBioEngineModule
     {

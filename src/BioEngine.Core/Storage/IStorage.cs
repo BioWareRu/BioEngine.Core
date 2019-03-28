@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Storage;
 
-namespace BioEngine.Core.Interfaces
+namespace BioEngine.Core.Storage
 {
     public interface IStorage
     {

@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
-using BioEngine.Core.Repository;
+using BioEngine.Core.Entities;
 
-namespace BioEngine.Core.Interfaces
+namespace BioEngine.Core.Repository
 {
     public interface IBioRepository
     {

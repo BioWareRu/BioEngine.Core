@@ -1,7 +1,7 @@
 ﻿using System;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Modules;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 

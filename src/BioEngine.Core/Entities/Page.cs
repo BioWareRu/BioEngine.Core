@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BioEngine.Core.Interfaces;
 
 namespace BioEngine.Core.Entities
 {

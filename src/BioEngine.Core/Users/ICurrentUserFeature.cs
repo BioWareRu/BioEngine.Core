@@ -1,6 +1,4 @@
-﻿using BioEngine.Core.Interfaces;
-
-namespace BioEngine.Core.Users
+﻿namespace BioEngine.Core.Users
 {
     public interface ICurrentUserFeature
     {

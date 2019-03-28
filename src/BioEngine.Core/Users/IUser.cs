@@ -1,4 +1,4 @@
-﻿namespace BioEngine.Core.Interfaces
+﻿namespace BioEngine.Core.Users
 {
     public interface IUser
     {

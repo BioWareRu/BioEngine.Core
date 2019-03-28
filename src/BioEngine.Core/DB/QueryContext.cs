@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Interfaces;
 using Newtonsoft.Json.Linq;
 
 namespace BioEngine.Core.DB

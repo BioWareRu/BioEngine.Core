@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BioEngine.Core.Repository;
+using BioEngine.Core.Entities;
 using FluentValidation.Results;
 
-namespace BioEngine.Core.Interfaces
+namespace BioEngine.Core.Repository
 {
     public interface IRepositoryFilter
     {

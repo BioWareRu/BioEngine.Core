@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Interfaces;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;

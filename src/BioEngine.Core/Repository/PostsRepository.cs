@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Interfaces;
 using BioEngine.Core.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;

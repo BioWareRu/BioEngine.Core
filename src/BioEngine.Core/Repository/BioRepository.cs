@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Validation;
 using FluentValidation;

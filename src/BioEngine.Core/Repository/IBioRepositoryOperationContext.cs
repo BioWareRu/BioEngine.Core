@@ -1,6 +1,7 @@
 using System;
+using BioEngine.Core.Users;
 
-namespace BioEngine.Core.Interfaces
+namespace BioEngine.Core.Repository
 {
     public interface IBioRepositoryOperationContext
     {

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using BioEngine.Core.DB;
-using BioEngine.Core.Interfaces;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Validation;
 
 namespace BioEngine.Core.Repository
