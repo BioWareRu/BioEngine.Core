@@ -6,6 +6,8 @@ using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
+using BioEngine.Core.Search;
+using BioEngine.Core.Search.ElasticSearch;
 using BioEngine.Core.Seo;
 using BioEngine.Core.Storage;
 using BioEngine.Core.Web;
@@ -13,6 +15,7 @@ using FluentValidation;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -24,9 +27,13 @@ namespace BioEngine.Core
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostingEnvironment environment)
         {
-            if (Config.EnableDatabase)
+            if (Config.EnableInMemoryDatabase)
             {
-                AddDatabase(services, configuration, environment);
+                AddInMemoryDatabase(services);
+            }
+            else if (Config.EnableDatabase)
+            {
+                AddPostgresDatabase(services, configuration, environment);
             }
 
             if (Config.EnableValidation)
@@ -49,8 +56,59 @@ namespace BioEngine.Core
                 AddS3Storage(services, configuration);
             }
 
+            if (Config.EnableElasticSearch)
+            {
+                AddElasticSearch(services, configuration);
+            }
+
             services.AddScoped<BaseControllerContext>();
             services.AddScoped(typeof(BaseControllerContext<>));
+        }
+
+        private void AddSearch(IServiceCollection services)
+        {
+            var assembliesList = new List<Assembly>(Config.Assemblies) {typeof(ISearchProvider).Assembly};
+            services.Scan(s =>
+                s.FromAssemblies(assembliesList).AddClasses(classes => classes.AssignableTo<ISearchProvider>())
+                    .AsSelfWithInterfaces().WithScopedLifetime());
+            services.AddScoped<IRepositoryHook, SearchRepositoryHook<Page>>();
+            services.AddScoped<IRepositoryHook, SearchRepositoryHook<Post>>();
+            foreach (var assembly in assembliesList)
+            {
+                foreach (var definedType in assembly.DefinedTypes)
+                {
+                    if (definedType.IsAbstract || definedType.BaseType == null)
+                    {
+                        continue;
+                    }
+
+                    if (!typeof(Section).IsAssignableFrom(definedType))
+                    {
+                        continue;
+                    }
+
+                    var type = typeof(SearchRepositoryHook<>).MakeGenericType(definedType);
+                    services.AddScoped(typeof(IRepositoryHook), type);
+                }
+            }
+        }
+
+        private void AddElasticSearch(IServiceCollection services, IConfiguration configuration)
+        {
+            AddSearch(services);
+            services.AddScoped<ISearcher, ElasticSearcher>();
+            services.Configure<ElasticSearcherOptions>(options =>
+            {
+                var uri = configuration["BE_ELASTICSEARCH_URI"];
+                if (string.IsNullOrEmpty(uri))
+                {
+                    throw new ArgumentException("Elastic url is empty");
+                }
+
+                options.Url = uri;
+                options.Login = configuration["BE_ELASTICSEARCH_LOGIN"];
+                options.Password = configuration["BE_ELASTICSEARCH_PASSWORD"];
+            });
         }
 
         private static void AddS3Storage(IServiceCollection services, IConfiguration configuration)
@@ -157,7 +215,54 @@ namespace BioEngine.Core
             }
         }
 
-        private void AddDatabase(IServiceCollection services, IConfiguration configuration,
+        private void AddRepositories(IServiceCollection services)
+        {
+            services.AddScoped<PropertiesProvider>();
+
+            // collect defined types
+            var assembliesList = new List<Assembly>(Config.Assemblies) {typeof(BioContext).Assembly};
+            if (Config.MigrationsAssembly != null)
+            {
+                assembliesList.Add(Config.MigrationsAssembly);
+            }
+
+            var types = new HashSet<TypeInfo>();
+            foreach (var assembly in assembliesList)
+            {
+                foreach (var definedType in assembly.DefinedTypes)
+                {
+                    types.Add(definedType);
+                }
+            }
+
+            services.AddScoped<BioRepositoryHooksManager>();
+            services.Scan(s =>
+                s.FromAssemblies(assembliesList).AddClasses(classes => classes.AssignableTo<IBioRepository>())
+                    .AsSelfWithInterfaces());
+
+            foreach (var type in types)
+            {
+                services.RegisterEntityType(type);
+            }
+
+            services.AddScoped(typeof(BioRepositoryContext<>));
+        }
+
+
+        private void AddInMemoryDatabase(IServiceCollection services)
+        {
+            services.AddEntityFrameworkInMemoryDatabase();
+            services.AddDbContext<BioContext>((p, options) =>
+            {
+                options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                    .UseInMemoryDatabase(Config.InMemoryDatabaseName).UseInternalServiceProvider(p);
+            });
+
+
+            AddRepositories(services);
+        }
+
+        private void AddPostgresDatabase(IServiceCollection services, IConfiguration configuration,
             IHostingEnvironment environment)
         {
             var connBuilder = new NpgsqlConnectionStringBuilder
@@ -186,30 +291,7 @@ namespace BioEngine.Core
                 }
             });
 
-            services.AddScoped<PropertiesProvider>();
-
-            // collect defined types
-            var assembliesList = new List<Assembly>(Config.Assemblies)
-                {Config.MigrationsAssembly, typeof(BioContext).Assembly};
-            var types = new HashSet<TypeInfo>();
-            foreach (var assembly in assembliesList)
-            {
-                foreach (var definedType in assembly.DefinedTypes)
-                {
-                    types.Add(definedType);
-                }
-            }
-
-            services.Scan(s =>
-                s.FromAssemblies(assembliesList).AddClasses(classes => classes.AssignableTo<IBioRepository>())
-                    .AsSelfWithInterfaces());
-
-            foreach (var type in types)
-            {
-                services.RegisterEntityType(type);
-            }
-
-            services.AddScoped(typeof(BioRepositoryContext<>));
+            AddRepositories(services);
         }
     }
 
@@ -217,11 +299,13 @@ namespace BioEngine.Core
     public class CoreModuleConfig
     {
         public bool EnableDatabase = true;
+        public bool EnableInMemoryDatabase;
+        public string InMemoryDatabaseName;
         public bool EnableValidation;
         public bool EnableFileStorage;
         public bool EnableS3Storage = true;
+        public bool EnableElasticSearch;
         public bool EnableSeoExtensions = true;
-
         public Action<NpgsqlConnectionStringBuilder, IConfiguration> DbConfigure;
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
         public Assembly MigrationsAssembly;
