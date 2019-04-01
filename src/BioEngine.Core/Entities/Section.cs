@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BioEngine.Core.Entities
 {
     [Table("Sections")]
-    public abstract class Section : BaseSiteEntity, IRoutable
+    public abstract class Section : BaseSiteEntity, IRoutable, IContentEntity
     {
         [Required] public virtual string Type { get; set; }
         public virtual Guid? ParentId { get; set; }
@@ -20,7 +21,8 @@ namespace BioEngine.Core.Entities
         [Column(TypeName = "jsonb")]
         public virtual StorageItem LogoSmall { get; set; }
 
-        [Required] public virtual string ShortDescription { get; set; }
+        [InverseProperty(nameof(ContentBlock.Section))]
+        public List<ContentBlock> Blocks { get; set; }
         [Required] public virtual string Hashtag { get; set; }
 
         [NotMapped] public string PublicUrl => $"/section/{Id}-{Url}.html";

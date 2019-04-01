@@ -33,6 +33,7 @@ namespace BioEngine.Core.Entities
 
     public interface IContentEntity : IEntity
     {
+        List<ContentBlock> Blocks { get; set; }
     }
 
     public interface ITypedEntity

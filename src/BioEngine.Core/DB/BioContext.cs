@@ -46,6 +46,7 @@ namespace BioEngine.Core.DB
             {
                 RegisterSiteEntityConversions<Page>(modelBuilder);
                 RegisterSiteEntityConversions<Post>(modelBuilder);
+                RegisterSiteEntityConversions<Section>(modelBuilder);
                 RegisterSectionEntityConversions<Post>(modelBuilder);
             }
 
