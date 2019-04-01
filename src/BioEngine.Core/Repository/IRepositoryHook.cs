@@ -6,7 +6,7 @@ using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository
 {
-    public interface IRepositoryFilter
+    public interface IRepositoryHook
     {
         bool CanProcess(Type type);
 

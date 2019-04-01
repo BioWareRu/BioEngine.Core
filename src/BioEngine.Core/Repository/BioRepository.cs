@@ -19,18 +19,18 @@ namespace BioEngine.Core.Repository
     {
         internal readonly BioContext DbContext;
         protected readonly List<IValidator<T>> Validators;
-        protected readonly List<IRepositoryFilter> Filters;
         protected readonly PropertiesProvider PropertiesProvider;
+        public BioRepositoryHooksManager HooksManager { get; set; }
 
         protected BioRepository(BioRepositoryContext<T> repositoryContext)
         {
             DbContext = repositoryContext.DbContext;
             Validators = repositoryContext.Validators ?? new List<IValidator<T>>();
-            Filters = repositoryContext.Filters ?? new List<IRepositoryFilter>();
             PropertiesProvider = repositoryContext.PropertiesProvider;
-
+            HooksManager = repositoryContext.HooksManager;
             Init();
         }
+
 
         private void Init()
         {
@@ -340,52 +340,25 @@ namespace BioEngine.Core.Repository
             return query;
         }
 
-        protected virtual async Task<bool> BeforeValidateAsync(T item,
+        protected virtual Task<bool> BeforeValidateAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
         {
-            var result = true;
-            foreach (var repositoryFilter in Filters)
-            {
-                if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeValidateAsync(item, validationResult, changes, operationContext))
-                {
-                    result = false;
-                }
-            }
-
-            return result;
+            return HooksManager.BeforeValidateAsync(item, validationResult, changes, operationContext);
         }
 
-        protected virtual async Task<bool> BeforeSaveAsync(T item,
+        protected virtual Task<bool> BeforeSaveAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
         {
-            var result = true;
-            foreach (var repositoryFilter in Filters)
-            {
-                if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.BeforeSaveAsync(item, validationResult, changes, operationContext))
-                {
-                    result = false;
-                }
-            }
-
-            return result;
+            return HooksManager.BeforeSaveAsync(item, validationResult, changes, operationContext);
         }
 
         protected virtual async Task<bool> AfterSaveAsync(T item, PropertyChange[] changes = null, T oldItem = null,
             IBioRepositoryOperationContext operationContext = null)
         {
-            var result = true;
-            foreach (var repositoryFilter in Filters)
-            {
-                if (!repositoryFilter.CanProcess(item.GetType())) continue;
-                if (!await repositoryFilter.AfterSaveAsync(item, changes, operationContext))
-                {
-                    result = false;
-                }
-            }
+            var result = await HooksManager.AfterSaveAsync(item, changes, operationContext);
+
 
             if (item.Properties != null)
             {
