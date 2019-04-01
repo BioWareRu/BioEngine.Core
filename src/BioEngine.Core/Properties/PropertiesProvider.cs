@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace BioEngine.Core.Properties
         private bool _batchMode;
         private bool _checkIfExists = true;
 
-        private static readonly Dictionary<Type, PropertiesSchema> Schema = new Dictionary<Type, PropertiesSchema>();
+        private static readonly ConcurrentDictionary<Type, PropertiesSchema> Schema = new ConcurrentDictionary<Type, PropertiesSchema>();
 
         public PropertiesProvider(BioContext dbContext)
         {
@@ -80,7 +81,7 @@ namespace BioEngine.Core.Properties
             {
                 schema = PropertiesSchema.Create<TProperties>();
 
-                Schema.Add(typeof(TProperties), schema);
+                Schema.TryAdd(typeof(TProperties), schema);
             }
 
             schema.AddRegistration(registrationType, entityType);
