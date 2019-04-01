@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
@@ -29,21 +30,23 @@ namespace BioEngine.Core.Tests
 
         private readonly Dictionary<string, BaseTestScope> _scopes = new Dictionary<string, BaseTestScope>();
 
-        private BaseTestScope GetScope(string name)
+        protected T GetScope([CallerMemberName] string name = "")
         {
             if (!_scopes.ContainsKey(name))
             {
                 var scope = Activator.CreateInstance<T>();
                 scope.Configure(name, TestOutputHelper);
+                scope.OnCreated();
                 _scopes.Add(name, scope);
             }
 
-            return _scopes[name];
+            return _scopes[name] as T;
         }
+
 
         protected BioContext GetDbContext(string name, bool init = true)
         {
-            return GetScope(name).GetDbContext(init);
+            return GetScope(name).GetDbContext();
         }
 
         public void Dispose()
@@ -59,91 +62,67 @@ namespace BioEngine.Core.Tests
     {
         public void Configure(string dbName, ITestOutputHelper testOutputHelper)
         {
-            _configuration = new ConfigurationBuilder()
+            Configuration = new ConfigurationBuilder()
                 .AddUserSecrets("bw")
                 .AddEnvironmentVariables()
                 .Build();
             var services = new ServiceCollection();
             services.AddLogging(o => o.AddProvider(new XunitLoggerProvider(testOutputHelper)));
-            ConfigureServices(services);
-            bool.TryParse(_configuration["BE_TESTS_POSTGRES"], out var testWithPostgres);
-            if (testWithPostgres)
-            {
-                services.AddEntityFrameworkNpgsql();
-            }
-            else
-            {
-                services.AddEntityFrameworkInMemoryDatabase();
-            }
+            ConfigureServices(services, dbName);
+            ServiceProvider = services.BuildServiceProvider();
+        }
 
-            services.AddDbContext<BioContext>((p, optionsBuilder) =>
+        protected void RegisterCoreModule(IServiceCollection services, string scopeName,
+            IEnumerable<Assembly> assemblies)
+        {
+            bool.TryParse(Configuration["BE_TESTS_POSTGRES"], out var testWithPostgres);
+            var module = new CoreModule();
+            module.Configure(config =>
             {
-                optionsBuilder.EnableSensitiveDataLogging().UseInternalServiceProvider(p);
-
+                config.Assemblies.AddRange(assemblies);
+                config.EnableValidation = true;
                 if (testWithPostgres)
                 {
-                    optionsBuilder
-                        .UseNpgsql(GetConnectionString(dbName))
-                        .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+                    config.EnableDatabase = true;
                 }
                 else
                 {
-                    optionsBuilder.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                        .UseInMemoryDatabase(dbName);
+                    config.EnableInMemoryDatabase = true;
+                    config.InMemoryDatabaseName = scopeName;
                 }
-
-                ModifyDbOptions(optionsBuilder.Options, !testWithPostgres);
             });
-            _serviceProvider = services.BuildServiceProvider();
+            module.ConfigureServices(services, Configuration,
+                new HostingEnvironment {EnvironmentName = "Development"});
         }
 
-        protected virtual IServiceCollection ConfigureServices(IServiceCollection services)
+        protected virtual IServiceCollection ConfigureServices(IServiceCollection services, string name)
         {
             return services;
         }
 
         private BioContext _bioContext;
 
-        public BioContext GetDbContext(bool needInit)
+        public virtual void OnCreated()
         {
+            _bioContext = ServiceProvider.GetService<BioContext>();
             if (_bioContext == null)
             {
-                _bioContext = _serviceProvider.GetService<BioContext>();
-                if (_bioContext == null)
-                {
-                    throw new Exception("Can't create db context");
-                }
-
-                _bioContext.Database.EnsureDeleted();
-                _bioContext.Database.EnsureCreated();
-                if (needInit)
-                {
-                    InitDbContext(_bioContext);
-                }
+                throw new Exception("Can't create db context");
             }
 
+            _bioContext.Database.EnsureDeleted();
+            _bioContext.Database.EnsureCreated();
+            InitDbContext(_bioContext);
+        }
+
+
+        public BioContext GetDbContext()
+        {
             return _bioContext;
         }
 
-        protected virtual string GetConnectionString(string databaseName)
-        {
-            var connBuilder = new NpgsqlConnectionStringBuilder
-            {
-                Host = _configuration["BE_POSTGRES_HOST"] ?? "localhost",
-                Port =
-                    !string.IsNullOrEmpty(_configuration["BE_POSTGRES_PORT"])
-                        ? int.Parse(_configuration["BE_POSTGRES_PORT"])
-                        : 5432,
-                Username = _configuration["BE_POSTGRES_USERNAME"] ?? "postgres",
-                Password = _configuration["BE_POSTGRES_PASSWORD"] ?? "",
-                Database = databaseName,
-                Pooling = false
-            };
-            return connBuilder.ConnectionString;
-        }
-
-        private IConfiguration _configuration;
-        private IServiceProvider _serviceProvider;
+        protected IConfiguration Configuration;
+        protected IServiceProvider ServiceProvider;
 
         protected virtual void InitDbContext(BioContext dbContext)
         {
@@ -152,6 +131,17 @@ namespace BioEngine.Core.Tests
         protected virtual void ModifyDbOptions(DbContextOptions options, bool inMemory)
         {
         }
+
+        public T Get<T>()
+        {
+            return ServiceProvider.GetRequiredService<T>();
+        }
+
+        public ILogger<T> GetLogger<T>()
+        {
+            return ServiceProvider.GetRequiredService<ILogger<T>>();
+        }
+
 
         public void Dispose()
         {

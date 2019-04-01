@@ -16,13 +16,11 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task DiscriminatorFill()
         {
-            var context = CreateDbContext();
-            var repository = GetSectionsRepository(context);
+            var scope = GetScope();
+            var repository = scope.Get<SectionRepository>();
             var section = new TestSection
             {
-                Title = "Test type",
-                Url = "testurl",
-                SiteIds = new[] {CoreTestScope.SiteId}
+                Title = "Test type", Url = "testurl", SiteIds = new[] {CoreTestScope.SiteId}
             };
 
             Assert.True(string.IsNullOrEmpty(section.Type));

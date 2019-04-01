@@ -21,10 +21,10 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task Create()
         {
-            var context = CreateDbContext(init: false);
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var repository = scope.Get<SitesRepository>();
             var count = await repository.CountAsync();
-            Assert.Equal(0, count);
+            Assert.Equal(1, count);
             var site = new Site
             {
                 Title = "New site",
@@ -34,14 +34,14 @@ namespace BioEngine.Core.Tests
             Assert.True(result.IsSuccess);
             Assert.True(result.Entity.Id != Guid.Empty);
             count = await repository.CountAsync();
-            Assert.Equal(1, count);
+            Assert.Equal(2, count);
         }
 
         [Fact]
         public async Task GetById()
         {
-            var context = CreateDbContext();
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var repository = scope.Get<SitesRepository>();
             var site = await repository.GetByIdAsync(CoreTestScope.SiteId);
             Assert.NotNull(site);
             Assert.Equal(CoreTestScope.SiteId, site.Id);
@@ -50,8 +50,9 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task Update()
         {
-            var context = CreateDbContext();
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var context = scope.GetDbContext();
+            var repository = scope.Get<SitesRepository>();
             var site = await repository.GetByIdAsync(CoreTestScope.SiteId);
             const string newTitle = "Test new";
             var oldDate = site.DateUpdated;
@@ -65,8 +66,9 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task Delete()
         {
-            var context = CreateDbContext();
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var context = scope.GetDbContext();
+            var repository = scope.Get<SitesRepository>();
             var count = await context.Sites.CountAsync();
             var site = await context.Sites.FirstAsync();
             await repository.DeleteAsync(site.Id);
@@ -77,8 +79,9 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task SearchNoConditions()
         {
-            var context = CreateDbContext();
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var context = scope.GetDbContext();
+            var repository = scope.Get<SitesRepository>();
             var queryContext = new QueryContext<Site>();
             var result = await repository.GetAllAsync(queryContext);
             var count = await context.Sites.CountAsync();
@@ -89,8 +92,9 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task SearchPublished()
         {
-            var context = CreateDbContext();
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var context = scope.GetDbContext();
+            var repository = scope.Get<SitesRepository>();
             var site = await context.Sites.FirstAsync();
             await repository.UnPublishAsync(site);
             var count = await context.Sites.CountAsync(s => s.IsPublished);
@@ -107,9 +111,9 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task Changes()
         {
-            var context = CreateDbContext();
-
-            var repository = GetSitesRepository(context);
+            var scope = GetScope();
+            var context = scope.GetDbContext();
+            var repository = scope.Get<SitesRepository>();
             var site = await context.Sites.FirstAsync();
             var oldSite = await context.Sites.AsNoTracking().FirstAsync();
 

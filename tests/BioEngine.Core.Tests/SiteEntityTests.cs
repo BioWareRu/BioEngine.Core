@@ -17,8 +17,8 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task SaveWithoutSiteIdsFails()
         {
-            var context = CreateDbContext();
-            var repository = GetSectionsRepository(context);
+            var scope = GetScope();
+            var repository = scope.Get<SectionRepository>();
 
             var section = new TestSection
             {

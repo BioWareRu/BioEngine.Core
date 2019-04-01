@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
+using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,14 +22,10 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task SaveWithoutSectionIdsFails()
         {
-            var context = CreateDbContext();
-            var repository = GetContentRepository(context);
+            var scope = GetScope();
+            var repository = scope.Get<PostsRepository>();
 
-            var content = new Post
-            {
-                Title = "Test Content 2",
-                Url = "content2"
-            };
+            var content = new Post {Title = "Test Content 2", Url = "content2"};
 
             var result = await repository.AddAsync(content);
             Assert.False(result.IsSuccess);
@@ -39,9 +36,9 @@ namespace BioEngine.Core.Tests
         [Fact]
         public async Task SiteIdsAutoFillFromSections()
         {
-            var context = CreateDbContext();
-            var repository = GetContentRepository(context);
-            var sectionRepository = GetSectionsRepository(context);
+            var scope = GetScope();
+            var repository = scope.Get<PostsRepository>();
+            var sectionRepository = scope.Get<SectionRepository>();
             var section = (await sectionRepository.GetAllAsync(new QueryContext<TestSection>())).items.First();
 
             Assert.NotEmpty(section.SiteIds);
@@ -52,16 +49,7 @@ namespace BioEngine.Core.Tests
                 Url = "content2",
                 SectionIds = new[] {section.Id},
                 AuthorId = 1,
-                Blocks = new List<ContentBlock>
-                {
-                    new TextBlock
-                    {
-                        Data = new TextBlockData
-                        {
-                            Text = "Bla"
-                        }
-                    }
-                }
+                Blocks = new List<ContentBlock> {new TextBlock {Data = new TextBlockData {Text = "Bla"}}}
             };
 
             Assert.Empty(content.SiteIds);
