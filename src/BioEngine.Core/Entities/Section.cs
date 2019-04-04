@@ -25,7 +25,7 @@ namespace BioEngine.Core.Entities
         public List<ContentBlock> Blocks { get; set; }
         [Required] public virtual string Hashtag { get; set; }
 
-        [NotMapped] public string PublicUrl => $"/section/{Id}-{Url}.html";
+        [NotMapped] public string PublicUrl => $"/section/{Id.ToString()}-{Url}.html";
     }
 
     public abstract class Section<T> : Section, ITypedEntity<T> where T : TypedData, new()

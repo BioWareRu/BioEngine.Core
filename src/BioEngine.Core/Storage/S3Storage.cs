@@ -37,7 +37,7 @@ namespace BioEngine.Core.Storage
             _client = new AmazonS3Client(_options.AccessKey, _options.SecretKey, config);
         }
 
-        private async Task<bool> CreateBucketAsync(string bucketName)
+        private async Task CreateBucketAsync(string bucketName)
         {
             try
             {
@@ -58,8 +58,6 @@ namespace BioEngine.Core.Storage
                 _logger.LogError(ex, ex.Message);
                 throw;
             }
-
-            return true;
         }
 
         protected override async Task<bool> DoSaveAsync(string path, string tmpPath)

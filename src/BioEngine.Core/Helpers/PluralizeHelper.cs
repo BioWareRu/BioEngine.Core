@@ -20,12 +20,19 @@ namespace BioEngine.Core.Helpers
                     var nTen = n % 10;
                     var nHundred = n % 100;
                     if (Math.Abs(nTen - 1) < double.Epsilon && Math.Abs(nHundred - 11) > double.Epsilon)
+                    {
                         return "one";
+                    }
                     if (nTen >= 2 && nTen <= 4 && !(nHundred >= 12 && nHundred <= 14))
+                    {
                         return "few";
+                    }
                     if (Math.Abs(nTen) < double.Epsilon || (nTen >= 5 && nTen <= 9) ||
                         (nHundred >= 11 && nHundred <= 14))
+                    {
                         return "many";
+                    }
+
                     return "other";
                 };
                 Formatters.Add(CultureInfo.CurrentCulture, mf);
@@ -37,11 +44,10 @@ namespace BioEngine.Core.Helpers
 
         public static string Pluralize(this string message, int number)
         {
-            var formatted = GetMessageFormatter().FormatMessage(message, new Dictionary<string, object>
+            return GetMessageFormatter().FormatMessage(message, new Dictionary<string, object>
             {
                 {"n", number},
             });
-            return formatted;
         }
 
         public static string Pluralize(this string message, double number)

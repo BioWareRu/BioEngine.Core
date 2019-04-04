@@ -10,11 +10,8 @@ namespace BioEngine.Core.Storage
     [UsedImplicitly]
     public class FileStorage : Storage
     {
-        private readonly FileStorageOptions _options;
-
         public FileStorage(IOptions<FileStorageOptions> options, IServiceProvider serviceProvider, ILogger<FileStorage> logger) : base(options, serviceProvider, logger)
         {
-            _options = options.Value;
         }
        
         protected override Task<bool> DoSaveAsync(string path, string tmpPath)

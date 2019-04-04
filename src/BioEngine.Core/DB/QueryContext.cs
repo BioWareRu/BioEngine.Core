@@ -246,40 +246,40 @@ namespace BioEngine.Core.DB
             switch (Operator)
             {
                 case QueryContextOperator.Equal:
-                    return $"{Property} == @{valueIndex}";
+                    return $"{Property} == @{valueIndex.ToString()}";
                 case QueryContextOperator.NotEqual:
-                    return $"{Property} != @{valueIndex}";
+                    return $"{Property} != @{valueIndex.ToString()}";
                 case QueryContextOperator.Greater:
-                    return $"{Property} > @{valueIndex}";
+                    return $"{Property} > @{valueIndex.ToString()}";
                 case QueryContextOperator.GreaterOrEqual:
-                    return $"{Property} >= @{valueIndex}";
+                    return $"{Property} >= @{valueIndex.ToString()}";
                 case QueryContextOperator.Less:
-                    return $"{Property} < @{valueIndex}";
+                    return $"{Property} < @{valueIndex.ToString()}";
                 case QueryContextOperator.LessOrEqual:
-                    return $"{Property} <= @{valueIndex}";
+                    return $"{Property} <= @{valueIndex.ToString()}";
                 case QueryContextOperator.Contains:
                     if (ValueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(ValueType))
                     {
-                        return $"{Property}.Contains(@{valueIndex})";
+                        return $"{Property}.Contains(@{valueIndex.ToString()})";
                     }
 
                     break;
                 case QueryContextOperator.StartsWith:
                     if (ValueType == typeof(string))
                     {
-                        return $"{Property}.StartsWith(@{valueIndex})";
+                        return $"{Property}.StartsWith(@{valueIndex.ToString()})";
                     }
 
                     break;
                 case QueryContextOperator.EndsWith:
                     if (ValueType == typeof(string))
                     {
-                        return $"{Property}.EndsWith(@{valueIndex})";
+                        return $"{Property}.EndsWith(@{valueIndex.ToString()})";
                     }
 
                     break;
                 case QueryContextOperator.In:
-                    return $"@{valueIndex}.Contains({Property})";
+                    return $"@{valueIndex.ToString()}.Contains({Property})";
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace BioEngine.Core.DB
@@ -66,13 +67,14 @@ namespace BioEngine.Core.DB
             var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             var metadataEntities = this.GetInfrastructure().GetServices<EntityMetadata>()?.ToArray();
+            var logger = this.GetInfrastructure().GetRequiredService<ILogger<BioContext>>();
             if (metadataEntities != null)
             {
                 foreach (var entityMetadata in metadataEntities)
                 {
                     if (typeof(Section).IsAssignableFrom(entityMetadata.EntityType))
                     {
-                        Console.WriteLine($"Register section type {entityMetadata}");
+                        logger.LogInformation("Register section type {entityMetadata}", entityMetadata);
                         RegisterDiscriminator<Section>(modelBuilder, entityMetadata.EntityType,
                             entityMetadata.EntityType.FullName);
 
@@ -84,8 +86,9 @@ namespace BioEngine.Core.DB
                     }
                     else if (typeof(ContentBlock).IsAssignableFrom(entityMetadata.EntityType))
                     {
-                        Console.WriteLine(
-                            $"Register content block type {entityMetadata.EntityType} ({entityMetadata.DataType})");
+                        logger.LogInformation(
+                            "Register content block type {entityType} ({dataType})", entityMetadata.EntityType,
+                            entityMetadata.DataType);
                         RegisterDiscriminator<ContentBlock>(modelBuilder, entityMetadata.EntityType,
                             entityMetadata.EntityType.FullName);
                     }
@@ -96,7 +99,7 @@ namespace BioEngine.Core.DB
                 }
             }
 
-            Console.WriteLine("Done registering");
+            logger.LogInformation("Done registering");
         }
 
         private void RegisterDiscriminator<TBase>(ModelBuilder modelBuilder, Type sectionType, string discriminator)

@@ -180,7 +180,8 @@ namespace BioEngine.Core.Storage
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Can't delete storage item {item.Id}: {item.FilePath}: {ex.Message}");
+                    _logger.LogError(ex, "Can't delete storage item {itemId}: {itemFilePath}: {errorMessage}", item.Id,
+                        item.FilePath, ex.ToString());
                 }
             }
 
@@ -194,10 +195,10 @@ namespace BioEngine.Core.Storage
         private string GetStorageFileName(string fileName)
         {
             var extension = fileName.Substring(fileName.LastIndexOf('.'));
-            return Guid.NewGuid() + extension;
+            return $"{Guid.NewGuid().ToString()}{extension}";
         }
 
-        private async Task<StorageItem> TryProcessImageAsync(StorageItem storageItem, string filePath,
+        private async Task TryProcessImageAsync(StorageItem storageItem, string filePath,
             string destinationPath)
         {
             try
@@ -218,10 +219,8 @@ namespace BioEngine.Core.Storage
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"File is not image: {ex.Message}");
+                _logger.LogInformation("File is not image: {errorText}", ex.ToString());
             }
-
-            return storageItem;
         }
 
         private async Task<StorageItemPictureThumbnail> CreateThumbnailAsync(Image<Rgba32> image, int maxWidth,
@@ -230,7 +229,7 @@ namespace BioEngine.Core.Storage
             var thumb = image.Clone();
             thumb.Mutate(i =>
                 i.Resize(image.Width >= image.Height ? maxWidth : 0, image.Height > image.Width ? maxHeight : 0));
-            var thumbFileName = $"{thumb.Width}_{thumb.Height}_{fileName}";
+            var thumbFileName = $"{thumb.Width.ToString()}_{thumb.Height.ToString()}_{fileName}";
             var tmpPath = Path.Combine(Path.GetTempPath(), thumbFileName);
             thumb.Save(tmpPath);
             var thumbPath = Path.Combine(destinationPath, "thumb", thumbFileName).Replace("\\", "/");
