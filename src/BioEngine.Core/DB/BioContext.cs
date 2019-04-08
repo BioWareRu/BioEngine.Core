@@ -83,7 +83,9 @@ namespace BioEngine.Core.DB
 
             foreach (var entityMetadata in metadataManager.GetSectionsMetadata())
             {
-                logger.LogInformation("Register section type {entityMetadata}", entityMetadata);
+                logger.LogInformation("Register section type {type} - {entityType} ({dataType})", entityMetadata.Type,
+                    entityMetadata.ObjectType,
+                    entityMetadata.DataType);
                 RegisterDiscriminator<Section>(modelBuilder, entityMetadata.ObjectType,
                     entityMetadata.Type);
                 if (Database.IsInMemory())
