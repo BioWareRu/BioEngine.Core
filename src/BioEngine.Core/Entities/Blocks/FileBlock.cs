@@ -1,5 +1,8 @@
-﻿namespace BioEngine.Core.Entities.Blocks
+﻿using BioEngine.Core.DB;
+
+namespace BioEngine.Core.Entities.Blocks
 {
+    [TypedEntity("file")]
     public class FileBlock : ContentBlock<FileBlockData>
     {
         public override string TypeTitle { get; set; } = "Файл";

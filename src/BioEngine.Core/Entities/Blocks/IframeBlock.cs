@@ -1,5 +1,8 @@
+using BioEngine.Core.DB;
+
 namespace BioEngine.Core.Entities.Blocks
 {
+    [TypedEntity("iframe")]
     public class IframeBlock : ContentBlock<IframeBlockData>
     {
         public override string TypeTitle { get; set; } = "Iframe";

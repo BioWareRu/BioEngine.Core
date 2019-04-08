@@ -66,50 +66,48 @@ namespace BioEngine.Core.DB
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-            var metadataEntities = this.GetInfrastructure().GetServices<EntityMetadata>()?.ToArray();
+            var metadataManager = this.GetInfrastructure().GetService<BioEntityMetadataManager>();
             var logger = this.GetInfrastructure().GetRequiredService<ILogger<BioContext>>();
-            if (metadataEntities != null)
+            foreach (var entityMetadata in metadataManager.GetBlocksMetadata())
             {
-                foreach (var entityMetadata in metadataEntities)
+                logger.LogInformation(
+                    "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Type,
+                    entityMetadata.ObjectType,
+                    entityMetadata.DataType);
+                RegisterDiscriminator<ContentBlock>(modelBuilder, entityMetadata.ObjectType,
+                    entityMetadata.Type);
+                dataConversionRegistrationMethod
+                    ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
+                    .Invoke(this, new object[] {modelBuilder});
+            }
+
+            foreach (var entityMetadata in metadataManager.GetSectionsMetadata())
+            {
+                logger.LogInformation("Register section type {entityMetadata}", entityMetadata);
+                RegisterDiscriminator<Section>(modelBuilder, entityMetadata.ObjectType,
+                    entityMetadata.Type);
+                if (Database.IsInMemory())
                 {
-                    if (typeof(Section).IsAssignableFrom(entityMetadata.EntityType))
-                    {
-                        logger.LogInformation("Register section type {entityMetadata}", entityMetadata);
-                        RegisterDiscriminator<Section>(modelBuilder, entityMetadata.EntityType,
-                            entityMetadata.EntityType.FullName);
-
-                        if (Database.IsInMemory())
-                        {
-                            siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.EntityType)
-                                .Invoke(this, new object[] {modelBuilder});
-                        }
-                    }
-                    else if (typeof(ContentBlock).IsAssignableFrom(entityMetadata.EntityType))
-                    {
-                        logger.LogInformation(
-                            "Register content block type {entityType} ({dataType})", entityMetadata.EntityType,
-                            entityMetadata.DataType);
-                        RegisterDiscriminator<ContentBlock>(modelBuilder, entityMetadata.EntityType,
-                            entityMetadata.EntityType.FullName);
-                    }
-
-                    dataConversionRegistrationMethod
-                        ?.MakeGenericMethod(entityMetadata.EntityType, entityMetadata.DataType)
+                    siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
                         .Invoke(this, new object[] {modelBuilder});
                 }
+
+                dataConversionRegistrationMethod
+                    ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
+                    .Invoke(this, new object[] {modelBuilder});
             }
 
             logger.LogInformation("Done registering");
         }
 
-        private void RegisterDiscriminator<TBase>(ModelBuilder modelBuilder, Type sectionType, string discriminator)
+        private void RegisterDiscriminator<TBase>(ModelBuilder modelBuilder, Type objectType, string discriminator)
             where TBase : class
         {
             var discriminatorBuilder =
                 modelBuilder.Entity<TBase>().HasDiscriminator<string>(nameof(Section.Type));
             var method = discriminatorBuilder.GetType().GetMethods()
                 .First(m => m.Name == nameof(DiscriminatorBuilder.HasValue) && m.IsGenericMethod);
-            var typedMethod = method?.MakeGenericMethod(sectionType);
+            var typedMethod = method?.MakeGenericMethod(objectType);
             typedMethod?.Invoke(discriminatorBuilder, new object[] {discriminator});
         }
 

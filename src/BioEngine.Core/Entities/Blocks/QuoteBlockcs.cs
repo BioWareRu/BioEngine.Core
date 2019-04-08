@@ -1,5 +1,8 @@
-﻿namespace BioEngine.Core.Entities.Blocks
+﻿using BioEngine.Core.DB;
+
+namespace BioEngine.Core.Entities.Blocks
 {
+    [TypedEntity("quote")]
     public class QuoteBlock : ContentBlock<QuoteBlockData>
     {
         public override string TypeTitle { get; set; } = "Цитата";

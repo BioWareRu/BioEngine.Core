@@ -239,12 +239,13 @@ namespace BioEngine.Core
             services.Scan(s =>
                 s.FromAssemblies(assembliesList).AddClasses(classes => classes.AssignableTo<IBioRepository>())
                     .AsSelfWithInterfaces());
-
+            var metadataManager = new BioEntityMetadataManager();
             foreach (var type in types)
             {
-                services.RegisterEntityType(type);
+                metadataManager.Register(type);
             }
 
+            services.AddSingleton(metadataManager);
             services.AddScoped(typeof(BioRepositoryContext<>));
         }
 

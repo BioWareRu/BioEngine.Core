@@ -1,9 +1,6 @@
 ﻿using System;
-using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BioEngine.Core
 {
@@ -31,39 +28,6 @@ namespace BioEngine.Core
             module.ConfigureHostBuilder(webHostBuilder);
             webHostBuilder.ConfigureServices((context, collection) =>
                 module.ConfigureServices(collection, context.Configuration, context.HostingEnvironment));
-        }
-    }
-
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceCollection RegisterEntityType(this IServiceCollection services, Type entityType)
-        {
-            if (entityType.IsAbstract || entityType.BaseType == null)
-            {
-                return services;
-            }
-
-            if (!typeof(Section).IsAssignableFrom(entityType) && !typeof(ContentBlock).IsAssignableFrom(entityType))
-            {
-                return services;
-            }
-
-            var metaData = GetTypeMetadata(entityType);
-            services.AddSingleton(typeof(EntityMetadata), metaData);
-
-            return services;
-        }
-
-        private static EntityMetadata GetTypeMetadata(Type type)
-        {
-            var dataType = type.BaseType?.GenericTypeArguments[0];
-
-            if (dataType == null)
-            {
-                throw new ArgumentException($"Entity type without data type: {type}");
-            }
-
-            return new EntityMetadata(type, dataType);
         }
     }
 }

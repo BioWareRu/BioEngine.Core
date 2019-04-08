@@ -1,7 +1,9 @@
 ﻿using System.Linq;
+using BioEngine.Core.DB;
 
 namespace BioEngine.Core.Entities.Blocks
 {
+    [TypedEntity("gallery")]
     public class GalleryBlock : ContentBlock<GalleryBlockData>
     {
         public override string TypeTitle { get; set; } = "Галерея";
