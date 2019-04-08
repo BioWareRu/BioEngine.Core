@@ -27,7 +27,7 @@ namespace BioEngine.Core.Tests
 
             var result = await repository.AddAsync(section);
             Assert.True(result.IsSuccess, $"Errors: {result.ErrorsString}");
-            Assert.Equal(section.GetType().FullName, section.Type);
+            Assert.Equal("testsection", section.Type);
         }
     }
 }
