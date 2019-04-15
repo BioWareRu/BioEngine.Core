@@ -20,6 +20,7 @@ namespace BioEngine.Core.Storage
         private readonly ILogger<Storage> _logger;
         private readonly StorageOptions _options;
         private List<StorageNode> _nodes;
+        private bool _batchMode;
 
         protected Storage(IOptions<StorageOptions> options, IServiceProvider serviceProvider,
             ILogger<Storage> logger)
@@ -143,7 +144,11 @@ namespace BioEngine.Core.Storage
                 throw new Exception(result.ErrorsString);
             }
 
-            await GenerateNodesAsync();
+            if (!_batchMode)
+            {
+                await GenerateNodesAsync();
+            }
+
             return storageItem;
         }
 
@@ -187,6 +192,19 @@ namespace BioEngine.Core.Storage
 
             await Repository.FinishBatchAsync();
             return true;
+        }
+
+        public void BeginBatch()
+        {
+            _batchMode = true;
+            Repository.BeginBatch();
+        }
+
+        public async Task FinishBatchAsync()
+        {
+            _batchMode = false;
+            await GenerateNodesAsync();
+            await Repository.FinishBatchAsync();
         }
 
         protected abstract Task<bool> DoSaveAsync(string path, string tmpPath);
