@@ -20,8 +20,8 @@ steps:
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
-        **\release\*Test*.dll
-        **\release\**\*Test*.dll
+        **\Release\*Test*.dll
+        **\Release\**\*Test*.dll
         !**\*Microsoft.VisualStudio.TestPlatform*
         !**\obj\**
       codeCoverageEnabled: true
@@ -29,7 +29,7 @@ steps:
   - task: DotNetCoreCLI@2
     inputs:
       command: pack
-      configuration: 'release'
+      configuration: 'Release'
       versioningScheme: byEnvVar
       versionEnvVar: 'Version'
       verbosityPack: 'minimal'
