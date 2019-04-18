@@ -19,7 +19,11 @@ steps:
   - task: VSTest@2
     inputs:
       testSelector: 'testAssemblies'
-      testAssemblyVer2: '**\*Test*.dll!**\*TestAdapter.dll!**\obj\**'
+      testAssemblyVer2: |
+        **\$(BuildConfiguration)\*Test*.dll
+        **\$(BuildConfiguration)\**\*Test*.dll
+        !**\*Microsoft.VisualStudio.TestPlatform*
+        !**\obj\**
       codeCoverageEnabled: true
 
   - task: DotNetCoreCLI@2
