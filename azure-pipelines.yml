@@ -20,8 +20,8 @@ steps:
     inputs:
       testSelector: 'testAssemblies'
       testAssemblyVer2: |
-        **\Release\*Test*.dll
-        **\Release\**\*Test*.dll
+        **\Release\*Tests*.dll
+        **\Release\**\*Tests*.dll
         !**\*Microsoft.VisualStudio.TestPlatform*
         !**\obj\**
       codeCoverageEnabled: true
