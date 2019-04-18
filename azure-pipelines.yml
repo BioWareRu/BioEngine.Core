@@ -12,10 +12,14 @@ variables:
 steps:
   - task: DotNetCoreCLI@2
     inputs:
-      command: test
-      publishTestResults: true
-      projects: 'tests/**/*.csproj'
+      command: 'build'
+      projects: 'src/**/*.csproj'
+      arguments: '-c Release'
 
+  - task: VSTest@2
+    inputs:
+      testSelector: 'testAssemblies'
+      codeCoverageEnabled: true
 
   - task: DotNetCoreCLI@2
     inputs:
