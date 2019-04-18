@@ -13,7 +13,7 @@ steps:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'build'
-      projects: 'src/**/*.csproj'
+      projects: '**/*.csproj'
       arguments: '-c Release'
 
   - task: VSTest@2
