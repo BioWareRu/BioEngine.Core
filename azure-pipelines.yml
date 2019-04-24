@@ -12,15 +12,24 @@ variables:
 steps:
   - task: DotNetCoreCLI@2
     inputs:
-      command: test
-      publishTestResults: true
-      projects: 'tests/**/*.csproj'
+      command: 'build'
+      projects: '**/*.csproj'
+      arguments: '-c Release'
 
+  - task: VSTest@2
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\Release\*Tests*.dll
+        **\Release\**\*Tests*.dll
+        !**\*Microsoft.VisualStudio.TestPlatform*
+        !**\obj\**
+      codeCoverageEnabled: true
 
   - task: DotNetCoreCLI@2
     inputs:
       command: pack
-      configuration: 'release'
+      configuration: 'Release'
       versioningScheme: byEnvVar
       versionEnvVar: 'Version'
       verbosityPack: 'minimal'
