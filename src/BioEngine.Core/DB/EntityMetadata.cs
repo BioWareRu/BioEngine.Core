@@ -85,6 +85,7 @@ namespace BioEngine.Core.DB
         public Type DataType { get; }
     }
 
+    [AttributeUsage(AttributeTargets.Class)]
     public class TypedEntityAttribute : Attribute
     {
         public TypedEntityAttribute(string type)
