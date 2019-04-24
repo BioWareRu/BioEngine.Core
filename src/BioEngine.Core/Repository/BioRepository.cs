@@ -102,6 +102,15 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
+        public virtual async Task<T> GetAsync(Func<IQueryable<T>, IQueryable<T>> where,
+            QueryContext<T> queryContext = null)
+        {
+            var query = where(GetBaseQuery(queryContext));
+            var item = await query.FirstOrDefaultAsync();
+            await AfterLoadAsync(item);
+            return item;
+        }
+
         public virtual async Task<T> NewAsync()
         {
             var item = Activator.CreateInstance<T>();

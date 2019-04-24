@@ -19,6 +19,7 @@ namespace BioEngine.Core.Repository
             Func<IQueryable<TEntity>, IQueryable<TEntity>> addConditionsCallback = null);
 
         Task<TEntity> GetByIdAsync(Guid id, QueryContext<TEntity> queryContext = null);
+        Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where, QueryContext<TEntity> queryContext = null);
 
         Task<TEntity> NewAsync();
 
