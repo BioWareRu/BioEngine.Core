@@ -20,7 +20,7 @@ namespace BioEngine.Core.Entities
         [InverseProperty(nameof(ContentBlock.Post))]
         public List<ContentBlock> Blocks { get; set; }
         
-        [NotMapped] public string PublicUrl => $"/content/{Id.ToString()}-{Url}.html";
+        [NotMapped] public string PublicUrl => $"/post/{Url}.html";
         [NotMapped] public IUser Author { get; set; }
     }
 }

@@ -8,8 +8,10 @@ namespace BioEngine.Core.Entities
     {
         [Required] public virtual string Title { get; set; }
         [Required] public virtual string Url { get; set; }
-        
+
         [InverseProperty(nameof(ContentBlock.Page))]
         public List<ContentBlock> Blocks { get; set; }
+
+        [NotMapped] public string PublicUrl => $"/page/{Url}.html";
     }
 }
