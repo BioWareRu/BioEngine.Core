@@ -7,7 +7,7 @@ using BioEngine.Core.Users;
 namespace BioEngine.Core.Entities
 {
     [Table("Posts")]
-    public class Post : BaseSiteEntity, ISectionEntity, IContentEntity,
+    public class Post : BaseSiteEntity, ISectionEntity, ITaggedContentEntity,
         IRoutable
     {
         [Required] public virtual int AuthorId { get; set; }
