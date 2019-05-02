@@ -14,7 +14,7 @@ namespace BioEngine.Core.Properties
         public List<PropertiesElementSchema> Properties { get; }
         public Type Type { get; }
 
-        private readonly HashSet<PropertiesRegistration> _registrations = new HashSet<PropertiesRegistration>();
+        private readonly List<PropertiesRegistration> _registrations = new List<PropertiesRegistration>();
 
         private PropertiesSchema(string key, Type propertiesType, PropertiesSetAttribute setAttribute,
             List<PropertiesElementSchema> properties)

@@ -146,7 +146,7 @@ namespace BioEngine.Core.Properties
         public async Task<bool> SetAsync<TProperties>(TProperties properties)
             where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value).FirstOrDefault();
             if (schema == null)
             {
                 throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
@@ -174,7 +174,7 @@ namespace BioEngine.Core.Properties
         public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value).FirstOrDefault();
             if (schema == null)
             {
                 throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
