@@ -38,7 +38,7 @@ namespace BioEngine.Core.Entities
         string PublicUrl { get; }
     }
 
-    public interface ITypedEntity
+    public interface ITypedEntity : IEntity
     {
         string TypeTitle { get; }
     }
