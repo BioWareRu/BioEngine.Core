@@ -196,10 +196,10 @@ namespace BioEngine.Core
 
         private static void AddSeo()
         {
-            PropertiesProvider.RegisterBioEngineSectionProperties<SeoPropertiesSet>();
-            PropertiesProvider.RegisterBioEngineContentProperties<SeoPropertiesSet>();
-            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Site>();
-            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Page>();
+            PropertiesProvider.RegisterBioEngineSectionProperties<SeoPropertiesSet>("seo");
+            PropertiesProvider.RegisterBioEngineContentProperties<SeoPropertiesSet>("seo");
+            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Site>("seo");
+            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Page>("seo");
         }
 
         private void AddValidation(IServiceCollection services)

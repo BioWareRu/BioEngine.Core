@@ -18,7 +18,8 @@ namespace BioEngine.Core.Properties
         private bool _batchMode;
         private bool _checkIfExists = true;
 
-        private static readonly ConcurrentDictionary<Type, PropertiesSchema> Schema = new ConcurrentDictionary<Type, PropertiesSchema>();
+        private static readonly ConcurrentDictionary<string, PropertiesSchema> Schema =
+            new ConcurrentDictionary<string, PropertiesSchema>();
 
         public PropertiesProvider(BioContext dbContext)
         {
@@ -54,58 +55,59 @@ namespace BioEngine.Core.Properties
             _checkIfExists = true;
         }
 
-        public static void RegisterBioEngineProperties<TProperties, TEntity>() where TProperties : PropertiesSet, new()
+        public static void RegisterBioEngineProperties<TProperties, TEntity>(string key)
+            where TProperties : PropertiesSet, new()
             where TEntity : IEntity, new()
         {
-            RegisterBioEngineProperties<TProperties>(typeof(TEntity));
+            RegisterBioEngineProperties<TProperties>(key, typeof(TEntity));
         }
 
-        public static void RegisterBioEngineSectionProperties<TProperties>()
+        public static void RegisterBioEngineSectionProperties<TProperties>(string key)
             where TProperties : PropertiesSet, new()
         {
-            RegisterBioEngineProperties<TProperties>(typeof(Section), PropertiesRegistrationType.Section);
+            RegisterBioEngineProperties<TProperties>(key, typeof(Section), PropertiesRegistrationType.Section);
         }
 
-        public static void RegisterBioEngineContentProperties<TProperties>()
+        public static void RegisterBioEngineContentProperties<TProperties>(string key)
             where TProperties : PropertiesSet, new()
         {
-            RegisterBioEngineProperties<TProperties>(typeof(Post), PropertiesRegistrationType.Content);
+            RegisterBioEngineProperties<TProperties>(key, typeof(Post), PropertiesRegistrationType.Content);
         }
 
-        private static void RegisterBioEngineProperties<TProperties>(Type entityType = null,
+        private static void RegisterBioEngineProperties<TProperties>(string key, Type entityType = null,
             PropertiesRegistrationType registrationType = PropertiesRegistrationType.Entity)
             where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.ContainsKey(typeof(TProperties)) ? Schema[typeof(TProperties)] : null;
+            var schema = Schema.ContainsKey(key) ? Schema[key] : null;
             if (schema == null)
             {
-                schema = PropertiesSchema.Create<TProperties>();
+                schema = PropertiesSchema.Create<TProperties>(key);
 
-                Schema.TryAdd(typeof(TProperties), schema);
+                Schema.TryAdd(key, schema);
             }
 
-            schema.AddRegistration(registrationType, entityType);
+            schema.AddRegistration(key, registrationType, entityType);
         }
 
-        public static PropertiesSet GetInstance(string className)
+        public static PropertiesSet GetInstance(string key)
         {
-            var type = Schema.Keys.FirstOrDefault(k => k.FullName == className);
+            var type = Schema.ContainsKey(key) ? Schema[key] : null;
             if (type != null)
             {
-                return (PropertiesSet)Activator.CreateInstance(type);
+                return (PropertiesSet)Activator.CreateInstance(type.Type);
             }
 
-            throw new ArgumentException($"Class {className} is not registered in properties provider");
+            throw new ArgumentException($"Class {key} is not registered in properties provider");
         }
 
-        public static PropertiesSchema GetSchema(Type propertiesType)
+        public static PropertiesSchema GetSchema(string key)
         {
-            if (!Schema.ContainsKey(propertiesType))
+            if (!Schema.ContainsKey(key))
             {
-                throw new ArgumentException($"Type {propertiesType} is not registered in properties provider!");
+                throw new ArgumentException($"Type {key} is not registered in properties provider!");
             }
 
-            return Schema[propertiesType];
+            return Schema[key];
         }
 
         [PublicAPI]
@@ -125,11 +127,12 @@ namespace BioEngine.Core.Properties
         public async Task<TProperties> GetAsync<TProperties>(IEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
-            if (!(entity.Properties.FirstOrDefault(x => x.Key == typeof(TProperties).FullName)?.Properties
+            var schema = Schema.FirstOrDefault(s => s.Value.Type == typeof(TProperties));
+            if (!(entity.Properties.FirstOrDefault(x => x.Key == schema.Key)?.Properties
                 .FirstOrDefault(x => x.SiteId == siteId)?.Value is TProperties properties))
             {
                 properties = new TProperties();
-                var propertiesRecord = await LoadFromDatabaseAsync(properties, entity, siteId);
+                var propertiesRecord = await LoadFromDatabaseAsync<TProperties>(entity, siteId);
                 if (propertiesRecord != null)
                 {
                     properties = JsonConvert.DeserializeObject<TProperties>(propertiesRecord.Data);
@@ -143,10 +146,13 @@ namespace BioEngine.Core.Properties
         public async Task<bool> SetAsync<TProperties>(TProperties properties)
             where TProperties : PropertiesSet, new()
         {
-            var record = await LoadFromDatabaseAsync<TProperties>() ?? new PropertiesRecord
+            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            if (schema == null)
             {
-                Key = typeof(TProperties).FullName
-            };
+                throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
+            }
+
+            var record = await LoadFromDatabaseAsync<TProperties>() ?? new PropertiesRecord {Key = schema.Key};
 
 
             record.DateUpdated = DateTimeOffset.UtcNow;
@@ -168,9 +174,15 @@ namespace BioEngine.Core.Properties
         public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
-            var record = await LoadFromDatabaseAsync(properties, entity) ?? new PropertiesRecord
+            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            if (schema == null)
             {
-                Key = properties.GetType().FullName,
+                throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
+            }
+
+            var record = await LoadFromDatabaseAsync<TProperties>(entity) ?? new PropertiesRecord
+            {
+                Key = schema.Key,
                 EntityType = entity.GetType().FullName,
                 EntityId = entity.Id,
                 SiteId = siteId
@@ -195,21 +207,23 @@ namespace BioEngine.Core.Properties
         private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>()
             where TProperties : PropertiesSet, new()
         {
-            return _checkIfExists
+            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            return schema == null || !_checkIfExists
                 ? Task.FromResult((PropertiesRecord)null)
                 : _dbContext.Properties.FirstOrDefaultAsync(s =>
-                    s.Key == typeof(TProperties).FullName
+                    s.Key == schema.Key
                     && s.EntityType == null && s.EntityId == null);
         }
 
-        private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>(TProperties properties, IEntity entity,
+        private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>(IEntity entity,
             Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
-            return _checkIfExists
+            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            return schema == null || !_checkIfExists
                 ? Task.FromResult((PropertiesRecord)null)
                 : _dbContext.Properties.FirstOrDefaultAsync(s =>
-                    s.Key == properties.GetType().FullName
+                    s.Key == schema.Key
                     && s.EntityType == entity.GetType().FullName && s.EntityId == entity.Id &&
                     (siteId == null || s.SiteId == siteId));
         }
@@ -265,7 +279,7 @@ namespace BioEngine.Core.Properties
                                     else
                                     {
                                         entry.Properties.Add(new PropertiesValue(null,
-                                            GetInstance(schema.Type.FullName)));
+                                            GetInstance(schema.Key)));
                                     }
 
                                     break;
@@ -274,7 +288,7 @@ namespace BioEngine.Core.Properties
                                     {
                                         var record = records.FirstOrDefault(r => r.SiteId == site.Id);
                                         var propertiesSet = record == null
-                                            ? GetInstance(schema.Type.FullName)
+                                            ? GetInstance(schema.Key)
                                             : DeserializeProperties(records.First(), schema);
 
                                         entry.Properties.Add(new PropertiesValue(site.Id, propertiesSet));

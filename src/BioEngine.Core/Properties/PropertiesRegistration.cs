@@ -4,12 +4,14 @@ namespace BioEngine.Core.Properties
 {
     internal struct PropertiesRegistration
     {
-        public PropertiesRegistration(PropertiesRegistrationType registrationType, Type entityType = null)
+        public PropertiesRegistration(string key, PropertiesRegistrationType registrationType, Type entityType = null)
         {
+            Key = key;
             EntityType = entityType;
             RegistrationType = registrationType;
         }
 
+        public string Key { get; }
         public Type EntityType { get; }
         public PropertiesRegistrationType RegistrationType { get; }
     }

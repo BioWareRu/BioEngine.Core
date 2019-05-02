@@ -16,10 +16,10 @@ namespace BioEngine.Core.Properties
 
         private readonly HashSet<PropertiesRegistration> _registrations = new HashSet<PropertiesRegistration>();
 
-        private PropertiesSchema(Type propertiesType, PropertiesSetAttribute setAttribute,
+        private PropertiesSchema(string key, Type propertiesType, PropertiesSetAttribute setAttribute,
             List<PropertiesElementSchema> properties)
         {
-            Key = propertiesType.FullName;
+            Key = key;
             Name = setAttribute.Name;
             IsEditable = setAttribute.IsEditable;
             Mode = setAttribute.Quantity;
@@ -27,7 +27,7 @@ namespace BioEngine.Core.Properties
             Properties = properties;
         }
 
-        public static PropertiesSchema Create<T>() where T : PropertiesSet
+        public static PropertiesSchema Create<T>(string key) where T : PropertiesSet
         {
             var propertiesType = typeof(T);
             var classAttr = propertiesType.GetCustomAttribute<PropertiesSetAttribute>();
@@ -47,18 +47,19 @@ namespace BioEngine.Core.Properties
                 }
             }
 
-            return new PropertiesSchema(propertiesType, classAttr, properties);
+            return new PropertiesSchema(key, propertiesType, classAttr, properties);
         }
 
 
-        public void AddRegistration(PropertiesRegistrationType type, Type entityType = null)
+        public void AddRegistration(string key, PropertiesRegistrationType type, Type entityType = null)
         {
-            _registrations.Add(new PropertiesRegistration(type, entityType));
+            _registrations.Add(new PropertiesRegistration(key, type, entityType));
         }
 
         public bool IsRegisteredFor(Type entityType)
         {
-            return _registrations.Any(r => r.EntityType == entityType && r.RegistrationType == PropertiesRegistrationType.Entity);
+            return _registrations.Any(r =>
+                r.EntityType == entityType && r.RegistrationType == PropertiesRegistrationType.Entity);
         }
 
         public bool IsRegisteredForSections()
