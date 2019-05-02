@@ -9,7 +9,7 @@ namespace BioEngine.Core.Tests.Fixtures
         public override string TypeTitle { get; set; } = "Раздел";
     }
 
-    public class TestSectionData : TypedData
+    public class TestSectionData : ITypedData
     {
     }
 }

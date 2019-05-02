@@ -57,7 +57,7 @@ namespace BioEngine.Core.Entities
         }
     }
 
-    public abstract class ContentBlockData : TypedData
+    public abstract class ContentBlockData : ITypedData
     {
     }
 }

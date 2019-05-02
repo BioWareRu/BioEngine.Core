@@ -28,7 +28,7 @@ namespace BioEngine.Core.Entities
         [NotMapped] public string PublicUrl => $"/section/{Id.ToString()}-{Url}.html";
     }
 
-    public abstract class Section<T> : Section, ITypedEntity<T> where T : TypedData, new()
+    public abstract class Section<T> : Section, ITypedEntity<T> where T : ITypedData, new()
     {
         public virtual T Data { get; set; } = new T();
         [NotMapped] public abstract string TypeTitle { get; set; }

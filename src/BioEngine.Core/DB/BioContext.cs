@@ -114,7 +114,7 @@ namespace BioEngine.Core.DB
         }
 
         private void RegisterDataConversion<TEntity, TData>(ModelBuilder modelBuilder)
-            where TEntity : class, ITypedEntity<TData> where TData : TypedData, new()
+            where TEntity : class, ITypedEntity<TData> where TData : ITypedData, new()
         {
             modelBuilder
                 .Entity<TEntity>()
