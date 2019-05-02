@@ -7,6 +7,8 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Amazon.S3.Util;
+using BioEngine.Core.DB;
+using BioEngine.Core.Repository;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,8 +22,9 @@ namespace BioEngine.Core.Storage
         private readonly S3StorageOptions _options;
         private readonly AmazonS3Client _client;
 
-        public S3Storage(IOptions<S3StorageOptions> options, IServiceProvider serviceProvider,
-            ILogger<S3Storage> logger) : base(options, serviceProvider, logger)
+        public S3Storage(IOptions<S3StorageOptions> options, StorageItemsRepository repository,
+            BioContext dbContext,
+            ILogger<S3Storage> logger) : base(options, repository, dbContext, logger)
         {
             _logger = logger;
             _options = options.Value;
@@ -44,11 +47,7 @@ namespace BioEngine.Core.Storage
                 var bucketExists = await AmazonS3Util.DoesS3BucketExistAsync(_client, bucketName);
                 if (!bucketExists)
                 {
-                    var putBucketRequest = new PutBucketRequest
-                    {
-                        BucketName = bucketName,
-                        UseClientRegion = true
-                    };
+                    var putBucketRequest = new PutBucketRequest {BucketName = bucketName, UseClientRegion = true};
 
                     await _client.PutBucketAsync(putBucketRequest);
                 }

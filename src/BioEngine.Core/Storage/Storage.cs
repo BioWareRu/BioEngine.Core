@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
@@ -16,34 +17,34 @@ namespace BioEngine.Core.Storage
 {
     public abstract class Storage : IStorage
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly StorageItemsRepository _repository;
+        private readonly BioContext _dbContext;
         private readonly ILogger<Storage> _logger;
         private readonly StorageOptions _options;
-        private List<StorageNode> _nodes;
-        private bool _batchMode;
 
-        protected Storage(IOptions<StorageOptions> options, IServiceProvider serviceProvider,
+        protected Storage(IOptions<StorageOptions> options,
+            StorageItemsRepository repository,
+            BioContext dbContext,
             ILogger<Storage> logger)
         {
-            _serviceProvider = serviceProvider;
+            _repository = repository;
+            _dbContext = dbContext;
             _logger = logger;
             _options = options.Value;
         }
 
-        protected StorageItemsRepository Repository => _serviceProvider.CreateScope().ServiceProvider
-            .GetRequiredService<StorageItemsRepository>();
-
         public async Task<IEnumerable<StorageNode>> ListItemsAsync(string path, string root = "/")
         {
-            var nodes = await GetNodesAsync();
-            var items = GetNodesByPath(nodes, $"{root}/{path}".Trim('/').Replace("//", "/"));
+            var nodes = await GetNodesAsync(root);
+            var items = await GetNodesByPathAsync(nodes, $"{root}/{path}".Trim('/').Replace("//", "/"));
             return items.Select(i => new StorageNode(i, root)).OrderByDescending(i => i.IsDirectory)
                 .ThenBy(i => i.Name);
         }
 
-        private List<StorageNode> GetNodesByPath(List<StorageNode> nodes, string path)
+        private async Task<List<StorageNode>> GetNodesByPathAsync(List<StorageNode> nodes, string path)
         {
             var parts = path?.Split('/');
+            var currentNode = nodes.First();
             var currentLevel = nodes;
             if (parts != null && parts.Length > 0)
             {
@@ -57,44 +58,47 @@ namespace BioEngine.Core.Storage
                     }
 
                     currentLevel = node.Items;
+                    currentNode = node;
                 }
             }
 
-            return currentLevel;
-        }
-
-        private async Task<List<StorageNode>> GetNodesAsync()
-        {
-            if (_nodes == null)
+            var nodesList = new List<StorageNode>();
+            foreach (var folder in currentNode.Items)
             {
-                await GenerateNodesAsync();
+                nodesList.Add(new StorageNode(folder, path));
             }
 
-            return _nodes;
+            var items = await _dbContext.StorageItems.Where(s => s.Path == currentNode.Path).ToListAsync();
+            foreach (var item in items)
+            {
+                nodesList.Add(new StorageNode(item));
+            }
+
+            return nodesList;
         }
 
-        private async Task GenerateNodesAsync()
+        private async Task<List<StorageNode>> GetNodesAsync(string root)
         {
-            _nodes = new List<StorageNode>();
-
-            var items = await Repository.GetAllAsync();
-            var rootNode = new StorageNode("/", "/");
-            foreach (var item in items.items.OrderBy(s => s.FilePath))
+            var paths = await _dbContext.StorageItems.Where(s => s.Path.StartsWith(root)).Select(s => s.Path)
+                .Distinct().ToArrayAsync();
+            var rootNode = new StorageNode(root, root);
+            foreach (var item in paths.OrderBy(s => s))
             {
-                var parts = item.FilePath.Split('/').Where(p => !string.IsNullOrEmpty(p));
+                var parts = item.Split('/').Where(p => !string.IsNullOrEmpty(p)).ToArray();
                 var currentRootNode = rootNode;
                 foreach (var part in parts)
                 {
                     if (part == parts.Last())
                     {
-                        currentRootNode.Items.Add(new StorageNode(item));
+                        currentRootNode.Items.Add(new StorageNode(part, item));
                     }
                     else
                     {
                         var node = currentRootNode.Items.FirstOrDefault(i => i.Name == part);
                         if (node == null)
                         {
-                            node = new StorageNode(part, Path.Combine(currentRootNode.Path, part).Replace("\\", "/"));
+                            node = new StorageNode(part,
+                                Path.Combine(currentRootNode.Path, part).Replace("\\", "/"));
                             currentRootNode.Items.Add(node);
                         }
 
@@ -103,7 +107,7 @@ namespace BioEngine.Core.Storage
                 }
             }
 
-            _nodes = rootNode.Items;
+            return rootNode.Items;
         }
 
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
@@ -127,10 +131,12 @@ namespace BioEngine.Core.Storage
                 await sourceStream.WriteAsync(file, 0, file.Length);
             }
 
-            var storageItem = await Repository.NewAsync();
+
+            var storageItem = await _repository.NewAsync();
             storageItem.FileName = fileName;
             storageItem.FileSize = file.LongLength;
             storageItem.FilePath = destinationPath;
+            storageItem.Path = Path.GetDirectoryName(destinationPath)?.Replace("\\", "/");
             storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
             storageItem.IsPublished = true;
 
@@ -138,15 +144,10 @@ namespace BioEngine.Core.Storage
 
             await DoSaveAsync(destinationPath, tmpPath);
 
-            var result = await Repository.AddAsync(storageItem);
+            var result = await _repository.AddAsync(storageItem);
             if (!result.IsSuccess)
             {
                 throw new Exception(result.ErrorsString);
-            }
-
-            if (!_batchMode)
-            {
-                await GenerateNodesAsync();
             }
 
             return storageItem;
@@ -170,13 +171,14 @@ namespace BioEngine.Core.Storage
                 }
             }
 
-            await Repository.DeleteAsync(item);
+            await _repository.DeleteAsync(item);
+
             return true;
         }
 
         public async Task<bool> DeleteAsync(IEnumerable<StorageItem> items)
         {
-            Repository.BeginBatch();
+            _repository.BeginBatch();
             foreach (var item in items)
             {
                 try
@@ -185,26 +187,25 @@ namespace BioEngine.Core.Storage
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Can't delete storage item {itemId}: {itemFilePath}: {errorMessage}", item.Id,
+                    _logger.LogError(ex, "Can't delete storage item {itemId}: {itemFilePath}: {errorMessage}",
+                        item.Id,
                         item.FilePath, ex.ToString());
                 }
             }
 
-            await Repository.FinishBatchAsync();
+            await _repository.FinishBatchAsync();
+
             return true;
         }
 
         public void BeginBatch()
         {
-            _batchMode = true;
-            Repository.BeginBatch();
+            _repository.BeginBatch();
         }
 
         public async Task FinishBatchAsync()
         {
-            _batchMode = false;
-            await GenerateNodesAsync();
-            await Repository.FinishBatchAsync();
+            await _repository.FinishBatchAsync();
         }
 
         protected abstract Task<bool> DoSaveAsync(string path, string tmpPath);
@@ -229,7 +230,7 @@ namespace BioEngine.Core.Storage
                         VerticalResolution = image.Height,
                         HorizontalResolution = image.Width,
                         MediumThumbnail = await CreateThumbnailAsync(image, _options.MediumThumbnailWidth,
-                            _options.SmallThumbnailHeight, destinationPath, storageItem.StorageFileName),
+                            _options.MediumThumbnailHeight, destinationPath, storageItem.StorageFileName),
                         SmallThumbnail = await CreateThumbnailAsync(image, _options.SmallThumbnailWidth,
                             _options.SmallThumbnailHeight, destinationPath, storageItem.StorageFileName)
                     };
@@ -288,7 +289,7 @@ namespace BioEngine.Core.Storage
             Name = node.Name;
             IsDirectory = node.IsDirectory;
             Item = node.Item;
-            Path = node.Path.Replace(root, "/").Replace("//", "/");
+            Path = node.Path.Replace(root, "").Trim('/');
         }
 
         public string Name { get; }

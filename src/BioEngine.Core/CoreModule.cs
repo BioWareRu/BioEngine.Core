@@ -163,7 +163,7 @@ namespace BioEngine.Core
                 o.AccessKey = accessKey;
                 o.SecretKey = secretKey;
             });
-            services.AddSingleton<IStorage, S3Storage>();
+            services.AddScoped<IStorage, S3Storage>();
         }
 
         private static void AddFileStorage(IServiceCollection services, IConfiguration configuration)
@@ -191,7 +191,7 @@ namespace BioEngine.Core
                 o.PublicUri = publicUri;
                 o.StoragePath = path;
             });
-            services.AddSingleton<IStorage, FileStorage>();
+            services.AddScoped<IStorage, FileStorage>();
         }
 
         private static void AddSeo()
