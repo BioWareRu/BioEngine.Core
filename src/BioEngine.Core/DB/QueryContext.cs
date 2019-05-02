@@ -260,21 +260,21 @@ namespace BioEngine.Core.DB
                 case QueryContextOperator.Contains:
                     if (ValueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(ValueType))
                     {
-                        return $"{Property}.Contains(@{valueIndex.ToString()})";
+                        return $"{Property}.ToLower().Contains(@{valueIndex.ToString()})";
                     }
 
                     break;
                 case QueryContextOperator.StartsWith:
                     if (ValueType == typeof(string))
                     {
-                        return $"{Property}.StartsWith(@{valueIndex.ToString()})";
+                        return $"{Property}.ToLower().StartsWith(@{valueIndex.ToString()})";
                     }
 
                     break;
                 case QueryContextOperator.EndsWith:
                     if (ValueType == typeof(string))
                     {
-                        return $"{Property}.EndsWith(@{valueIndex.ToString()})";
+                        return $"{Property}.ToLower().EndsWith(@{valueIndex.ToString()})";
                     }
 
                     break;
