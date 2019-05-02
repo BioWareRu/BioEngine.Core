@@ -11,12 +11,12 @@ namespace BioEngine.Core.Repository
     public abstract class SectionEntityRepository<T> : SiteEntityRepository<T>
         where T : class, IEntity, ISiteEntity, ISectionEntity
     {
-        private readonly SectionsRepository _sectionsRepository;
+        protected readonly SectionsRepository SectionsRepository;
 
         protected SectionEntityRepository(BioRepositoryContext<T> repositoryContext,
             SectionsRepository sectionsRepository) : base(repositoryContext)
         {
-            _sectionsRepository = sectionsRepository;
+            SectionsRepository = sectionsRepository;
         }
 
         protected override void RegisterValidators()
@@ -45,7 +45,7 @@ namespace BioEngine.Core.Repository
 
             if (item.SectionIds != null && item.SectionIds.Any())
             {
-                var sections = (await _sectionsRepository.GetByIdsAsync(item.SectionIds)).ToArray();
+                var sections = (await SectionsRepository.GetByIdsAsync(item.SectionIds)).ToArray();
 
                 if (sections.Any())
                 {

@@ -13,10 +13,14 @@ namespace BioEngine.Core.Repository
     [UsedImplicitly]
     public class PostsRepository : ContentItemRepository<Post>
     {
+        private readonly TagsRepository _tagsRepository;
+
         public PostsRepository(BioRepositoryContext<Post> repositoryContext,
-            SectionsRepository sectionsRepository, IUserDataProvider userDataProvider = null) : base(repositoryContext,
+            SectionsRepository sectionsRepository, TagsRepository tagsRepository,
+            IUserDataProvider userDataProvider = null) : base(repositoryContext,
             sectionsRepository, userDataProvider)
         {
+            _tagsRepository = tagsRepository;
         }
 
         protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
@@ -28,6 +32,23 @@ namespace BioEngine.Core.Repository
             }
 
             return base.ApplyContext(query, queryContext);
+        }
+
+        protected override async Task AfterLoadAsync(Post[] entities)
+        {
+            await base.AfterLoadAsync(entities);
+
+            var sectionsIds = entities.SelectMany(p => p.SectionIds).Distinct().ToArray();
+            var sections = await SectionsRepository.GetByIdsAsync(sectionsIds);
+
+            var tagIds = entities.SelectMany(p => p.TagIds).Distinct().ToArray();
+            var tags = await _tagsRepository.GetByIdsAsync(tagIds);
+
+            foreach (var entity in entities)
+            {
+                entity.Sections = sections.Where(s => entity.SectionIds.Contains(s.Id)).ToList();
+                entity.Tags = tags.Where(t => entity.TagIds.Contains(t.Id)).ToList();
+            }
         }
 
         protected override async Task<bool> AfterSaveAsync(Post item, PropertyChange[] changes = null,

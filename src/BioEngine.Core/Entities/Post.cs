@@ -19,8 +19,10 @@ namespace BioEngine.Core.Entities
 
         [InverseProperty(nameof(ContentBlock.Post))]
         public List<ContentBlock> Blocks { get; set; }
-        
+
         [NotMapped] public string PublicUrl => $"/post/{Url}.html";
         [NotMapped] public IUser Author { get; set; }
+        [NotMapped] public List<Section> Sections { get; set; }
+        [NotMapped] public List<Tag> Tags { get; set; }
     }
 }
