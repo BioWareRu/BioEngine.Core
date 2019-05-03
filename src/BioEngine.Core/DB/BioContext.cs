@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using BioEngine.Core.Comments;
 using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,9 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
+        [UsedImplicitly] public DbSet<Comment> Comments { get; set; }
+        [UsedImplicitly] public DbSet<Post> Posts { get; set; }
+        [UsedImplicitly] public DbSet<Section> Sections { get; set; }
         public DbSet<ContentBlock> Blocks { get; set; }
         [UsedImplicitly] public DbSet<StorageItem> StorageItems { get; set; }
         public DbSet<PostVersion> PostVersions { get; set; }
