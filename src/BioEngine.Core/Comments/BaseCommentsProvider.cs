@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -12,21 +13,27 @@ namespace BioEngine.Core.Comments
     public abstract class BaseCommentsProvider : ICommentsProvider
     {
         protected readonly BioContext DbContext;
+        private readonly IUserDataProvider _userDataProvider;
         protected readonly ILogger<ICommentsProvider> Logger;
 
-        protected BaseCommentsProvider(BioContext dbContext, ILogger<ICommentsProvider> logger)
+        protected BaseCommentsProvider(BioContext dbContext,
+            IUserDataProvider userDataProvider,
+            ILogger<ICommentsProvider> logger)
         {
             DbContext = dbContext;
+            _userDataProvider = userDataProvider;
             Logger = logger;
         }
 
         public Task<int> GetCommentsCountAsync(IContentEntity entity)
         {
-            return DbContext.Comments.Where(c => c.ContentId == entity.Id && c.Type == entity.GetType().FullName)
+            return GetDbSet().Where(c => c.ContentId == entity.Id && c.Type == entity.GetType().FullName)
                 .CountAsync();
         }
 
-        public async Task<Dictionary<Guid, int>> GetCommentsCountAsync(IEnumerable<IContentEntity> entities)
+        protected abstract IQueryable<BaseComment> GetDbSet();
+
+        public virtual async Task<Dictionary<Guid, int>> GetCommentsCountAsync(IEnumerable<IContentEntity> entities)
         {
             var result = new Dictionary<Guid, int>();
             foreach (var entity in entities)
@@ -39,11 +46,11 @@ namespace BioEngine.Core.Comments
         }
 
         public abstract Task<Uri> GetCommentsUrlAsync(IContentEntity entity);
-
-        public async Task<IEnumerable<Comment>> GetLastCommentsAsync(Site site, int count)
+        public virtual async Task<IEnumerable<BaseComment>> GetLastCommentsAsync(Site site, int count)
         {
-            var comments = await DbContext.Comments.Where(c => c.SiteIds.Contains(site.Id))
+            var comments = await GetDbSet().Where(c => c.SiteIds.Contains(site.Id))
                 .OrderByDescending(c => c.DateUpdated).Take(count).ToListAsync();
+            var authors = await _userDataProvider.GetDataAsync(comments.Select(c => c.AuthorId).ToArray());
             foreach (var comment in comments)
             {
                 if (comment.Type == typeof(Post).FullName)
@@ -63,15 +70,18 @@ namespace BioEngine.Core.Comments
                     comment.Content = await DbContext.Sections.Where(s => s.Id == comment.ContentId)
                         .FirstOrDefaultAsync();
                 }
+
+                comment.Author = authors.FirstOrDefault(a => a.Id == comment.AuthorId);
             }
 
             return comments;
         }
 
-        public async Task<List<(IContentEntity entity, int commentsCount)>> GetMostCommentedAsync(Site site, int count,
+        public virtual async Task<List<(IContentEntity entity, int commentsCount)>> GetMostCommentedAsync(Site site,
+            int count,
             TimeSpan period)
         {
-            var ids = await DbContext.Comments
+            var ids = await GetDbSet()
                 .Where(c => c.DateUpdated >= DateTimeOffset.Now - period && c.SiteIds.Contains(site.Id))
                 .GroupBy(c => new {c.ContentId, c.Type}).OrderByDescending(c => c.Count()).Select(c => c.Key)
                 .Take(count)

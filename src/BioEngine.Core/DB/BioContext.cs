@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using BioEngine.Core.Comments;
+using System.Reflection;    
 using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +25,6 @@ namespace BioEngine.Core.DB
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
         [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
-        [UsedImplicitly] public DbSet<Comment> Comments { get; set; }
         [UsedImplicitly] public DbSet<Post> Posts { get; set; }
         [UsedImplicitly] public DbSet<Section> Sections { get; set; }
         public DbSet<ContentBlock> Blocks { get; set; }
@@ -101,6 +99,13 @@ namespace BioEngine.Core.DB
                 dataConversionRegistrationMethod
                     ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
                     .Invoke(this, new object[] {modelBuilder});
+            }
+
+            var entitiesManager = this.GetInfrastructure().GetService<BioEntitiesManager>();
+            var entitiesTypes = entitiesManager.GetTypes();
+            foreach (var type in entitiesTypes)
+            {
+                modelBuilder.Entity(type);
             }
 
             logger.LogInformation("Done registering");

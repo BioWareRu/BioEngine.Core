@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace BioEngine.Core.Entities
 {
-    public interface IContentEntity : IEntity
+    public interface IContentEntity : ISiteEntity
     {
         string Title { get; set; }
         string Url { get; set; }
