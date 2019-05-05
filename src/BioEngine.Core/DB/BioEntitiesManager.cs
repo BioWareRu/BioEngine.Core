@@ -6,7 +6,7 @@ namespace BioEngine.Core.DB
 {
     public class BioEntitiesManager
     {
-        private List<Type> _entities = new List<Type>();
+        private readonly List<Type> _entities = new List<Type>();
 
         public void Register<TEntity>() where TEntity : IEntity
         {
