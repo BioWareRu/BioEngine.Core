@@ -101,7 +101,7 @@ namespace BioEngine.Core.DB
                     .Invoke(this, new object[] {modelBuilder});
             }
 
-            var entitiesManager = this.GetInfrastructure().GetService<BioEntitiesManager>();
+            var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
             var entitiesTypes = entitiesManager.GetTypes();
             foreach (var type in entitiesTypes)
             {

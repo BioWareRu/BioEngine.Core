@@ -64,8 +64,6 @@ namespace BioEngine.Core.Tests
         {
             RegisterCoreModule(services, name, new[] {typeof(CoreTest).Assembly});
 
-            //services.RegisterEntityType(typeof(TestSection));
-            //services.RegisterEntityType(typeof(TextBlock));
             return base.ConfigureServices(services, name);
         }
     }
@@ -75,42 +73,5 @@ namespace BioEngine.Core.Tests
         protected CoreTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
-
-//        protected BioContext CreateDbContext([CallerMemberName] string databaseName = "", bool init = true)
-//        {
-//            return GetDbContext(databaseName, init);
-//        }
-
-//        private PropertiesProvider GetPropertiesProvider(BioContext dbContext)
-//        {
-//            var provider = new PropertiesProvider(dbContext);
-//            //init properties
-//            return provider;
-//        }
-//
-//        protected SitesRepository GetSitesRepository(BioContext context)
-//        {
-//            var propertiesProvider = GetPropertiesProvider(context);
-//            var repositoryContext = new BioRepositoryContext<Site>(context, propertiesProvider);
-//            var repository = new SitesRepository(repositoryContext);
-//            return repository;
-//        }
-//
-//        protected SectionRepository GetSectionsRepository(BioContext context)
-//        {
-//            var propertiesProvider = GetPropertiesProvider(context);
-//            var repositoryContext = new BioRepositoryContext<TestSection>(context, propertiesProvider);
-//            var repository = new SectionRepository(repositoryContext);
-//            return repository;
-//        }
-//
-//        protected PostsRepository GetContentRepository(BioContext context)
-//        {
-//            var propertiesProvider = GetPropertiesProvider(context);
-//            var repositoryContext = new BioRepositoryContext<Post>(context, propertiesProvider);
-//            var repository = new PostsRepository(repositoryContext,
-//                new SectionsRepository(new BioRepositoryContext<Section>(context, propertiesProvider)));
-//            return repository;
-//        }
     }
 }

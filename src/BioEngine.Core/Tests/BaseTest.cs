@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
@@ -60,6 +61,8 @@ namespace BioEngine.Core.Tests
 
     public abstract class BaseTestScope : IDisposable
     {
+        private static readonly BioEntitiesManager EntitiesManager = new BioEntitiesManager();
+
         public void Configure(string dbName, ITestOutputHelper testOutputHelper)
         {
             Configuration = new ConfigurationBuilder()
@@ -93,6 +96,8 @@ namespace BioEngine.Core.Tests
             });
             module.ConfigureServices(services, Configuration,
                 new HostingEnvironment {EnvironmentName = "Development"});
+            module.RegisterEntities(EntitiesManager);
+            services.TryAddSingleton(EntitiesManager);
         }
 
         protected virtual IServiceCollection ConfigureServices(IServiceCollection services, string name)
