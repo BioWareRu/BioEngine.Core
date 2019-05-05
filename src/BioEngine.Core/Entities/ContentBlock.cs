@@ -8,6 +8,8 @@ namespace BioEngine.Core.Entities
     [Table("ContentBlocks")]
     public abstract class ContentBlock : BaseEntity, ITypedEntity
     {
+        [NotMapped] public override string Title => TypeTitle;
+        [NotMapped] public override string Url { get; set; }
         [Required] public Guid ContentId { get; set; }
         [Required] public string Type { get; set; }
         [Required] public int Position { get; set; }

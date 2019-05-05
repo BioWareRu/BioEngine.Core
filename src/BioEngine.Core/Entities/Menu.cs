@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BioEngine.Core.Entities
 {
     public class Menu : BaseSingleSiteEntity
     {
-        public string Title { get; set; }
+        [NotMapped] public override string Url { get; set; }
         public List<MenuItem> Items { get; set; } = new List<MenuItem>();
     }
 

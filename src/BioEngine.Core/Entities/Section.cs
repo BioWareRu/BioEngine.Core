@@ -6,12 +6,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BioEngine.Core.Entities
 {
     [Table("Sections")]
-    public abstract class Section : BaseSiteEntity, IRoutable, IContentEntity
+    public abstract class Section : BaseSiteEntity, IContentEntity
     {
         [Required] public virtual string Type { get; set; }
         public virtual Guid? ParentId { get; set; }
-        [Required] public virtual string Title { get; set; }
-        [Required] public virtual string Url { get; set; }
 
         [Required]
         [Column(TypeName = "jsonb")]
@@ -23,6 +21,7 @@ namespace BioEngine.Core.Entities
 
         [InverseProperty(nameof(ContentBlock.Section))]
         public List<ContentBlock> Blocks { get; set; }
+
         [Required] public virtual string Hashtag { get; set; }
 
 

@@ -37,7 +37,7 @@ namespace BioEngine.Core.Search
                     Date = post.DateAdded,
                     AuthorId = post.AuthorId,
                     SiteIds = post.SiteIds,
-                    Tags = tags.Where(t => post.TagIds.Contains(t.Id)).Select(t => t.Name).ToArray(),
+                    Tags = tags.Where(t => post.TagIds.Contains(t.Id)).Select(t => t.Title).ToArray(),
                     Content = string.Join(" ", post.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s)))
                 };
 

@@ -9,6 +9,8 @@ namespace BioEngine.Core.Entities
     public abstract class BaseEntity : IEntity
     {
         [Key] public virtual Guid Id { get; set; } = Guid.Empty;
+        [Required] public virtual string Title { get; set; }
+        [Required] public virtual string Url { get; set; }
         [Required] public virtual DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
         [Required] public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         public virtual bool IsPublished { get; set; }

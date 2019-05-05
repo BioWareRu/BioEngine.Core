@@ -9,6 +9,8 @@ namespace BioEngine.Core.Entities
         List<PropertiesEntry> Properties { get; set; }
 
         Guid Id { get; set; }
+        string Title { get; set; }
+        string Url { get; set; }
         DateTimeOffset DateAdded { get; set; }
         DateTimeOffset DateUpdated { get; set; }
         bool IsPublished { get; set; }

@@ -7,12 +7,9 @@ using BioEngine.Core.Users;
 namespace BioEngine.Core.Entities
 {
     [Table("Posts")]
-    public class Post : BaseSiteEntity, ISectionEntity, ITaggedContentEntity,
-        IRoutable
+    public class Post : BaseSiteEntity, ISectionEntity, ITaggedContentEntity
     {
         [Required] public virtual int AuthorId { get; set; }
-        [Required] public virtual string Title { get; set; }
-        [Required] public virtual string Url { get; set; }
         public bool IsPinned { get; set; } = false;
         public virtual Guid[] SectionIds { get; set; } = new Guid[0];
         public virtual Guid[] TagIds { get; set; } = new Guid[0];

@@ -2,11 +2,8 @@ using System.Collections.Generic;
 
 namespace BioEngine.Core.Entities
 {
-    public interface IContentEntity : ISiteEntity
+    public interface IContentEntity : ISiteEntity, IRoutable
     {
-        string Title { get; set; }
-        string Url { get; set; }
         List<ContentBlock> Blocks { get; set; }
-        string PublicUrl { get; }
     }
 }

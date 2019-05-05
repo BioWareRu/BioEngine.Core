@@ -6,6 +6,8 @@ namespace BioEngine.Core.Entities
 {
     public class PostVersion : BaseEntity
     {
+        [NotMapped] public override string Title { get; set; }
+        [NotMapped] public override string Url { get; set; }
         public Guid PostId { get; set; }
         [Column(TypeName = "jsonb")] public string Data { get; set; }
 

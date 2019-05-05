@@ -5,6 +5,6 @@ namespace BioEngine.Core.Entities
     [Table("Tags")]
     public class Tag : BaseEntity
     {
-        public string Name { get; set; }
+        [NotMapped] public override string Url { get; set; }
     }
 }
