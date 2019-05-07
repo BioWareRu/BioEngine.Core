@@ -1,44 +1,39 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 pool:
-  vmImage: 'vs2017-win2016'
-
+  vmImage: vs2017-win2016
 variables:
-  Version: '3.0.$(Build.BuildId)'
-
+  Version: 3.0.$(Build.BuildId)
 steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: sdk
+      version: 3.0.100-preview5-011568
+      includePreviewVersions: true
   - task: DotNetCoreCLI@2
     inputs:
-      command: 'build'
+      command: build
       projects: '**/*.csproj'
       arguments: '-c Release'
-
   - task: VSTest@2
     inputs:
-      testSelector: 'testAssemblies'
+      testSelector: testAssemblies
       testAssemblyVer2: |
         **\Release\*Tests*.dll
         **\Release\**\*Tests*.dll
         !**\*Microsoft.VisualStudio.TestPlatform*
         !**\obj\**
       codeCoverageEnabled: true
-
   - task: DotNetCoreCLI@2
     inputs:
       command: pack
-      configuration: 'Release'
+      configuration: Release
       versioningScheme: byEnvVar
-      versionEnvVar: 'Version'
-      verbosityPack: 'minimal'
-      projects: 'src/**/*.csproj'
-
+      versionEnvVar: Version
+      verbosityPack: minimal
+      projects: src/**/*.csproj
   - task: DotNetCoreCLI@2
     inputs:
       command: push
-      nuGetFeedType: 'internal'
-      publishVstsFeed: 'BioEngine'
+      nuGetFeedType: internal
+      publishVstsFeed: BioEngine
       versioningScheme: byEnvVar
-      versionEnvVar: 'Version'
+      versionEnvVar: Version
