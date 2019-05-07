@@ -1,19 +1,19 @@
 ﻿using System;
 using BioEngine.Core.DB;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Modules
 {
     public abstract class BioEngineModule : IBioEngineModule
     {
         public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
         }
 
-        public virtual void ConfigureHostBuilder(IWebHostBuilder hostBuilder)
+        public virtual void ConfigureHostBuilder(IHostBuilder hostBuilder)
         {
         }
 

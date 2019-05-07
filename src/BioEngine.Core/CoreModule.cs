@@ -13,11 +13,11 @@ using BioEngine.Core.Storage;
 using BioEngine.Core.Web;
 using FluentValidation;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 
 namespace BioEngine.Core
@@ -25,7 +25,7 @@ namespace BioEngine.Core
     public class CoreModule : BioEngineModule<CoreModuleConfig>
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
             if (Config.EnableInMemoryDatabase)
             {
@@ -264,7 +264,7 @@ namespace BioEngine.Core
         }
 
         private void AddPostgresDatabase(IServiceCollection services, IConfiguration configuration,
-            IHostingEnvironment environment)
+            IHostEnvironment environment)
         {
             var connBuilder = new NpgsqlConnectionStringBuilder
             {

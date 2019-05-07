@@ -1,14 +1,14 @@
 ﻿using System;
 using BioEngine.Core.DB;
 using BioEngine.Core.Modules;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core
 {
     public static class HostBuilderExtensions
     {
-        public static IWebHostBuilder AddBioEngineModule<TModule, TModuleConfig>(this IWebHostBuilder webHostBuilder,
+        public static IHostBuilder AddBioEngineModule<TModule, TModuleConfig>(this IHostBuilder webHostBuilder,
             Action<TModuleConfig> configure = null)
             where TModule : IBioEngineModule<TModuleConfig>, new() where TModuleConfig : new()
         {
@@ -18,7 +18,7 @@ namespace BioEngine.Core
             return webHostBuilder;
         }
 
-        public static IWebHostBuilder AddBioEngineModule<TModule>(this IWebHostBuilder webHostBuilder)
+        public static IHostBuilder AddBioEngineModule<TModule>(this IHostBuilder webHostBuilder)
             where TModule : IBioEngineModule, new()
         {
             ConfigureModule(webHostBuilder, new TModule());
@@ -27,7 +27,7 @@ namespace BioEngine.Core
 
         private static readonly BioEntitiesManager EntitiesManager = new BioEntitiesManager();
 
-        private static void ConfigureModule(IWebHostBuilder webHostBuilder, IBioEngineModule module)
+        private static void ConfigureModule(IHostBuilder webHostBuilder, IBioEngineModule module)
         {
             module.ConfigureHostBuilder(webHostBuilder);
             webHostBuilder.ConfigureServices(
