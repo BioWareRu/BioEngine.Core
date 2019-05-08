@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
@@ -6,6 +7,7 @@ namespace BioEngine.Core.Search
 {
     public interface ISearchProvider
     {
+        bool CanProcess(Type type);
         Task DeleteIndexAsync();
         Task<long> CountAsync(string term);
         Task InitAsync();

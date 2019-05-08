@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,17 @@ namespace BioEngine.Core.Search.ElasticSearch
             if (_client == null)
             {
                 _logger.LogDebug("Create elastic client");
-                var settings = new ConnectionSettings(new Uri(_options.Url));
+                var settings = new ConnectionSettings(new Uri(_options.Url)).DisableDirectStreaming()
+                    .OnRequestCompleted(details =>
+                    {
+                        _logger.LogDebug("### ES REQEUST ###");
+                        if (details.RequestBodyInBytes != null)
+                            _logger.LogDebug(Encoding.UTF8.GetString(details.RequestBodyInBytes));
+                        _logger.LogDebug("### ES RESPONSE ###");
+                        if (details.ResponseBodyInBytes != null)
+                            _logger.LogDebug(Encoding.UTF8.GetString(details.ResponseBodyInBytes));
+                    })
+                    .PrettyJson();
                 if (!string.IsNullOrEmpty(_options.Login))
                 {
                     settings.BasicAuthentication(_options.Login, _options.Password);
@@ -49,7 +60,7 @@ namespace BioEngine.Core.Search.ElasticSearch
             var names = GetSearchText(term);
 
             return descriptor.Query(q => q.QueryString(qs => qs.Query(names)))
-                .Sort(s => s.Descending("_score").Descending("id")).Size(limit > 0 ? limit : 20)
+                .Sort(s => s.Descending("_score").Descending("date")).Size(limit > 0 ? limit : 20)
                 .Index(indexName.ToLowerInvariant());
         }
 

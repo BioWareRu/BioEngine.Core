@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
@@ -17,6 +18,11 @@ namespace BioEngine.Core.Search
         }
 
         private string IndexName => typeof(T).FullName?.ToLowerInvariant();
+
+        public bool CanProcess(Type type)
+        {
+            return typeof(T) == type;
+        }
 
         public Task DeleteIndexAsync()
         {
