@@ -8,7 +8,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.101.13"/>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.101.15"/>
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.1"/>
     <PackageReference Include="MessageFormat" Version="3.0.1"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview5.19227.1"/>
