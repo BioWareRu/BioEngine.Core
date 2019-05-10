@@ -9,18 +9,18 @@ using Newtonsoft.Json.Linq;
 
 namespace BioEngine.Core.DB
 {
-    public class QueryContext<T> where T : class, IEntity
+    public class QueryContext
     {
         public int? Limit { get; set; }
         public int? Offset { get; set; }
         public Guid? SiteId { get; private set; }
         public Guid? SectionId { get; private set; }
         public Guid? TagId { get; private set; }
-        public Expression<Func<T, object>> OrderBy { get; private set; }
-        public bool OrderByDescending { get; private set; }
+
+        public bool OrderByDescending { get; protected set; }
         public bool IncludeUnpublished { get; set; }
 
-        internal List<(string propertyName, bool isDescending)> SortQueries { get; private set; } =
+        public List<(string propertyName, bool isDescending)> SortQueries { get; protected set; } =
             new List<(string propertyName, bool isDescending)>();
 
         internal List<QueryContextConditionsGroup> ConditionsGroups { get; } =
@@ -40,6 +40,11 @@ namespace BioEngine.Core.DB
         {
             TagId = tag.Id;
         }
+    }
+
+    public class QueryContext<T> : QueryContext where T : class, IEntity
+    {
+        public Expression<Func<T, object>> OrderBy { get; private set; }
 
         public void SetOrderBy(Expression<Func<T, object>> keySelector)
         {
@@ -123,6 +128,7 @@ namespace BioEngine.Core.DB
 
                 return values;
             }
+
             object parsedValue = null;
             var nullableType = Nullable.GetUnderlyingType(propertyType);
             if (nullableType != null)

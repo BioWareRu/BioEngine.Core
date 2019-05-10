@@ -26,6 +26,7 @@ namespace BioEngine.Core.Entities
 
 
         public abstract string PublicUrl { get; }
+        public abstract string PostsUrl { get; }
     }
 
     public abstract class Section<T> : Section, ITypedEntity<T> where T : ITypedData, new()
