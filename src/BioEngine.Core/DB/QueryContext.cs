@@ -13,9 +13,9 @@ namespace BioEngine.Core.DB
     {
         public int? Limit { get; set; }
         public int? Offset { get; set; }
-        public Guid? SiteId { get; private set; }
-        public Guid? SectionId { get; private set; }
-        public Guid? TagId { get; private set; }
+        public Guid SiteId { get; private set; } = Guid.Empty;
+        public Guid SectionId { get; private set; } = Guid.Empty;
+        public Guid TagId { get; private set; } = Guid.Empty;
 
         public bool OrderByDescending { get; protected set; }
         public bool IncludeUnpublished { get; set; }
@@ -44,7 +44,7 @@ namespace BioEngine.Core.DB
 
     public class QueryContext<T> : QueryContext where T : class, IEntity
     {
-        public Expression<Func<T, object>> OrderBy { get; private set; }
+        public Expression<Func<T, object>>? OrderBy { get; private set; }
 
         public void SetOrderBy(Expression<Func<T, object>> keySelector)
         {
@@ -89,7 +89,8 @@ namespace BioEngine.Core.DB
 
         public void SetWhere(IEnumerable<QueryContextConditionsGroup> conditionsGroups)
         {
-            if (conditionsGroups == null) return;
+            if (conditionsGroups == null)
+                return;
             foreach (var conditionsGroup in conditionsGroups)
             {
                 var group = new QueryContextConditionsGroup(new List<QueryContextCondition>());
@@ -100,7 +101,10 @@ namespace BioEngine.Core.DB
                     {
                         condition.Property = propertyInfo.Value.name;
                         condition.ValueType = propertyInfo.Value.type;
-                        condition.Value = ParsePropertyValue(condition.ValueType, condition.Value);
+                        if (condition.Value != null)
+                        {
+                            condition.Value = ParsePropertyValue(condition.ValueType, condition.Value);
+                        }
                         group.Conditions.Add(condition);
                     }
                 }
@@ -112,9 +116,10 @@ namespace BioEngine.Core.DB
             }
         }
 
-        private static object ParsePropertyValue(Type propertyType, object value)
+        private static object? ParsePropertyValue(Type propertyType, object value)
         {
-            if (value == null) return null;
+            if (value == null)
+                return null;
             if (value is JArray arr)
             {
                 var values = Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyType)) as IList;
@@ -129,7 +134,7 @@ namespace BioEngine.Core.DB
                 return values;
             }
 
-            object parsedValue = null;
+            object? parsedValue = null;
             var nullableType = Nullable.GetUnderlyingType(propertyType);
             if (nullableType != null)
             {
@@ -166,7 +171,8 @@ namespace BioEngine.Core.DB
                     parsedValue = dto;
                 }
             }
-            else parsedValue = Convert.ChangeType(value.ToString(), propertyType);
+            else
+                parsedValue = Convert.ChangeType(value.ToString(), propertyType);
 
             return parsedValue;
         }
@@ -244,10 +250,17 @@ namespace BioEngine.Core.DB
     {
         public string Property { get; set; }
         public QueryContextOperator Operator { get; set; }
-        public object Value { get; set; }
-        public Type ValueType { get; set; }
+        public object? Value { get; set; }
+        public Type ValueType { get; set; } = typeof(object);
 
-        public string GetExpression(int valueIndex)
+        public QueryContextCondition(string property, QueryContextOperator conditionOperator, object value)
+        {
+            Property = property;
+            Operator = conditionOperator;
+            Value = value;
+        }
+
+        public string? GetExpression(int valueIndex)
         {
             switch (Operator)
             {

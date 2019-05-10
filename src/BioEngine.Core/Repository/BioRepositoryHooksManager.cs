@@ -20,7 +20,7 @@ namespace BioEngine.Core.Repository
 
         public async Task<bool> BeforeValidateAsync<T>(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
+            PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
             where T : class, IEntity
         {
             var result = true;
@@ -39,7 +39,7 @@ namespace BioEngine.Core.Repository
 
         public async Task<bool> BeforeSaveAsync<T>(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
+            PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
             where T : class, IEntity
         {
             var result = true;
@@ -56,8 +56,8 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        public async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null) where T : class, IEntity
+        public async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null,
+            IBioRepositoryOperationContext? operationContext = null) where T : class, IEntity
         {
             var result = true;
             var hooks = _serviceProvider.GetServices<IRepositoryHook>().ToArray();

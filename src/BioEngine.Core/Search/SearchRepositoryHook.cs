@@ -19,8 +19,8 @@ namespace BioEngine.Core.Search
             return typeof(TEntity).IsAssignableFrom(type);
         }
 
-        public override async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null)
+        public override async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null,
+            IBioRepositoryOperationContext? operationContext = null)
         {
             if (item is TEntity entity)
             {

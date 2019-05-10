@@ -15,6 +15,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class YoutubeBlockData : ContentBlockData
     {
-        public string YoutubeId { get; set; }
+        public string YoutubeId { get; set; } = "";
     }
 }

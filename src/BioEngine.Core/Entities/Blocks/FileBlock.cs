@@ -15,6 +15,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class FileBlockData : ContentBlockData
     {
-        public StorageItem File { get; set; }
+        public StorageItem File { get; set; } = new StorageItem();
     }
 }

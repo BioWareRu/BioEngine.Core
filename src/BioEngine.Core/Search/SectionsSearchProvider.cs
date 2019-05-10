@@ -18,19 +18,15 @@ namespace BioEngine.Core.Search
 
         protected override Task<IEnumerable<SearchModel>> GetSearchModelsAsync(IEnumerable<T> entities)
         {
-            return Task.FromResult(entities.Select(post =>
+            return Task.FromResult(entities.Select(section =>
             {
-                var model = new SearchModel
+                return new SearchModel(section.Id, section.Title, section.Url,
+                    string.Join(" ", section.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s))),
+                    section.DateAdded)
                 {
-                    Id = post.Id,
-                    Url = post.Url,
-                    Title = post.Title,
-                    Date = post.DateAdded,
-                    SiteIds = post.SiteIds,
-                    Content = string.Join(" ", post.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s)))
+                    SiteIds = section.SiteIds
                 };
 
-                return model;
             }));
         }
     }

@@ -14,7 +14,7 @@ namespace BioEngine.Core.Search.ElasticSearch
     {
         private readonly ILogger<ElasticSearcher> _logger;
         private readonly ElasticSearcherOptions _options;
-        private ElasticClient _client;
+        private ElasticClient? _client;
 
         public ElasticSearcher(IOptions<ElasticSearcherOptions> options, ILogger<ElasticSearcher> logger)
         {

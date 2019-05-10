@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BioEngine.Core.Entities
 {
     [Table("StorageItems")]
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class StorageItem : BaseEntity
     {
         [NotMapped] public override string Title { get; set; }
@@ -17,7 +18,7 @@ namespace BioEngine.Core.Entities
         public StorageItemPictureInfo PictureInfo { get; set; }
 
         public string StorageFileName => FilePath.Substring(FilePath.LastIndexOf('/') + 1);
-        private readonly string[] _units = {"bytes", "KB", "MB", "GB", "TB", "PB"};
+        private readonly string[] _units = { "bytes", "KB", "MB", "GB", "TB", "PB" };
 
         public string HumanSize
         {
@@ -53,8 +54,8 @@ namespace BioEngine.Core.Entities
         public double VerticalResolution { get; set; }
         public double HorizontalResolution { get; set; }
 
-        public StorageItemPictureThumbnail MediumThumbnail { get; set; }
-        public StorageItemPictureThumbnail SmallThumbnail { get; set; }
+        public StorageItemPictureThumbnail? MediumThumbnail { get; set; }
+        public StorageItemPictureThumbnail? SmallThumbnail { get; set; }
     }
 
     public class StorageItemPictureThumbnail
@@ -64,5 +65,14 @@ namespace BioEngine.Core.Entities
 
         public int Width { get; set; }
         public int Height { get; set; }
+
+        public StorageItemPictureThumbnail(Uri publicUri, string filePath, int width, int height)
+        {
+            PublicUri = publicUri;
+            FilePath = filePath;
+            Width = width;
+            Height = height;
+        }
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }

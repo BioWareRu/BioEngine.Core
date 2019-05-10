@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace BioEngine.Core.Entities
 {
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class PostVersion : BaseEntity
     {
         [NotMapped] public override string Title { get; set; }
@@ -32,4 +33,5 @@ namespace BioEngine.Core.Entities
                 });
         }
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }

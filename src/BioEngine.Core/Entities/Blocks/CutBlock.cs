@@ -15,6 +15,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class CutBlockData : ContentBlockData
     {
-        public string ButtonText { get; set; }
+        public string ButtonText { get; set; } = "Читать дальше";
     }
 }

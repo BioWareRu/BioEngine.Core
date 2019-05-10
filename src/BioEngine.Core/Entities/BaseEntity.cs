@@ -6,6 +6,7 @@ using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Entities
 {
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public abstract class BaseEntity : IEntity
     {
         [Key] public virtual Guid Id { get; set; } = Guid.Empty;
@@ -17,6 +18,7 @@ namespace BioEngine.Core.Entities
         public virtual DateTimeOffset? DatePublished { get; set; }
         [NotMapped] public virtual List<PropertiesEntry> Properties { get; set; } = new List<PropertiesEntry>();
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 
     public abstract class BaseSiteEntity : BaseEntity, ISiteEntity
     {

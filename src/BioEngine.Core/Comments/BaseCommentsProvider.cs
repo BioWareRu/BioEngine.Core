@@ -89,7 +89,7 @@ namespace BioEngine.Core.Comments
             var results = new List<(IContentEntity entity, int commentsCount)>();
             foreach (var id in ids)
             {
-                IContentEntity entity = null;
+                IContentEntity? entity = null;
                 if (id.Type == typeof(Post).FullName)
                 {
                     entity =

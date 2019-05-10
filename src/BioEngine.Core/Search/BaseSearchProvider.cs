@@ -17,7 +17,7 @@ namespace BioEngine.Core.Search
             Logger = logger;
         }
 
-        private string IndexName => typeof(T).FullName?.ToLowerInvariant();
+        private string IndexName => typeof(T).FullName.ToLowerInvariant();
 
         public bool CanProcess(Type type)
         {

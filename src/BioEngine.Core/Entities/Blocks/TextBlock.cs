@@ -15,6 +15,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class TextBlockData : ContentBlockData
     {
-        public string Text { get; set; }
+        public string Text { get; set; } = "";
     }
 }

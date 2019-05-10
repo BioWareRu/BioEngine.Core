@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
@@ -25,11 +26,12 @@ namespace BioEngine.Core.Repository
             Validators.Add(new SectionEntityValidator<T>());
         }
 
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T> queryContext)
+        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T>? queryContext)
         {
-            if ((queryContext?.SectionId).HasValue)
+            if (queryContext != null && queryContext.SectionId != Guid.Empty)
             {
-                query = query.Where(e => e.SectionIds.Contains(queryContext.SectionId.Value));
+                var sectionId = queryContext.SectionId;
+                query = query.Where(e => e.SectionIds.Contains(sectionId));
             }
 
             return base.ApplyContext(query, queryContext);
@@ -37,11 +39,12 @@ namespace BioEngine.Core.Repository
 
         protected override async Task<bool> BeforeValidateAsync(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
+            PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
         {
             var result = await base.BeforeValidateAsync(item, validationResult, changes, operationContext);
 
-            if (!result) return false;
+            if (!result)
+                return false;
 
             if (item.SectionIds != null && item.SectionIds.Any())
             {

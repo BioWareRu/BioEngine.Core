@@ -16,6 +16,6 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class GalleryBlockData : ContentBlockData
     {
-        public StorageItem[] Pictures { get; set; }
+        public StorageItem[] Pictures { get; set; } = new StorageItem[0];
     }
 }

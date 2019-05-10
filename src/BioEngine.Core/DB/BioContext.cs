@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;    
+using System.Reflection;
 using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +17,9 @@ namespace BioEngine.Core.DB
     public sealed class BioContext : DbContext
     {
         // ReSharper disable once SuggestBaseTypeForParameter
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
         public BioContext(DbContextOptions<BioContext> options) : base(options)
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
         {
         }
 

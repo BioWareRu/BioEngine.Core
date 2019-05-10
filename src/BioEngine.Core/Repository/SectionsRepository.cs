@@ -20,7 +20,7 @@ namespace BioEngine.Core.Repository
         {
         }
 
-        protected override IQueryable<T> GetBaseQuery(QueryContext<T> queryContext = null)
+        protected override IQueryable<T> GetBaseQuery(QueryContext<T>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<T>().Include(p => p.Blocks), queryContext);
         }

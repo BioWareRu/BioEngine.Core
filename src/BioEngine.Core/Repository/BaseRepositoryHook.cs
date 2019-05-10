@@ -12,7 +12,7 @@ namespace BioEngine.Core.Repository
 
         public virtual Task<bool> BeforeValidateAsync<T>(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
+            PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
             where T : class, IEntity
         {
             return Task.FromResult(true);
@@ -20,14 +20,14 @@ namespace BioEngine.Core.Repository
 
         public virtual Task<bool> BeforeSaveAsync<T>(T item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
-            PropertyChange[] changes = null, IBioRepositoryOperationContext operationContext = null)
+            PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
             where T : class, IEntity
         {
             return Task.FromResult(true);
         }
 
-        public virtual Task<bool> AfterSaveAsync<T>(T item, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null)
+        public virtual Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null,
+            IBioRepositoryOperationContext? operationContext = null)
             where T : class, IEntity
         {
             return Task.FromResult(true);

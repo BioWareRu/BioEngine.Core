@@ -43,7 +43,7 @@ namespace BioEngine.Core.Storage
 
         private async Task<List<StorageNode>> GetNodesByPathAsync(List<StorageNode> nodes, string path)
         {
-            var parts = path?.Split('/');
+            var parts = path.Split('/');
             var currentNode = nodes.First();
             var currentLevel = nodes;
             if (parts != null && parts.Length > 0)
@@ -136,7 +136,7 @@ namespace BioEngine.Core.Storage
             storageItem.FileName = fileName;
             storageItem.FileSize = file.LongLength;
             storageItem.FilePath = destinationPath;
-            storageItem.Path = Path.GetDirectoryName(destinationPath)?.Replace("\\", "/");
+            storageItem.Path = Path.GetDirectoryName(destinationPath).Replace("\\", "/");
             storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
             storageItem.IsPublished = true;
 
@@ -255,13 +255,7 @@ namespace BioEngine.Core.Storage
             if (thumbPath.StartsWith("/")) thumbPath = thumbPath.Substring(1);
             await DoSaveAsync(thumbPath, tmpPath);
 
-            return new StorageItemPictureThumbnail
-            {
-                FilePath = thumbPath,
-                PublicUri = new Uri($"{_options.PublicUri}/{thumbPath}"),
-                Width = thumb.Width,
-                Height = thumb.Height
-            };
+            return new StorageItemPictureThumbnail(new Uri($"{_options.PublicUri}/{thumbPath}"), thumbPath, thumb.Width, thumb.Height);
         }
     }
 
@@ -295,10 +289,11 @@ namespace BioEngine.Core.Storage
         public string Name { get; }
         public string Path { get; }
         public bool IsDirectory { get; }
-        public StorageItem Item { get; }
+        public StorageItem? Item { get; }
         public List<StorageNode> Items { get; } = new List<StorageNode>();
     }
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class StorageOptions : IStorageOptions
     {
         public Uri PublicUri { get; set; }
@@ -307,4 +302,5 @@ namespace BioEngine.Core.Storage
         public int SmallThumbnailWidth { get; set; } = 100;
         public int SmallThumbnailHeight { get; set; } = 100;
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }

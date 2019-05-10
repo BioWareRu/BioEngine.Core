@@ -5,7 +5,7 @@ namespace BioEngine.Core.Repository
 {
     public interface IBioRepositoryOperationContext
     {
-        IUser User { get; set; }
+        IUser? User { get; set; }
         Guid? SiteId { get; set; }
     }
 }

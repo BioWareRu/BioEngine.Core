@@ -8,5 +8,10 @@ namespace BioEngine.Core.Properties
         public string Name { get; set; }
         public bool IsEditable { get; set; }
         public PropertiesQuantity Quantity { get; set; } = PropertiesQuantity.OnePerEntity;
+
+        public PropertiesSetAttribute(string name)
+        {
+            Name = name;
+        }
     }
 }

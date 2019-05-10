@@ -6,7 +6,9 @@ using Newtonsoft.Json;
 namespace BioEngine.Core.Entities
 {
     [Table("ContentBlocks")]
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public abstract class ContentBlock : BaseEntity, ITypedEntity
+
     {
         [NotMapped] public override string Title => TypeTitle;
         [NotMapped] public override string Url { get; set; }
@@ -28,8 +30,10 @@ namespace BioEngine.Core.Entities
             return GetType().Name;
         }
     }
-
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
+#pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public abstract class ContentBlock<T> : ContentBlock, ITypedEntity<T> where T : ContentBlockData, new()
+
     {
         public T Data { get; set; }
 
@@ -58,7 +62,7 @@ namespace BioEngine.Core.Entities
             }
         }
     }
-
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
     public abstract class ContentBlockData : ITypedData
     {
     }

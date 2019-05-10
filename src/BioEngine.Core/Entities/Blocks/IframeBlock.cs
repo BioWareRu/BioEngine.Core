@@ -15,8 +15,8 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class IframeBlockData : ContentBlockData
     {
-        public string Src { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public string Src { get; set; } = "";
+        public int Width { get; set; } = 0;
+        public int Height { get; set; } = 0;
     }
 }

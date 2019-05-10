@@ -33,15 +33,29 @@ namespace BioEngine.Core.Tests
 
         protected T GetScope([CallerMemberName] string name = "")
         {
+            T scope;
+
             if (!_scopes.ContainsKey(name))
             {
-                var scope = Activator.CreateInstance<T>();
+                scope = Activator.CreateInstance<T>();
                 scope.Configure(name, TestOutputHelper);
                 scope.OnCreated();
                 _scopes.Add(name, scope);
             }
+            else
+            {
+                if(_scopes[name] is T typedScope)
+                {
+                    scope = typedScope;
+                }
+                else
+                {
+                    throw new Exception($"Can't create scope for {name}");
+                }
+            }
 
-            return _scopes[name] as T;
+
+            return scope;
         }
 
 
@@ -78,6 +92,10 @@ namespace BioEngine.Core.Tests
         protected void RegisterCoreModule(IServiceCollection services, string scopeName,
             IEnumerable<Assembly> assemblies)
         {
+            if(Configuration == null)
+            {
+                throw new Exception("Configuration is empty");
+            }
             bool.TryParse(Configuration["BE_TESTS_POSTGRES"], out var testWithPostgres);
             var module = new CoreModule();
             module.Configure(config =>
@@ -105,7 +123,7 @@ namespace BioEngine.Core.Tests
             return services;
         }
 
-        private BioContext _bioContext;
+        private BioContext? _bioContext;
 
         public virtual void OnCreated()
         {
@@ -123,11 +141,15 @@ namespace BioEngine.Core.Tests
 
         public BioContext GetDbContext()
         {
+            if (_bioContext == null)
+            {
+                throw new Exception("Db context is null");
+            }
             return _bioContext;
         }
 
-        protected IConfiguration Configuration;
-        protected IServiceProvider ServiceProvider;
+        protected IConfiguration? Configuration;
+        protected IServiceProvider? ServiceProvider;
 
         protected virtual void InitDbContext(BioContext dbContext)
         {
@@ -150,8 +172,8 @@ namespace BioEngine.Core.Tests
 
         public void Dispose()
         {
-            _bioContext.Database.EnsureDeleted();
-            _bioContext.Dispose();
+            GetDbContext().Database.EnsureDeleted();
+            GetDbContext().Dispose();
         }
     }
 }

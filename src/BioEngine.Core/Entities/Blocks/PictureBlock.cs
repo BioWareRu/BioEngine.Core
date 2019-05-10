@@ -15,7 +15,7 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class PictureBlockData : ContentBlockData
     {
-        public StorageItem Picture { get; set; }
-        public string Url { get; set; }
+        public StorageItem Picture { get; set; } = new StorageItem();
+        public string Url { get; set; } = "";
     }
 }

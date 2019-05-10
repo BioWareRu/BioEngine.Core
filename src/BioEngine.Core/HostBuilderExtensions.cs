@@ -9,11 +9,14 @@ namespace BioEngine.Core
     public static class HostBuilderExtensions
     {
         public static IHostBuilder AddBioEngineModule<TModule, TModuleConfig>(this IHostBuilder webHostBuilder,
-            Action<TModuleConfig> configure = null)
+            Action<TModuleConfig>? configure = null)
             where TModule : IBioEngineModule<TModuleConfig>, new() where TModuleConfig : new()
         {
             var module = new TModule();
-            module.Configure(configure);
+            if (configure != null)
+            {
+                module.Configure(configure);
+            }
             ConfigureModule(webHostBuilder, module);
             return webHostBuilder;
         }

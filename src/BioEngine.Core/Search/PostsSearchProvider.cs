@@ -28,17 +28,12 @@ namespace BioEngine.Core.Search
             var tags = await _tagsRepository.GetByIdsAsync(tagIds);
             return entities.Select(post =>
             {
-                var model = new SearchModel
+                var model = new SearchModel(post.Id, post.Title, post.Url, string.Join(" ", post.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s))), post.DateAdded)
                 {
-                    Id = post.Id,
-                    Url = post.Url,
-                    Title = post.Title,
                     SectionIds = post.SectionIds,
-                    Date = post.DateAdded,
                     AuthorId = post.AuthorId,
                     SiteIds = post.SiteIds,
-                    Tags = tags.Where(t => post.TagIds.Contains(t.Id)).Select(t => t.Title).ToArray(),
-                    Content = string.Join(" ", post.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s)))
+                    Tags = tags.Where(t => post.TagIds.Contains(t.Id)).Select(t => t.Title).ToArray()
                 };
 
                 return model;

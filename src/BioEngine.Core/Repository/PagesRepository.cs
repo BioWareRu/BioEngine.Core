@@ -11,7 +11,7 @@ namespace BioEngine.Core.Repository
         {
         }
         
-        protected override IQueryable<Page> GetBaseQuery(QueryContext<Page> queryContext = null)
+        protected override IQueryable<Page> GetBaseQuery(QueryContext<Page>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<Page>().Include(p => p.Blocks), queryContext);
         }

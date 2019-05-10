@@ -51,7 +51,7 @@ namespace BioEngine.Core.Properties
         }
 
 
-        public void AddRegistration(string key, PropertiesRegistrationType type, Type entityType = null)
+        public void AddRegistration(string key, PropertiesRegistrationType type, Type entityType)
         {
             _registrations.Add(new PropertiesRegistration(key, type, entityType));
         }

@@ -11,16 +11,16 @@ namespace BioEngine.Core.Repository
     public abstract class ContentItemRepository<T> : SectionEntityRepository<T>
         where T : Post, IEntity, ISiteEntity, ISectionEntity
     {
-        private readonly IUserDataProvider _userDataProvider;
+        private readonly IUserDataProvider? _userDataProvider;
 
         protected ContentItemRepository(BioRepositoryContext<T> repositoryContext,
-            SectionsRepository sectionsRepository, IUserDataProvider userDataProvider = null) : base(repositoryContext,
+            SectionsRepository sectionsRepository, IUserDataProvider? userDataProvider = null) : base(repositoryContext,
             sectionsRepository)
         {
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<T> GetBaseQuery(QueryContext<T> queryContext = null)
+        protected override IQueryable<T> GetBaseQuery(QueryContext<T>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<T>().Include(p => p.Blocks), queryContext);
         }

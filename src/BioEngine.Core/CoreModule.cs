@@ -301,14 +301,14 @@ namespace BioEngine.Core
     {
         public bool EnableDatabase = true;
         public bool EnableInMemoryDatabase;
-        public string InMemoryDatabaseName;
+        public string? InMemoryDatabaseName;
         public bool EnableValidation;
         public bool EnableFileStorage;
         public bool EnableS3Storage = true;
         public bool EnableElasticSearch;
         public bool EnableSeoExtensions = true;
-        public Action<NpgsqlConnectionStringBuilder, IConfiguration> DbConfigure;
+        public Action<NpgsqlConnectionStringBuilder, IConfiguration>? DbConfigure;
         public List<Assembly> Assemblies { get; } = new List<Assembly>();
-        public Assembly MigrationsAssembly;
+        public Assembly? MigrationsAssembly;
     }
 }

@@ -15,7 +15,7 @@ namespace BioEngine.Core.Entities.Blocks
 
     public class TwitterBlockData : ContentBlockData
     {
-        public string TweetId { get; set; }
-        public string TweetAuthor { get; set; }
+        public string TweetId { get; set; } = "";
+        public string TweetAuthor { get; set; } = "";
     }
 }

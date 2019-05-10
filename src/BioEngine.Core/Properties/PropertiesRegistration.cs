@@ -4,7 +4,7 @@ namespace BioEngine.Core.Properties
 {
     internal struct PropertiesRegistration
     {
-        public PropertiesRegistration(string key, PropertiesRegistrationType registrationType, Type entityType = null)
+        public PropertiesRegistration(string key, PropertiesRegistrationType registrationType, Type entityType)
         {
             Key = key;
             EntityType = entityType;

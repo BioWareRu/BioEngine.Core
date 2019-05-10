@@ -10,13 +10,13 @@ namespace BioEngine.Core.Repository
     public class BioRepositoryContext<T> where T : class, IEntity
     {
         internal BioContext DbContext { get; }
-        public List<IValidator<T>> Validators { get; }
+        public List<IValidator<T>>? Validators { get; }
         public PropertiesProvider PropertiesProvider { get; }
         public BioRepositoryHooksManager HooksManager { get; }
 
         public BioRepositoryContext(BioContext dbContext, PropertiesProvider propertiesProvider,
             BioRepositoryHooksManager hooksManager,
-            IEnumerable<IValidator<T>> validators = default)
+            IEnumerable<IValidator<T>>? validators = default)
         {
             DbContext = dbContext;
             PropertiesProvider = propertiesProvider;

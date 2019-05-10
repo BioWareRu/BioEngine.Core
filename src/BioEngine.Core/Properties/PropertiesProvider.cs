@@ -74,7 +74,7 @@ namespace BioEngine.Core.Properties
             RegisterBioEngineProperties<TProperties>(key, typeof(Post), PropertiesRegistrationType.Content);
         }
 
-        private static void RegisterBioEngineProperties<TProperties>(string key, Type entityType = null,
+        private static void RegisterBioEngineProperties<TProperties>(string key, Type entityType,
             PropertiesRegistrationType registrationType = PropertiesRegistrationType.Entity)
             where TProperties : PropertiesSet, new()
         {
@@ -204,25 +204,25 @@ namespace BioEngine.Core.Properties
             return true;
         }
 
-        private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>()
+        private async Task<PropertiesRecord?> LoadFromDatabaseAsync<TProperties>()
             where TProperties : PropertiesSet, new()
         {
             var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
             return schema == null || !_checkIfExists
-                ? Task.FromResult((PropertiesRecord)null)
-                : _dbContext.Properties.FirstOrDefaultAsync(s =>
+                ? null
+                : await _dbContext.Properties.FirstOrDefaultAsync(s =>
                     s.Key == schema.Key
                     && s.EntityType == null && s.EntityId == null);
         }
 
-        private Task<PropertiesRecord> LoadFromDatabaseAsync<TProperties>(IEntity entity,
+        private async Task<PropertiesRecord?> LoadFromDatabaseAsync<TProperties>(IEntity entity,
             Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
             var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
             return schema == null || !_checkIfExists
-                ? Task.FromResult((PropertiesRecord)null)
-                : _dbContext.Properties.FirstOrDefaultAsync(s =>
+                ? null
+                : await _dbContext.Properties.FirstOrDefaultAsync(s =>
                     s.Key == schema.Key
                     && s.EntityType == entity.GetType().FullName && s.EntityId == entity.Id &&
                     (siteId == null || s.SiteId == siteId));

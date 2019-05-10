@@ -12,7 +12,7 @@ namespace BioEngine.Core.Repository
         }
 
         public override async Task<AddOrUpdateOperationResult<Tag>> AddAsync(Tag item,
-            IBioRepositoryOperationContext operationContext = null)
+            IBioRepositoryOperationContext? operationContext = null)
         {
             var existingTag = await DbContext.Tags.FirstOrDefaultAsync(t => t.Title == item.Title);
             if (existingTag != null)

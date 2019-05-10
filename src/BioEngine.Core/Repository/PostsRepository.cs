@@ -17,18 +17,19 @@ namespace BioEngine.Core.Repository
 
         public PostsRepository(BioRepositoryContext<Post> repositoryContext,
             SectionsRepository sectionsRepository, TagsRepository tagsRepository,
-            IUserDataProvider userDataProvider = null) : base(repositoryContext,
+            IUserDataProvider? userDataProvider = null) : base(repositoryContext,
             sectionsRepository, userDataProvider)
         {
             _tagsRepository = tagsRepository;
         }
 
         protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
-            QueryContext<Post> queryContext)
+            QueryContext<Post>? queryContext)
         {
-            if ((queryContext?.TagId).HasValue)
+            if (queryContext != null && queryContext.TagId != Guid.Empty)
             {
-                query = query.Where(e => e.TagIds.Contains(queryContext.TagId.Value));
+                var tagId = queryContext.TagId;
+                query = query.Where(e => e.TagIds.Contains(tagId));
             }
 
             return base.ApplyContext(query, queryContext);
@@ -51,12 +52,15 @@ namespace BioEngine.Core.Repository
             }
         }
 
-        protected override async Task<bool> AfterSaveAsync(Post item, PropertyChange[] changes = null,
-            Post oldItem = null, IBioRepositoryOperationContext operationContext = null)
+        protected override async Task<bool> AfterSaveAsync(Post item, PropertyChange[]? changes = null,
+            Post? oldItem = null, IBioRepositoryOperationContext? operationContext = null)
         {
             var version = new PostVersion
             {
-                Id = Guid.NewGuid(), PostId = item.Id, IsPublished = true, DatePublished = DateTimeOffset.UtcNow,
+                Id = Guid.NewGuid(),
+                PostId = item.Id,
+                IsPublished = true,
+                DatePublished = DateTimeOffset.UtcNow,
             };
             version.SetPost(item);
             if (operationContext?.User != null)
