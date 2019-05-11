@@ -5,7 +5,7 @@ namespace BioEngine.Core.Properties
     [PublicAPI]
     public class PropertiesOption
     {
-        public PropertiesOption(string title, object value, string group)
+        public PropertiesOption(string title, object value, string? group)
         {
             Title = title;
             Value = value;
@@ -14,6 +14,6 @@ namespace BioEngine.Core.Properties
 
         public string Title { get; }
         public object Value { get; }
-        public string Group { get; }
+        public string? Group { get; }
     }
 }

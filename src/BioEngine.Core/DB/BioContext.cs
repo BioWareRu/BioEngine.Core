@@ -19,7 +19,6 @@ namespace BioEngine.Core.DB
         // ReSharper disable once SuggestBaseTypeForParameter
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
         public BioContext(DbContextOptions<BioContext> options) : base(options)
-#pragma warning restore CS8618 // Non-nullable field is uninitialized.
         {
         }
 
@@ -182,4 +181,5 @@ namespace BioEngine.Core.DB
                     v => JsonConvert.DeserializeObject<Guid[]>(v));
         }
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }
