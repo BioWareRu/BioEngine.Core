@@ -7,8 +7,8 @@ namespace BioEngine.Core.Entities
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class StorageItem : BaseEntity
     {
-        [NotMapped] public override string Title { get; set; }
-        [NotMapped] public override string Url { get; set; }
+        [NotMapped] public override string Title => FileName;
+        [NotMapped] public override string Url => PublicUri.ToString();
         public string FileName { get; set; }
         public long FileSize { get; set; }
         public Uri PublicUri { get; set; }
@@ -18,7 +18,7 @@ namespace BioEngine.Core.Entities
         public StorageItemPictureInfo PictureInfo { get; set; }
 
         public string StorageFileName => FilePath.Substring(FilePath.LastIndexOf('/') + 1);
-        private readonly string[] _units = { "bytes", "KB", "MB", "GB", "TB", "PB" };
+        private readonly string[] _units = {"bytes", "KB", "MB", "GB", "TB", "PB"};
 
         public string HumanSize
         {
