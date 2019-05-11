@@ -104,9 +104,10 @@ namespace BioEngine.Core.DB
 
             var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
             var entitiesTypes = entitiesManager.GetTypes();
-            foreach (var type in entitiesTypes)
+            foreach (var registration in entitiesTypes)
             {
-                modelBuilder.Entity(type);
+                modelBuilder.Entity(registration.Type);
+                registration.ConfigureContext?.Invoke(modelBuilder);
             }
 
             logger.LogInformation("Done registering");
