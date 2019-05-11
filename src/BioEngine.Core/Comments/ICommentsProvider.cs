@@ -7,10 +7,11 @@ namespace BioEngine.Core.Comments
 {
     public interface ICommentsProvider
     {
-        Task<int> GetCommentsCountAsync(IContentEntity entity);
-        Task<Dictionary<Guid, int>> GetCommentsCountAsync(IEnumerable<IContentEntity> entities);
-        Task<Uri> GetCommentsUrlAsync(IContentEntity entity);
+        Task<Dictionary<Guid, (int count, Uri? uri)>> GetCommentsDataAsync(IContentEntity[] entities);
+        Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentEntity[] entities);
         Task<IEnumerable<BaseComment>> GetLastCommentsAsync(Site site, int count);
-        Task<List<(IContentEntity entity, int commentsCount)>> GetMostCommentedAsync(Site site, int count, TimeSpan period);
+
+        Task<List<(IContentEntity entity, int commentsCount)>> GetMostCommentedAsync(Site site, int count,
+            TimeSpan period);
     }
 }

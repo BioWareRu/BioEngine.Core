@@ -33,19 +33,41 @@ namespace BioEngine.Core.Comments
 
         protected abstract IQueryable<BaseComment> GetDbSet();
 
-        public virtual async Task<Dictionary<Guid, int>> GetCommentsCountAsync(IEnumerable<IContentEntity> entities)
+        public virtual async Task<Dictionary<Guid, (int count, Uri? uri)>> GetCommentsDataAsync(
+            IContentEntity[] entities)
         {
-            var result = new Dictionary<Guid, int>();
+            var result = new Dictionary<Guid, (int count, Uri? uri)>();
+            var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();
+            var ids = entities.Select(e => e.Id).ToArray();
+            var counts = await GetDbSet().Where(c => types.Contains(c.Type) && ids.Contains(c.ContentId))
+                .GroupBy(c => new {c.Type, c.ContentId}).Select(g => new {g.Key, count = g.Count()})
+                .ToListAsync();
+            var urls = await GetCommentsUrlAsync(entities);
             foreach (var entity in entities)
             {
-                var count = await GetCommentsCountAsync(entity);
-                result.Add(entity.Id, count);
+                var entityData = counts
+                    .FirstOrDefault(c => c.Key.Type == entity.GetType().FullName && c.Key.ContentId == entity.Id);
+
+                var count = 0;
+                Uri? uri = null;
+                if (entityData != null)
+                {
+                    count = entityData.count;
+                }
+
+                if (urls.ContainsKey(entity.Id))
+                {
+                    uri = urls[entity.Id];
+                }
+
+                result.Add(entity.Id, (count, uri));
             }
 
             return result;
         }
 
-        public abstract Task<Uri> GetCommentsUrlAsync(IContentEntity entity);
+        public abstract Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentEntity[] entities);
+
         public virtual async Task<IEnumerable<BaseComment>> GetLastCommentsAsync(Site site, int count)
         {
             var comments = await GetDbSet().Where(c => c.SiteIds.Contains(site.Id))
