@@ -9,7 +9,7 @@ namespace BioEngine.Extra.Ads.Site
     public class AdsProvider
     {
         private readonly AdsRepository _adsRepository;
-        private Stack<Ad> _ads = new Stack<Ad>();
+        private Stack<Ad>? _ads;
         private static readonly Random Rng = new Random();
 
         private static void Shuffle<T>(IList<T> list)
@@ -28,15 +28,16 @@ namespace BioEngine.Extra.Ads.Site
         public AdsProvider(AdsRepository adsRepository)
         {
             _adsRepository = adsRepository;
+            _ads = null;
         }
 
         private async Task<Stack<Ad>> GetAdsAsync(Core.Entities.Site site)
         {
-            if (_ads.Count != 0) return _ads;
+            if (_ads != null) return _ads;
 
             var context = new QueryContext<Ad>
             {
-                IncludeUnpublished = false,
+                IncludeUnpublished = false
             };
             context.SetSite(site);
             var ads = await _adsRepository.GetAllAsync(context);
