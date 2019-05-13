@@ -8,8 +8,8 @@ namespace BioEngine.Core.DB
 {
     public class BioEntityMetadataManager
     {
-        private List<EntityMetadata> _blocks = new List<EntityMetadata>();
-        private List<EntityMetadata> _sections = new List<EntityMetadata>();
+        private readonly List<EntityMetadata> _blocks = new List<EntityMetadata>();
+        private readonly List<EntityMetadata> _sections = new List<EntityMetadata>();
 
         public void Register(Type type)
         {

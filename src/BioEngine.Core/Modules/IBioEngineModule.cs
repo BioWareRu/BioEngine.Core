@@ -13,10 +13,12 @@ namespace BioEngine.Core.Modules
 
         void ConfigureHostBuilder(IHostBuilder hostBuilder);
         void RegisterEntities(BioEntitiesManager entitiesManager);
+        void RegisterValidation(IServiceCollection serviceCollection);
+        void RegisterRepositories(IServiceCollection serviceCollection, BioEntityMetadataManager metadataManager);
     }
 
     public interface IBioEngineModule<out TConfig> : IBioEngineModule where TConfig : new()
     {
-        void Configure(Action<TConfig> config);
+        void Configure(Action<TConfig, IConfiguration, IHostEnvironment> config, IConfiguration configuration, IHostEnvironment environment);
     }
 }

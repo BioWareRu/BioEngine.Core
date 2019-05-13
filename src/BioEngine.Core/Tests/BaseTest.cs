@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
-using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
@@ -44,7 +41,7 @@ namespace BioEngine.Core.Tests
             }
             else
             {
-                if(_scopes[name] is T typedScope)
+                if (_scopes[name] is T typedScope)
                 {
                     scope = typedScope;
                 }
@@ -75,47 +72,24 @@ namespace BioEngine.Core.Tests
 
     public abstract class BaseTestScope : IDisposable
     {
-        private static readonly BioEntitiesManager EntitiesManager = new BioEntitiesManager();
-
         public void Configure(string dbName, ITestOutputHelper testOutputHelper)
         {
-            Configuration = new ConfigurationBuilder()
-                .AddUserSecrets("bw")
-                .AddEnvironmentVariables()
-                .Build();
-            var services = new ServiceCollection();
-            services.AddLogging(o => o.AddProvider(new XunitLoggerProvider(testOutputHelper)));
-            ConfigureServices(services, dbName);
-            ServiceProvider = services.BuildServiceProvider();
+            var bioEngine = new BioEngine(new string[0]);
+            bioEngine.ConfigureServices(collection =>
+            {
+                collection.AddLogging(o => o.AddProvider(new XunitLoggerProvider(testOutputHelper)));
+                ConfigureServices(collection, dbName);
+            }).AddModule<InMemoryDatabaseModule, InMemoryDatabaseModuleConfig>((config, configuration, env) =>
+            {
+                config.InMemoryDatabaseName = dbName;
+            });
+            bioEngine = ConfigureBioEngine(bioEngine);
+            ServiceProvider = bioEngine.Build().Services;
         }
 
-        protected void RegisterCoreModule(IServiceCollection services, string scopeName,
-            IEnumerable<Assembly> assemblies)
+        protected virtual BioEngine ConfigureBioEngine(BioEngine bioEngine)
         {
-            if(Configuration == null)
-            {
-                throw new Exception("Configuration is empty");
-            }
-            bool.TryParse(Configuration["BE_TESTS_POSTGRES"], out var testWithPostgres);
-            var module = new CoreModule();
-            module.Configure(config =>
-            {
-                config.Assemblies.AddRange(assemblies);
-                config.EnableValidation = true;
-                if (testWithPostgres)
-                {
-                    config.EnableDatabase = true;
-                }
-                else
-                {
-                    config.EnableInMemoryDatabase = true;
-                    config.InMemoryDatabaseName = scopeName;
-                }
-            });
-            module.ConfigureServices(services, Configuration,
-                new HostingEnvironment {EnvironmentName = "Development"});
-            module.RegisterEntities(EntitiesManager);
-            services.TryAddSingleton(EntitiesManager);
+            return bioEngine;
         }
 
         protected virtual IServiceCollection ConfigureServices(IServiceCollection services, string name)
@@ -145,6 +119,7 @@ namespace BioEngine.Core.Tests
             {
                 throw new Exception("Db context is null");
             }
+
             return _bioContext;
         }
 

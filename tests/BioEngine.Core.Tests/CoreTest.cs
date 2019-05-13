@@ -1,9 +1,9 @@
 using System;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Modules;
 using BioEngine.Core.Tests.Fixtures;
 using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
@@ -60,11 +60,10 @@ namespace BioEngine.Core.Tests
             dbContext.SaveChanges();
         }
 
-        protected override IServiceCollection ConfigureServices(IServiceCollection services, string name)
+        protected override BioEngine ConfigureBioEngine(BioEngine bioEngine)
         {
-            RegisterCoreModule(services, name, new[] {typeof(CoreTest).Assembly});
-
-            return base.ConfigureServices(services, name);
+            base.ConfigureBioEngine(bioEngine);
+            return bioEngine.AddModule<TestsModule>();
         }
     }
 
@@ -73,5 +72,9 @@ namespace BioEngine.Core.Tests
         protected CoreTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
+    }
+
+    public class TestsModule : BioEngineModule
+    {
     }
 }

@@ -10,6 +10,7 @@ using Amazon.S3.Util;
 using BioEngine.Core.DB;
 using BioEngine.Core.Repository;
 using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -105,4 +106,57 @@ namespace BioEngine.Core.Storage
         public string SecretKey { get; set; }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
+
+    public class S3StorageModule : StorageModule<S3StorageModuleConfig>
+    {
+        protected override void CheckConfig()
+        {
+            if (Config.ServerUri == null)
+            {
+                throw new ArgumentException("Storage server url is empty");
+            }
+
+            if (Config.PublicUri == null)
+            {
+                throw new ArgumentException("Storage public url is empty");
+            }
+
+            if (string.IsNullOrEmpty(Config.Bucket))
+            {
+                throw new ArgumentException("S3 bucketName is empty");
+            }
+
+            if (string.IsNullOrEmpty(Config.AccessKey))
+            {
+                throw new ArgumentException("S3 access key is empty");
+            }
+
+            if (string.IsNullOrEmpty(Config.SecretKey))
+            {
+                throw new ArgumentException("S3 secret key is empty");
+            }
+        }
+
+        protected override void ConfigureStorage(IServiceCollection services)
+        {
+            services.Configure<S3StorageOptions>(o =>
+            {
+                o.PublicUri = Config.PublicUri;
+                o.Server = Config.ServerUri;
+                o.Bucket = Config.Bucket;
+                o.AccessKey = Config.AccessKey;
+                o.SecretKey = Config.SecretKey;
+            });
+            services.AddScoped<IStorage, S3Storage>();
+        }
+    }
+
+    public class S3StorageModuleConfig : StorageModuleConfig
+    {
+        public Uri ServerUri { get; set; }
+        public Uri PublicUri { get; set; }
+        public string Bucket { get; set; }
+        public string AccessKey { get; set; }
+        public string SecretKey { get; set; }
+    }
 }
