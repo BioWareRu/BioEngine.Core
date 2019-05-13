@@ -1,3 +1,4 @@
+using BioEngine.Core.API;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
@@ -17,6 +18,7 @@ namespace BioEngine.Extra.Ads
         {
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<AdsProvider>();
+            services.RegisterApiEntities(GetType().Assembly);
         }
 
         public override void RegisterEntities(BioEntitiesManager entitiesManager)
