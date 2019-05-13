@@ -141,8 +141,8 @@ namespace BioEngine.Core.Storage
         {
             services.Configure<S3StorageOptions>(o =>
             {
-                o.PublicUri = Config.PublicUri;
-                o.Server = Config.ServerUri;
+                o.PublicUri = Config.PublicUri!;
+                o.Server = Config.ServerUri!;
                 o.Bucket = Config.Bucket;
                 o.AccessKey = Config.AccessKey;
                 o.SecretKey = Config.SecretKey;
@@ -153,10 +153,10 @@ namespace BioEngine.Core.Storage
 
     public class S3StorageModuleConfig : StorageModuleConfig
     {
-        public Uri ServerUri { get; set; }
-        public Uri PublicUri { get; set; }
-        public string Bucket { get; set; }
-        public string AccessKey { get; set; }
-        public string SecretKey { get; set; }
+        public Uri? ServerUri { get; set; }
+        public Uri? PublicUri { get; set; }
+        public string Bucket { get; set; } = "";
+        public string AccessKey { get; set; } = "";
+        public string SecretKey { get; set; } = "";
     }
 }

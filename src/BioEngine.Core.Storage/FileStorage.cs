@@ -63,7 +63,7 @@ namespace BioEngine.Core.Storage
         {
             services.Configure<FileStorageOptions>(o =>
             {
-                o.PublicUri = Config.PublicUri;
+                o.PublicUri = Config.PublicUri!;
                 o.StoragePath = Config.StoragePath;
             });
             services.AddScoped<IStorage, FileStorage>();
@@ -72,7 +72,7 @@ namespace BioEngine.Core.Storage
 
     public class FileStorageModuleConfig : StorageModuleConfig
     {
-        public Uri PublicUri { get; set; }
-        public string StoragePath { get; set; }
+        public Uri? PublicUri { get; set; }
+        public string StoragePath { get; set; } = "";
     }
 }

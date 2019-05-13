@@ -27,8 +27,8 @@ namespace BioEngine.Core.Search.ElasticSearch
 
     public class ElasticSearchModuleConfig : SearchModuleConfig
     {
-        public string Url { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
+        public string Url { get; set; } = "";
+        public string Login { get; set; } = "";
+        public string Password { get; set; } = "";
     }
 }
