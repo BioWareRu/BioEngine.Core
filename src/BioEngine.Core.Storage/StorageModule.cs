@@ -20,7 +20,7 @@ namespace BioEngine.Core.Storage
 
     public abstract class StorageModuleConfig
     {
-        public Uri PublicUri { get; set; }
+        public Uri? PublicUri { get; set; }
         public int MediumThumbnailWidth { get; set; } = 300;
         public int MediumThumbnailHeight { get; set; } = 300;
         public int SmallThumbnailWidth { get; set; } = 100;

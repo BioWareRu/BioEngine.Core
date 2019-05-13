@@ -32,7 +32,7 @@ namespace BioEngine.Core.Storage
             var config = new AmazonS3Config
             {
                 RegionEndpoint = RegionEndpoint.USEast1,
-                ServiceURL = _options.ServerUri.ToString(),
+                ServiceURL = _options.ServerUri!.ToString(),
                 ForcePathStyle = true
             };
             _client = new AmazonS3Client(_options.AccessKey, _options.SecretKey, config);

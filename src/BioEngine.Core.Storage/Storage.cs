@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -109,6 +110,7 @@ namespace BioEngine.Core.Storage
             return rootNode.Items;
         }
 
+        [SuppressMessage("ReSharper", "RCS1198")]
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
         {
             var destinationName = GetStorageFileName(fileName);
@@ -241,6 +243,7 @@ namespace BioEngine.Core.Storage
             }
         }
 
+        [SuppressMessage("ReSharper", "RCS1198")]
         private async Task<StorageItemPictureThumbnail> CreateThumbnailAsync(Image<Rgba32> image, int maxWidth,
             int maxHeight, string destinationPath, string fileName)
         {
