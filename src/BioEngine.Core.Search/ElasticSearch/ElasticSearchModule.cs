@@ -16,12 +16,7 @@ namespace BioEngine.Core.Search.ElasticSearch
         protected override void ConfigureSearch(IServiceCollection services)
         {
             services.AddScoped<ISearcher, ElasticSearcher>();
-            services.Configure<ElasticSearcherOptions>(options =>
-            {
-                options.Url = Config.Url;
-                options.Login = Config.Login;
-                options.Password = Config.Password;
-            });
+            services.AddSingleton(Config);
         }
     }
 

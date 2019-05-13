@@ -8,7 +8,6 @@ using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -20,9 +19,9 @@ namespace BioEngine.Core.Storage
         private readonly StorageItemsRepository _repository;
         private readonly BioContext _dbContext;
         private readonly ILogger<Storage> _logger;
-        private readonly StorageOptions _options;
+        private readonly StorageModuleConfig _options;
 
-        protected Storage(IOptions<StorageOptions> options,
+        protected Storage(StorageModuleConfig options,
             StorageItemsRepository repository,
             BioContext dbContext,
             ILogger<Storage> logger)
@@ -30,7 +29,7 @@ namespace BioEngine.Core.Storage
             _repository = repository;
             _dbContext = dbContext;
             _logger = logger;
-            _options = options.Value;
+            _options = options;
         }
 
         public async Task<IEnumerable<StorageNode>> ListItemsAsync(string path, string root = "/")
@@ -292,15 +291,4 @@ namespace BioEngine.Core.Storage
         public StorageItem? Item { get; }
         public List<StorageNode> Items { get; } = new List<StorageNode>();
     }
-
-#pragma warning disable CS8618 // Non-nullable field is uninitialized.
-    public class StorageOptions : IStorageOptions
-    {
-        public Uri PublicUri { get; set; }
-        public int MediumThumbnailWidth { get; set; } = 300;
-        public int MediumThumbnailHeight { get; set; } = 300;
-        public int SmallThumbnailWidth { get; set; } = 100;
-        public int SmallThumbnailHeight { get; set; } = 100;
-    }
-#pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }

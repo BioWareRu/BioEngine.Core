@@ -6,14 +6,13 @@ using BioEngine.Core.Repository;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace BioEngine.Core.Storage
 {
     [UsedImplicitly]
     public class FileStorage : Storage
     {
-        public FileStorage(IOptions<FileStorageOptions> options, StorageItemsRepository repository,
+        public FileStorage(FileStorageModuleConfig options, StorageItemsRepository repository,
             BioContext dbContext, ILogger<FileStorage> logger) : base(options, repository, dbContext, logger)
         {
         }
@@ -37,13 +36,6 @@ namespace BioEngine.Core.Storage
         }
     }
 
-#pragma warning disable CS8618 // Non-nullable field is uninitialized.
-    public class FileStorageOptions : StorageOptions
-    {
-        public string StoragePath { get; set; }
-    }
-#pragma warning restore CS8618 // Non-nullable field is uninitialized.
-
     public class FileStorageModule : StorageModule<FileStorageModuleConfig>
     {
         protected override void CheckConfig()
@@ -61,18 +53,13 @@ namespace BioEngine.Core.Storage
 
         protected override void ConfigureStorage(IServiceCollection services)
         {
-            services.Configure<FileStorageOptions>(o =>
-            {
-                o.PublicUri = Config.PublicUri!;
-                o.StoragePath = Config.StoragePath;
-            });
+            services.AddSingleton(Config);
             services.AddScoped<IStorage, FileStorage>();
         }
     }
 
     public class FileStorageModuleConfig : StorageModuleConfig
     {
-        public Uri? PublicUri { get; set; }
         public string StoragePath { get; set; } = "";
     }
 }

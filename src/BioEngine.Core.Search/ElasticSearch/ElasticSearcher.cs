@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Nest;
 
 namespace BioEngine.Core.Search.ElasticSearch
@@ -13,13 +12,13 @@ namespace BioEngine.Core.Search.ElasticSearch
     public class ElasticSearcher : ISearcher
     {
         private readonly ILogger<ElasticSearcher> _logger;
-        private readonly ElasticSearcherOptions _options;
+        private readonly ElasticSearchModuleConfig _options;
         private ElasticClient? _client;
 
-        public ElasticSearcher(IOptions<ElasticSearcherOptions> options, ILogger<ElasticSearcher> logger)
+        public ElasticSearcher(ElasticSearchModuleConfig options, ILogger<ElasticSearcher> logger)
         {
             _logger = logger;
-            _options = options.Value;
+            _options = options;
         }
 
         private ElasticClient GetClient()
