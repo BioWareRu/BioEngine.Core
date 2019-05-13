@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Storage
 {
-    public abstract class StorageModule<T> : BioEngineModule<T> where T : StorageModuleConfig, new()
+    public abstract class StorageModule<T> : BioEngineModule<T> where T : StorageModuleConfig
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
@@ -20,7 +20,12 @@ namespace BioEngine.Core.Storage
 
     public abstract class StorageModuleConfig
     {
-        public Uri? PublicUri { get; set; }
+        protected StorageModuleConfig(Uri publicUri)
+        {
+            PublicUri = publicUri;
+        }
+
+        public Uri PublicUri { get; }
         public int MediumThumbnailWidth { get; set; } = 300;
         public int MediumThumbnailHeight { get; set; } = 300;
         public int SmallThumbnailWidth { get; set; } = 100;

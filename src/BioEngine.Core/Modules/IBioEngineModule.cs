@@ -17,8 +17,9 @@ namespace BioEngine.Core.Modules
         void RegisterRepositories(IServiceCollection serviceCollection, BioEntityMetadataManager metadataManager);
     }
 
-    public interface IBioEngineModule<out TConfig> : IBioEngineModule where TConfig : new()
+    public interface IBioEngineModule<TConfig> : IBioEngineModule where TConfig : class
     {
-        void Configure(Action<TConfig, IConfiguration, IHostEnvironment> config, IConfiguration configuration, IHostEnvironment environment);
+        void Configure(Func<IConfiguration, IHostEnvironment, TConfig> configure, IConfiguration configuration,
+            IHostEnvironment environment);
     }
 }

@@ -57,14 +57,14 @@ namespace BioEngine.Core.Modules
         }
     }
 
-    public abstract class BioEngineModule<TConfig> : BioEngineModule, IBioEngineModule<TConfig> where TConfig : new()
+    public abstract class BioEngineModule<TConfig> : BioEngineModule, IBioEngineModule<TConfig> where TConfig : class
     {
-        protected readonly TConfig Config = new TConfig();
+        protected TConfig Config { get; private set; }
 
-        public virtual void Configure(Action<TConfig, IConfiguration, IHostEnvironment> config,
+        public virtual void Configure(Func<IConfiguration, IHostEnvironment, TConfig> configure,
             IConfiguration configuration, IHostEnvironment environment)
         {
-            config?.Invoke(Config, configuration, environment);
+            Config = configure(configuration, environment);
             CheckConfig();
         }
     }

@@ -60,6 +60,11 @@ namespace BioEngine.Core.Storage
 
     public class FileStorageModuleConfig : StorageModuleConfig
     {
-        public string StoragePath { get; set; } = "";
+        public string StoragePath { get; }
+
+        public FileStorageModuleConfig(Uri publicUri, string storagePath) : base(publicUri)
+        {
+            StoragePath = storagePath;
+        }
     }
 }

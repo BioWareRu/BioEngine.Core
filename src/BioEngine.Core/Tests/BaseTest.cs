@@ -79,9 +79,9 @@ namespace BioEngine.Core.Tests
             {
                 collection.AddLogging(o => o.AddProvider(new XunitLoggerProvider(testOutputHelper)));
                 ConfigureServices(collection, dbName);
-            }).AddModule<InMemoryDatabaseModule, InMemoryDatabaseModuleConfig>((config, configuration, env) =>
+            }).AddModule<InMemoryDatabaseModule, InMemoryDatabaseModuleConfig>((configuration, environment) =>
             {
-                config.InMemoryDatabaseName = dbName;
+                return new InMemoryDatabaseModuleConfig(dbName);
             });
             bioEngine = ConfigureBioEngine(bioEngine);
             ServiceProvider = bioEngine.Build().Services;

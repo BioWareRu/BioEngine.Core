@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Search
 {
-    public abstract class SearchModule<T> : BioEngineModule<T> where T : SearchModuleConfig, new()
+    public abstract class SearchModule<T> : BioEngineModule<T> where T : SearchModuleConfig
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)

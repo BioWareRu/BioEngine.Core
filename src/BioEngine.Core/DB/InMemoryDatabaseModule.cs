@@ -32,6 +32,11 @@ namespace BioEngine.Core.DB
 
     public class InMemoryDatabaseModuleConfig : DatabaseModuleConfig
     {
-        public string InMemoryDatabaseName { get; set; } = "";
+        public InMemoryDatabaseModuleConfig(string inMemoryDatabaseName)
+        {
+            InMemoryDatabaseName = inMemoryDatabaseName;
+        }
+
+        public string InMemoryDatabaseName { get; }
     }
 }

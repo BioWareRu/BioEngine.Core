@@ -68,13 +68,31 @@ namespace BioEngine.Core.DB
 
     public class PostgresDatabaseModuleConfig : DatabaseModuleConfig
     {
-        public string Host { get; set; } = "localhost";
-        public int Port { get; set; } = 5432;
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
-        public string Database { get; set; } = "";
-        public bool EnablePooling { get; set; } = true;
-        public Assembly? MigrationsAssembly;
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Database { get; set; }
+        public bool EnablePooling { get; set; }
+
+        public Assembly? MigrationsAssembly
+        {
+            get;
+        }
+
         public Action<NpgsqlConnectionStringBuilder, IConfiguration>? DbConfigure;
+
+        public PostgresDatabaseModuleConfig(string host, string username, string database,
+            string password = "",
+            int port = 5432, bool enablePooling = true, Assembly migrationsAssembly = null)
+        {
+            Host = host;
+            Username = username;
+            Database = database;
+            MigrationsAssembly = migrationsAssembly;
+            EnablePooling = enablePooling;
+            Password = password;
+            Port = port;
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace BioEngine.Core
         private readonly BioEntityMetadataManager _entityMetadataManager = new BioEntityMetadataManager();
 
         private bool _coreConfigured;
-        private IHostBuilder _hostBuilder;
+        private readonly IHostBuilder _hostBuilder;
 
         public BioEngine(string[] args)
         {
@@ -52,8 +52,8 @@ namespace BioEngine.Core
         }
 
         public BioEngine AddModule<TModule, TModuleConfig>(
-            Action<TModuleConfig, IConfiguration, IHostEnvironment>? configure = null)
-            where TModule : IBioEngineModule<TModuleConfig>, new() where TModuleConfig : new()
+            Func<IConfiguration, IHostEnvironment, TModuleConfig> configure)
+            where TModule : IBioEngineModule<TModuleConfig>, new() where TModuleConfig : class
         {
             var module = new TModule();
             ConfigureModule(module, configure);
@@ -91,7 +91,7 @@ namespace BioEngine.Core
         }
 
         private void ConfigureModule<TModuleConfig>(IBioEngineModule<TModuleConfig> module,
-            Action<TModuleConfig, IConfiguration, IHostEnvironment>? configure = null) where TModuleConfig : new()
+            Func<IConfiguration, IHostEnvironment, TModuleConfig> configure) where TModuleConfig : class
         {
             module.ConfigureHostBuilder(_hostBuilder);
             _hostBuilder.ConfigureServices(
@@ -101,6 +101,7 @@ namespace BioEngine.Core
                     {
                         module.Configure(configure, context.Configuration, context.HostingEnvironment);
                     }
+
                     ConfigureModule(module, collection, context.HostingEnvironment, context.Configuration);
                 }
             );
