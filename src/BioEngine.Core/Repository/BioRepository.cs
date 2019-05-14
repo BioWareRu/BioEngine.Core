@@ -110,6 +110,15 @@ namespace BioEngine.Core.Repository
             await AfterLoadAsync(item);
             return item;
         }
+        
+        public virtual async Task<T[]> GetAllAsync(Func<IQueryable<T>, IQueryable<T>> where,
+            QueryContext<T>? queryContext = null)
+        {
+            var query = where(GetBaseQuery(queryContext));
+            var items = await query.ToArrayAsync();
+            await AfterLoadAsync(items);
+            return items;
+        }
 
         public virtual async Task<T> NewAsync()
         {

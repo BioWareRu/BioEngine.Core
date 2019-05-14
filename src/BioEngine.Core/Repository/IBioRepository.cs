@@ -20,6 +20,7 @@ namespace BioEngine.Core.Repository
 
         Task<TEntity> GetByIdAsync(Guid id, QueryContext<TEntity>? queryContext = null);
         Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where, QueryContext<TEntity>? queryContext = null);
+        Task<TEntity[]> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where, QueryContext<TEntity>? queryContext = null);
 
         Task<TEntity> NewAsync();
 
