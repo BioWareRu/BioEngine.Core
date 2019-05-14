@@ -6,4 +6,10 @@ namespace BioEngine.Core.Entities
     {
         List<ContentBlock> Blocks { get; set; }
     }
+    
+    public enum ContentEntityViewMode
+    {
+        List,
+        Entity
+    }
 }
