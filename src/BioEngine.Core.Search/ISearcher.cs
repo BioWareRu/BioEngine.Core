@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Search
 {
@@ -9,7 +10,7 @@ namespace BioEngine.Core.Search
         Task<bool> DeleteAsync(string indexName, IEnumerable<SearchModel> searchModels);
         Task<bool> DeleteAsync(string indexName);
         Task<long> CountAsync(string indexName, string term);
-        Task<IEnumerable<SearchModel>> SearchAsync(string indexName, string term, int limit);
+        Task<SearchModel[]> SearchAsync(string indexName, string term, int limit, Site site);
         Task InitAsync(string indexName);
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -54,11 +56,14 @@ namespace BioEngine.Core.Search.ElasticSearch
 
         private SearchDescriptor<SearchModel> GetSearchRequest(SearchDescriptor<SearchModel> descriptor,
             string indexName, string term,
+            Site site,
             int limit = 0)
         {
             var names = GetSearchText(term);
 
-            return descriptor.Query(q => q.QueryString(qs => qs.Query(names)))
+            return descriptor.Query(q =>
+                    q.QueryString(qs => qs.Query(names)) &&
+                    q.Match(c => c.Field(p => p.SiteIds).Query(site.Id.ToString())))
                 .Sort(s => s.Descending("_score").Descending("date")).Size(limit > 0 ? limit : 20)
                 .Index(indexName.ToLowerInvariant());
         }
@@ -102,11 +107,12 @@ namespace BioEngine.Core.Search.ElasticSearch
             return resultsCount.Count;
         }
 
-        public async Task<IEnumerable<SearchModel>> SearchAsync(string indexName, string term, int limit)
+        public async Task<SearchModel[]> SearchAsync(string indexName, string term, int limit, Site site)
         {
-            var results = await GetClient().SearchAsync<SearchModel>(x => GetSearchRequest(x, indexName, term, limit));
+            var results = await GetClient()
+                .SearchAsync<SearchModel>(x => GetSearchRequest(x, indexName, term, site, limit));
 
-            return results.Documents;
+            return results.Documents.ToArray();
         }
 
         private AnalysisDescriptor BuildIndexDescriptor(AnalysisDescriptor a)

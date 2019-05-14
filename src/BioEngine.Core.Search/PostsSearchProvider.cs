@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
@@ -22,7 +21,7 @@ namespace BioEngine.Core.Search
             _postsRepository = postsRepository;
         }
 
-        protected override async Task<IEnumerable<SearchModel>> GetSearchModelsAsync(IEnumerable<Post> entities)
+        protected override async Task<SearchModel[]> GetSearchModelsAsync(Post[] entities)
         {
             var tagIds = entities.SelectMany(e => e.TagIds).Distinct().ToArray();
             var tags = await _tagsRepository.GetByIdsAsync(tagIds);
@@ -37,13 +36,13 @@ namespace BioEngine.Core.Search
                 };
 
                 return model;
-            });
+            }).ToArray();
         }
 
-        protected override async Task<IEnumerable<Post>> GetEntitiesAsync(IEnumerable<SearchModel> searchModels)
+        protected override Task<Post[]> GetEntitiesAsync(SearchModel[] searchModels)
         {
             var ids = searchModels.Select(s => s.Id).Distinct().ToArray();
-            return await _postsRepository.GetByIdsAsync(ids);
+            return _postsRepository.GetByIdsAsync(ids);
         }
     }
 }

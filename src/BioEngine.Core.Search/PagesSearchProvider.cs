@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
@@ -20,7 +19,7 @@ namespace BioEngine.Core.Search
             _pagesRepository = pagesRepository;
         }
 
-        protected override Task<IEnumerable<SearchModel>> GetSearchModelsAsync(IEnumerable<Page> entities)
+        protected override Task<SearchModel[]> GetSearchModelsAsync(Page[] entities)
         {
             return Task.FromResult(entities.Select(page =>
             {
@@ -31,13 +30,13 @@ namespace BioEngine.Core.Search
                     SiteIds = page.SiteIds
                 };
 
-            }));
+            }).ToArray());
         }
 
-        protected override async Task<IEnumerable<Page>> GetEntitiesAsync(IEnumerable<SearchModel> searchModels)
+        protected override Task<Page[]> GetEntitiesAsync(SearchModel[] searchModels)
         {
             var ids = searchModels.Select(s => s.Id).Distinct().ToArray();
-            return await _pagesRepository.GetByIdsAsync(ids);
+            return _pagesRepository.GetByIdsAsync(ids);
         }
     }
 }

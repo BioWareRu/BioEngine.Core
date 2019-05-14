@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
@@ -16,18 +15,14 @@ namespace BioEngine.Core.Search
         {
         }
 
-        protected override Task<IEnumerable<SearchModel>> GetSearchModelsAsync(IEnumerable<T> entities)
+        protected override Task<SearchModel[]> GetSearchModelsAsync(T[] entities)
         {
             return Task.FromResult(entities.Select(section =>
             {
                 return new SearchModel(section.Id, section.Title, section.Url,
                     string.Join(" ", section.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s))),
-                    section.DateAdded)
-                {
-                    SiteIds = section.SiteIds
-                };
-
-            }));
+                    section.DateAdded) {SiteIds = section.SiteIds};
+            }).ToArray());
         }
     }
 }

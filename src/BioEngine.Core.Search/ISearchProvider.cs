@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 
@@ -15,9 +14,9 @@ namespace BioEngine.Core.Search
 
     public interface ISearchProvider<T> : ISearchProvider where T : BaseEntity
     {
-        Task<IEnumerable<T>> SearchAsync(string term, int limit);
+        Task<T[]> SearchAsync(string term, int limit, Site site);
         Task AddOrUpdateEntityAsync(T entity);
-        Task<bool> AddOrUpdateEntitiesAsync(IEnumerable<T> entities);
+        Task<bool> AddOrUpdateEntitiesAsync(T[] entities);
         Task<bool> DeleteEntityAsync(T entity);
     }
 }

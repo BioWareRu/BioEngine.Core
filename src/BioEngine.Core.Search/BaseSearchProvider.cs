@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using Microsoft.Extensions.Logging;
@@ -39,9 +38,9 @@ namespace BioEngine.Core.Search
             return _searcher.InitAsync(IndexName);
         }
 
-        public async Task<IEnumerable<T>> SearchAsync(string term, int limit)
+        public async Task<T[]> SearchAsync(string term, int limit, Site site)
         {
-            var result = await _searcher.SearchAsync(IndexName, term, limit);
+            var result = await _searcher.SearchAsync(IndexName, term, limit, site);
             return await GetEntitiesAsync(result);
         }
 
@@ -50,7 +49,7 @@ namespace BioEngine.Core.Search
             return AddOrUpdateEntitiesAsync(new[] {entity});
         }
 
-        public async Task<bool> AddOrUpdateEntitiesAsync(IEnumerable<T> entities)
+        public async Task<bool> AddOrUpdateEntitiesAsync(T[] entities)
         {
             return await _searcher.AddOrUpdateAsync(IndexName, await GetSearchModelsAsync(entities));
         }
@@ -60,7 +59,7 @@ namespace BioEngine.Core.Search
             return await _searcher.DeleteAsync(IndexName, await GetSearchModelsAsync(new[] {entity}));
         }
 
-        protected abstract Task<IEnumerable<SearchModel>> GetSearchModelsAsync(IEnumerable<T> entities);
-        protected abstract Task<IEnumerable<T>> GetEntitiesAsync(IEnumerable<SearchModel> searchModels);
+        protected abstract Task<SearchModel[]> GetSearchModelsAsync(T[] entities);
+        protected abstract Task<T[]> GetEntitiesAsync(SearchModel[] searchModels);
     }
 }
