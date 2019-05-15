@@ -4,15 +4,12 @@ namespace BioEngine.Core.Properties
 {
     public class PropertiesEntry
     {
-        public PropertiesEntry(string key, PropertiesSchema schema)
+        public PropertiesEntry(string key)
         {
             Key = key;
-            Schema = schema;
         }
 
         public string Key { get; }
-
-        public PropertiesSchema Schema { get; }
 
         public List<PropertiesValue> Properties { get; } = new List<PropertiesValue>();
     }

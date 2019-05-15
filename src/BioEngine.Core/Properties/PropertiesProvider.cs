@@ -262,13 +262,13 @@ namespace BioEngine.Core.Properties
                         entity.Properties = new List<PropertiesEntry>();
                         foreach (var schema in schemas.Select(s => s.Value))
                         {
-                            var entry = new PropertiesEntry(schema.Key, schema);
+                            var entry = new PropertiesEntry(schema.Key);
 
                             var records = propertiesRecords
                                 .Where(s => s.EntityId == entity.Id && s.Key == schema.Key)
                                 .ToList();
 
-                            switch (entry.Schema.Mode)
+                            switch (schema.Mode)
                             {
                                 case PropertiesQuantity.OnePerEntity:
                                     if (records.Any())
