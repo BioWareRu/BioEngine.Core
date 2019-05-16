@@ -27,5 +27,14 @@ namespace BioEngine.Core.Web
                 return feature.User;
             }
         }
+
+        protected string CurrentToken
+        {
+            get
+            {
+                var feature = HttpContext.Features.Get<ICurrentUserFeature>();
+                return feature.Token;
+            }
+        }
     }
 }
