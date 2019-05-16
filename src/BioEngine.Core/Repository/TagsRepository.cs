@@ -17,7 +17,8 @@ namespace BioEngine.Core.Repository
             var existingTag = await DbContext.Tags.FirstOrDefaultAsync(t => t.Title == item.Title);
             if (existingTag != null)
             {
-                return new AddOrUpdateOperationResult<Tag>(existingTag, new ValidationFailure[0]);
+                return new AddOrUpdateOperationResult<Tag>(existingTag, new ValidationFailure[0],
+                    new PropertyChange[0]);
             }
 
             return await base.AddAsync(item, operationContext);

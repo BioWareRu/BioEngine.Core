@@ -74,7 +74,7 @@ namespace BioEngine.Core.Repository
 
         protected virtual Task AfterLoadAsync(T entity)
         {
-            return entity != null ? AfterLoadAsync(new[] { entity }) : Task.CompletedTask;
+            return entity != null ? AfterLoadAsync(new[] {entity}) : Task.CompletedTask;
         }
 
         protected virtual async Task AfterLoadAsync(T[] entities)
@@ -110,7 +110,7 @@ namespace BioEngine.Core.Repository
             await AfterLoadAsync(item);
             return item;
         }
-        
+
         public virtual async Task<T[]> GetAllAsync(Func<IQueryable<T>, IQueryable<T>> where,
             QueryContext<T>? queryContext = null)
         {
@@ -158,7 +158,7 @@ namespace BioEngine.Core.Repository
                 }
             }
 
-            return new AddOrUpdateOperationResult<T>(item, validationResult.errors);
+            return new AddOrUpdateOperationResult<T>(item, validationResult.errors, new PropertyChange[0]);
         }
 
         public PropertyChange[] GetChanges(T item, T oldEntity)
@@ -214,7 +214,7 @@ namespace BioEngine.Core.Repository
                 }
             }
 
-            return new AddOrUpdateOperationResult<T>(item, validationResult.errors);
+            return new AddOrUpdateOperationResult<T>(item, validationResult.errors, changes);
         }
 
         public Task FinishBatchAsync()
@@ -237,24 +237,25 @@ namespace BioEngine.Core.Repository
             await UpdateAsync(item, operationContext);
         }
 
-        public virtual async Task<bool> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null)
+        public virtual async Task<T> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null)
         {
             var item = await GetByIdAsync(id);
             if (item != null)
             {
                 DbContext.Remove(item);
                 await SaveChangesAsync();
-                return true;
+                return item;
             }
 
             throw new ArgumentException();
         }
 
-        public Task<bool> DeleteAsync(T item, IBioRepositoryOperationContext? operationContext = null)
+        public async Task<T> DeleteAsync(T item, IBioRepositoryOperationContext? operationContext = null)
         {
             DbContext.Attach(item);
             DbContext.Remove(item);
-            return SaveChangesAsync();
+            await SaveChangesAsync();
+            return item;
         }
 
         protected virtual async Task<bool> SaveChangesAsync()
