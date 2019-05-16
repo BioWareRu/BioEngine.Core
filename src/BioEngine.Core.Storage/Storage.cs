@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
@@ -21,6 +22,7 @@ namespace BioEngine.Core.Storage
         private readonly BioContext _dbContext;
         private readonly ILogger<Storage> _logger;
         private readonly StorageModuleConfig _options;
+        private SHA256 Sha256 = SHA256.Create();
 
         protected Storage(StorageModuleConfig options,
             StorageItemsRepository repository,
@@ -110,9 +112,21 @@ namespace BioEngine.Core.Storage
             return rootNode.Items;
         }
 
+        private static string HashBytesToString(byte[] bytes)
+        {
+            return bytes.Aggregate("", (current, b) => current + b.ToString("x2"));
+        }
+
         [SuppressMessage("ReSharper", "RCS1198")]
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
         {
+            var hash = HashBytesToString(Sha256.ComputeHash(file));
+            var storageItem = await _repository.GetAsync(q => q.Where(i => i.Hash == hash));
+            if (storageItem != null)
+            {
+                return storageItem;
+            }
+
             var destinationName = GetStorageFileName(fileName);
             if (path.StartsWith("/")) path = path.Substring(1);
             var basePath = path;
@@ -133,13 +147,14 @@ namespace BioEngine.Core.Storage
             }
 
 
-            var storageItem = await _repository.NewAsync();
+            storageItem = await _repository.NewAsync();
             storageItem.FileName = fileName;
             storageItem.FileSize = file.LongLength;
             storageItem.FilePath = destinationPath;
             storageItem.Path = Path.GetDirectoryName(destinationPath).Replace("\\", "/");
             storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
             storageItem.IsPublished = true;
+            storageItem.Hash = hash;
 
             await TryProcessImageAsync(storageItem, tmpPath, basePath);
 
@@ -257,7 +272,8 @@ namespace BioEngine.Core.Storage
             if (thumbPath.StartsWith("/")) thumbPath = thumbPath.Substring(1);
             await DoSaveAsync(thumbPath, tmpPath);
 
-            return new StorageItemPictureThumbnail(new Uri($"{_options.PublicUri}/{thumbPath}"), thumbPath, thumb.Width, thumb.Height);
+            return new StorageItemPictureThumbnail(new Uri($"{_options.PublicUri}/{thumbPath}"), thumbPath, thumb.Width,
+                thumb.Height);
         }
     }
 
