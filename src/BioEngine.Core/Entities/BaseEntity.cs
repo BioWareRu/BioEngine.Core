@@ -23,6 +23,7 @@ namespace BioEngine.Core.Entities
     public abstract class BaseSiteEntity : BaseEntity, ISiteEntity
     {
         public virtual Guid[] SiteIds { get; set; } = new Guid[0];
+        [Required] public virtual Guid MainSiteId { get; set; } = Guid.Empty;
     }
 
     public abstract class BaseSingleSiteEntity : BaseEntity, ISingleSiteEntity

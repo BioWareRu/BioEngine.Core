@@ -55,6 +55,7 @@ namespace BioEngine.Core.Repository
                     item.SiteIds = sections.SelectMany(s => s.SiteIds).Distinct().ToArray();
                     if (item.SiteIds.Any())
                     {
+                        item.MainSiteId = sections.First(s => s.Id == item.SectionIds.First()).MainSiteId;
                         return true;
                     }
 

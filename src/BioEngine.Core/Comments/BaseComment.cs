@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace BioEngine.Core.Comments
 {
     [UsedImplicitly]
-    public abstract class BaseComment : BaseEntity, ISiteEntity
+    public abstract class BaseComment : BaseEntity
     {
         [Required] public Guid ContentId { get; set; }
         [Required] public string Type { get; set; } = "";
