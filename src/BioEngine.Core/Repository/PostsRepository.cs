@@ -16,9 +16,10 @@ namespace BioEngine.Core.Repository
         private readonly TagsRepository _tagsRepository;
 
         public PostsRepository(BioRepositoryContext<Post> repositoryContext,
-            SectionsRepository sectionsRepository, TagsRepository tagsRepository,
+            SectionsRepository sectionsRepository, IMainSiteSelectionPolicy mainSiteSelectionPolicy,
+            TagsRepository tagsRepository,
             IUserDataProvider? userDataProvider = null) : base(repositoryContext,
-            sectionsRepository, userDataProvider)
+            sectionsRepository, mainSiteSelectionPolicy, userDataProvider)
         {
             _tagsRepository = tagsRepository;
         }
@@ -57,10 +58,7 @@ namespace BioEngine.Core.Repository
         {
             var version = new PostVersion
             {
-                Id = Guid.NewGuid(),
-                PostId = item.Id,
-                IsPublished = true,
-                DatePublished = DateTimeOffset.UtcNow,
+                Id = Guid.NewGuid(), PostId = item.Id, IsPublished = true, DatePublished = DateTimeOffset.UtcNow,
             };
             version.SetPost(item);
             if (operationContext?.User != null)

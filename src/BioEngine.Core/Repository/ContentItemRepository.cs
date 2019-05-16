@@ -14,8 +14,8 @@ namespace BioEngine.Core.Repository
         private readonly IUserDataProvider? _userDataProvider;
 
         protected ContentItemRepository(BioRepositoryContext<T> repositoryContext,
-            SectionsRepository sectionsRepository, IUserDataProvider? userDataProvider = null) : base(repositoryContext,
-            sectionsRepository)
+            SectionsRepository sectionsRepository, IMainSiteSelectionPolicy mainSiteSelectionPolicy, IUserDataProvider? userDataProvider = null) : base(repositoryContext,
+            sectionsRepository, mainSiteSelectionPolicy)
         {
             _userDataProvider = userDataProvider;
         }

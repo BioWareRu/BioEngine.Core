@@ -12,9 +12,12 @@ namespace BioEngine.Core.Repository
     public abstract class SiteEntityRepository<T> : BioRepository<T>
         where T : class, IEntity, ISiteEntity
     {
-        protected SiteEntityRepository(BioRepositoryContext<T> repositoryContext)
+        private readonly IMainSiteSelectionPolicy _mainSiteSelectionPolicy;
+
+        protected SiteEntityRepository(BioRepositoryContext<T> repositoryContext,IMainSiteSelectionPolicy mainSiteSelectionPolicy)
             : base(repositoryContext)
         {
+            _mainSiteSelectionPolicy = mainSiteSelectionPolicy;
         }
 
         protected override void RegisterValidators()
@@ -40,7 +43,7 @@ namespace BioEngine.Core.Repository
         {
             if (item.SiteIds.Any())
             {
-                item.MainSiteId = item.SiteIds.First();
+                item.MainSiteId = _mainSiteSelectionPolicy.Get(item);
             }
 
             return base.BeforeValidateAsync(item, validationResult, changes, operationContext);
