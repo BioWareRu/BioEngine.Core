@@ -11,7 +11,6 @@ namespace BioEngine.Core.Validation
         public SiteEntityValidator()
         {
             RuleFor(e => e.SiteIds).NotEmpty();
-            RuleFor(e => e.MainSiteId).NotEqual(Guid.Empty);
         }
     }
 

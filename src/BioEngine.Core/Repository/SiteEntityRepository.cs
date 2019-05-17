@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Validation;
-using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository
 {
     public abstract class SiteEntityRepository<T> : BioRepository<T>
         where T : class, IEntity, ISiteEntity
     {
-        private readonly IMainSiteSelectionPolicy _mainSiteSelectionPolicy;
-
-        protected SiteEntityRepository(BioRepositoryContext<T> repositoryContext,IMainSiteSelectionPolicy mainSiteSelectionPolicy)
-            : base(repositoryContext)
+        protected SiteEntityRepository(BioRepositoryContext<T> repositoryContext) : base(repositoryContext)
         {
-            _mainSiteSelectionPolicy = mainSiteSelectionPolicy;
         }
 
         protected override void RegisterValidators()
@@ -35,18 +28,6 @@ namespace BioEngine.Core.Repository
             }
 
             return base.ApplyContext(query, queryContext);
-        }
-
-        protected override Task<bool> BeforeValidateAsync(T item,
-            (bool isValid, IList<ValidationFailure> errors) validationResult, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null)
-        {
-            if (item.SiteIds.Any())
-            {
-                item.MainSiteId = _mainSiteSelectionPolicy.Get(item);
-            }
-
-            return base.BeforeValidateAsync(item, validationResult, changes, operationContext);
         }
     }
 

@@ -13,13 +13,11 @@ namespace BioEngine.Core.Repository
         where T : class, IEntity, ISiteEntity, ISectionEntity
     {
         protected readonly SectionsRepository SectionsRepository;
-        private readonly IMainSiteSelectionPolicy _mainSiteSelectionPolicy;
 
         protected SectionEntityRepository(BioRepositoryContext<T> repositoryContext,
-            SectionsRepository sectionsRepository, IMainSiteSelectionPolicy mainSiteSelectionPolicy) : base(repositoryContext, mainSiteSelectionPolicy)
+            SectionsRepository sectionsRepository) : base(repositoryContext)
         {
             SectionsRepository = sectionsRepository;
-            _mainSiteSelectionPolicy = mainSiteSelectionPolicy;
         }
 
         protected override void RegisterValidators()
@@ -57,7 +55,6 @@ namespace BioEngine.Core.Repository
                     item.SiteIds = sections.SelectMany(s => s.SiteIds).Distinct().ToArray();
                     if (item.SiteIds.Any())
                     {
-                        item.MainSiteId = _mainSiteSelectionPolicy.Get(item, sections);
                         return true;
                     }
 

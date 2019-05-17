@@ -2,10 +2,8 @@ using System;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
-using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
@@ -65,10 +63,7 @@ namespace BioEngine.Core.Tests
         protected override BioEngine ConfigureBioEngine(BioEngine bioEngine)
         {
             base.ConfigureBioEngine(bioEngine);
-            return bioEngine.AddModule<TestsModule>().ConfigureServices(collection =>
-            {
-                collection.AddSingleton<IMainSiteSelectionPolicy, TestMainSiteSelectionPolicy>();
-            });
+            return bioEngine.AddModule<TestsModule>();
         }
     }
 

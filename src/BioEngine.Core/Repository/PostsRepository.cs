@@ -16,10 +16,10 @@ namespace BioEngine.Core.Repository
         private readonly TagsRepository _tagsRepository;
 
         public PostsRepository(BioRepositoryContext<Post> repositoryContext,
-            SectionsRepository sectionsRepository, IMainSiteSelectionPolicy mainSiteSelectionPolicy,
+            SectionsRepository sectionsRepository,
             TagsRepository tagsRepository,
             IUserDataProvider? userDataProvider = null) : base(repositoryContext,
-            sectionsRepository, mainSiteSelectionPolicy, userDataProvider)
+            sectionsRepository, userDataProvider)
         {
             _tagsRepository = tagsRepository;
         }

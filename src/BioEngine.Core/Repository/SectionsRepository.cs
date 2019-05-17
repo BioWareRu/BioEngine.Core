@@ -10,20 +10,15 @@ namespace BioEngine.Core.Repository
     [UsedImplicitly]
     public class SectionsRepository : SectionRepository<Section>
     {
-        public SectionsRepository(BioRepositoryContext<Section> repositoryContext,
-            IMainSiteSelectionPolicy mainSiteSelectionPolicy) : base(repositoryContext, mainSiteSelectionPolicy)
+        public SectionsRepository(BioRepositoryContext<Section> repositoryContext) : base(repositoryContext)
         {
         }
     }
 
     public abstract class SectionRepository<T> : SiteEntityRepository<T> where T : Section
     {
-        private readonly IMainSiteSelectionPolicy _mainSiteSelectionPolicy;
-
-        protected SectionRepository(BioRepositoryContext<T> repositoryContext,
-            IMainSiteSelectionPolicy mainSiteSelectionPolicy) : base(repositoryContext, mainSiteSelectionPolicy)
+        protected SectionRepository(BioRepositoryContext<T> repositoryContext) : base(repositoryContext)
         {
-            _mainSiteSelectionPolicy = mainSiteSelectionPolicy;
         }
 
         protected override IQueryable<T> GetBaseQuery(QueryContext<T>? queryContext = null)
@@ -46,7 +41,6 @@ namespace BioEngine.Core.Repository
                     post.SiteIds = sections.SelectMany(s => s.SiteIds).Distinct().ToArray();
                     if (post.SiteIds.Any())
                     {
-                        post.MainSiteId = _mainSiteSelectionPolicy.Get(post, sections);
                         DbContext.Update(post);
                         hasChanges = true;
                     }

@@ -12,8 +12,7 @@ namespace BioEngine.Core.Repository
             return ApplyContext(DbContext.Set<Page>().Include(p => p.Blocks), queryContext);
         }
 
-        public PagesRepository(BioRepositoryContext<Page> repositoryContext,
-            IMainSiteSelectionPolicy mainSiteSelectionPolicy) : base(repositoryContext, mainSiteSelectionPolicy)
+        public PagesRepository(BioRepositoryContext<Page> repositoryContext) : base(repositoryContext)
         {
         }
     }
