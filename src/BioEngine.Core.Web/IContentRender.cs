@@ -5,7 +5,7 @@ namespace BioEngine.Core.Web
 {
     public interface IContentRender
     {
-        Task<string> RenderHtmlAsync(IContentEntity contentEntity,
+        Task<string> RenderHtmlAsync(IContentEntity contentEntity, Site site,
             ContentEntityViewMode mode = ContentEntityViewMode.List);
     }
 }
