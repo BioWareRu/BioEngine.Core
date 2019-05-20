@@ -48,7 +48,7 @@ namespace BioEngine.Core.Publishers
 
             foreach (var record in records)
             {
-                if (site != null && record.SiteId != site.Id)
+                if (site != null && !record.SiteIds.Contains(site.Id))
                 {
                     continue;
                 }
@@ -73,7 +73,7 @@ namespace BioEngine.Core.Publishers
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
                     r.Type == entity.GetType().FullName && r.ContentId == entity.Id &&
-                    (site == null || r.SiteId == site.Id));
+                    (site == null || r.SiteIds.Contains(site.Id)));
         }
 
         protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(IContentEntity entity)

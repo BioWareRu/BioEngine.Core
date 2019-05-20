@@ -15,7 +15,7 @@ namespace BioEngine.Core.Publishers
     {
     }
 
-    public abstract class BasePublishRecord : BaseSingleSiteEntity
+    public abstract class BasePublishRecord : BaseSiteEntity
     {
         [NotMapped] public override string Title { get; set; }
         [NotMapped] public override string Url { get; set; }
