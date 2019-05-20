@@ -41,6 +41,12 @@ namespace BioEngine.Core
             return this;
         }
 
+        public BioEngine ConfigureServices(Action<HostBuilderContext, IServiceCollection> conifgure)
+        {
+            _hostBuilder.ConfigureServices(conifgure);
+            return this;
+        }
+
         public IHost Build()
         {
             return _hostBuilder.Build();
