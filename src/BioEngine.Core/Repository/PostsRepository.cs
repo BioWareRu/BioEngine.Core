@@ -35,7 +35,7 @@ namespace BioEngine.Core.Repository
                 Expression<Func<Post, bool>> ex = null;
                 foreach (var tagId in queryContext.TagIds)
                 {
-                    ex = ex == null ? post => post.TagIds.Contains(tagId) : ex.Or(post => post.TagIds.Contains(tagId));
+                    ex = ex == null ? post => post.TagIds.Contains(tagId) : ex.And(post => post.TagIds.Contains(tagId));
                 }
 
                 if (ex != null)
