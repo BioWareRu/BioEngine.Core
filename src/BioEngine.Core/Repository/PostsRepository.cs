@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Extensions;
 using BioEngine.Core.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +31,17 @@ namespace BioEngine.Core.Repository
         {
             if (queryContext != null && queryContext.TagIds.Any())
             {
-                query = query.Where(e => e.TagIds.Any(t => queryContext.TagIds.Contains(t)));
+                // https://github.com/aspnet/EntityFrameworkCore/issues/6812
+                Expression<Func<Post, bool>> ex = null;
+                foreach (var tagId in queryContext.TagIds)
+                {
+                    ex = ex == null ? post => post.TagIds.Contains(tagId) : ex.Or(post => post.TagIds.Contains(tagId));
+                }
+
+                if (ex != null)
+                {
+                    query = query.Where(ex);
+                }
             }
 
             return base.ApplyContext(query, queryContext);
