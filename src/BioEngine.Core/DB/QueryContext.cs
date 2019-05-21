@@ -15,7 +15,7 @@ namespace BioEngine.Core.DB
         public int? Offset { get; set; }
         public Guid SiteId { get; private set; } = Guid.Empty;
         public Guid SectionId { get; private set; } = Guid.Empty;
-        public Guid TagId { get; private set; } = Guid.Empty;
+        public Guid[] TagIds { get; private set; } = new Guid[0];
 
         public bool OrderByDescending { get; protected set; }
         public bool IncludeUnpublished { get; set; }
@@ -36,9 +36,9 @@ namespace BioEngine.Core.DB
             SectionId = section.Id;
         }
 
-        public void SetTag(Tag tag)
+        public void SetTags(Tag[] tags)
         {
-            TagId = tag.Id;
+            TagIds = tags.Select(t => t.Id).Distinct().ToArray();
         }
     }
 
@@ -105,6 +105,7 @@ namespace BioEngine.Core.DB
                         {
                             condition.Value = ParsePropertyValue(condition.ValueType, condition.Value);
                         }
+
                         group.Conditions.Add(condition);
                     }
                 }

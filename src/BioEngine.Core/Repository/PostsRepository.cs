@@ -27,10 +27,9 @@ namespace BioEngine.Core.Repository
         protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
             QueryContext<Post>? queryContext)
         {
-            if (queryContext != null && queryContext.TagId != Guid.Empty)
+            if (queryContext != null && queryContext.TagIds.Any())
             {
-                var tagId = queryContext.TagId;
-                query = query.Where(e => e.TagIds.Contains(tagId));
+                query = query.Where(e => e.TagIds.Any(t => queryContext.TagIds.Contains(t)));
             }
 
             return base.ApplyContext(query, queryContext);
