@@ -52,7 +52,7 @@ namespace BioEngine.Core.Tests
                 Blocks = new List<ContentBlock> {new TextBlock {Data = new TextBlockData {Text = "Bla"}}}
             };
 
-            Assert.Null(content.SiteIds);
+            Assert.Empty(content.SiteIds);
             var result = await repository.AddAsync(content);
             Assert.True(result.IsSuccess, $"Errors: {result.ErrorsString}");
             Assert.NotNull(content.SiteIds);
