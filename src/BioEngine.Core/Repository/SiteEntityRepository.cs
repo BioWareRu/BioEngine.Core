@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Validation;
 
 namespace BioEngine.Core.Repository
@@ -18,7 +19,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new SiteEntityValidator<TEntity>());
         }
 
-        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, IQueryContext<TEntity>? queryContext)
+        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, QueryContext<TEntity>? queryContext)
         {
             if (queryContext != null && queryContext.SiteId != Guid.Empty)
             {

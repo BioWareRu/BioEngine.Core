@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Users;
 using BioEngine.Core.Validation;
@@ -20,7 +21,7 @@ namespace BioEngine.Core.Repository
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<TEntity> GetBaseQuery(IQueryContext<TEntity>? queryContext = null)
+        protected override IQueryable<TEntity> GetBaseQuery(QueryContext<TEntity>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<TEntity>().Include(p => p.Blocks), queryContext);
         }

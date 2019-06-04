@@ -16,10 +16,9 @@ namespace BioEngine.Core.Posts.SiteMaps
         protected override double Priority { get; } = 0.9;
 
         public PostsSiteMapNodeService(IHttpContextAccessor httpContextAccessor,
-            IQueryContext<Post> queryContext,
             IBioRepository<Post> repository,
             LinkGenerator linkGenerator) :
-            base(httpContextAccessor, queryContext, repository, linkGenerator)
+            base(httpContextAccessor, repository, linkGenerator)
         {
         }
 

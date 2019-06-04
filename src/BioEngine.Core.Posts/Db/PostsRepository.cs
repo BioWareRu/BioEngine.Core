@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Extensions;
 using BioEngine.Core.Posts.Entities;
@@ -29,7 +30,7 @@ namespace BioEngine.Core.Posts.Db
         }
 
         protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
-            IQueryContext<Post>? queryContext)
+            QueryContext<Post>? queryContext)
         {
             if (queryContext != null && queryContext.TagIds.Any())
             {

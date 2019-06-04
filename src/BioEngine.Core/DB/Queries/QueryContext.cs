@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace BioEngine.Core.DB.Queries
 {
-    public class QueryContext : IQueryContext
+    public class QueryContext
     {
         public int? Limit { get; set; }
         public int? Offset { get; set; }
@@ -41,7 +41,7 @@ namespace BioEngine.Core.DB.Queries
         }
     }
 
-    public class QueryContext<T> : QueryContext, IQueryContext<T> where T : class, IEntity
+    public class QueryContext<T> : QueryContext where T : class, IEntity
     {
         public Expression<Func<T, object>>? OrderBy { get; private set; }
 

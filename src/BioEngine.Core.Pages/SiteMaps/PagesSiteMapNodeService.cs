@@ -9,9 +9,8 @@ namespace BioEngine.Core.Pages.SiteMaps
     public class PagesSiteMapNodeService : BaseSiteMapNodeService<Page>
     {
         public PagesSiteMapNodeService(IHttpContextAccessor httpContextAccessor,
-            IQueryContext<Page> queryContext,
             IBioRepository<Page> repository, LinkGenerator linkGenerator) :
-            base(httpContextAccessor, queryContext, repository, linkGenerator)
+            base(httpContextAccessor, repository, linkGenerator)
         {
         }
     }

@@ -5,6 +5,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Validation;
 using FluentValidation;
@@ -42,7 +43,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new EntityValidator());
         }
 
-        public virtual async Task<(TEntity[] items, int itemsCount)> GetAllAsync(IQueryContext<TEntity>? queryContext = null,
+        public virtual async Task<(TEntity[] items, int itemsCount)> GetAllAsync(QueryContext<TEntity>? queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? addConditionsCallback = null)
         {
             var itemsCount = await CountAsync(queryContext, addConditionsCallback);
@@ -82,7 +83,7 @@ namespace BioEngine.Core.Repository
             await PropertiesProvider.LoadPropertiesAsync(entities);
         }
 
-        public virtual async Task<int> CountAsync(IQueryContext<TEntity>? queryContext = null,
+        public virtual async Task<int> CountAsync(QueryContext<TEntity>? queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? addConditionsCallback = null)
         {
             var query = GetBaseQuery(queryContext);
@@ -95,7 +96,7 @@ namespace BioEngine.Core.Repository
             return await query.CountAsync();
         }
 
-        public virtual async Task<TEntity> GetByIdAsync(Guid id, IQueryContext<TEntity>? queryContext = null)
+        public virtual async Task<TEntity> GetByIdAsync(Guid id, QueryContext<TEntity>? queryContext = null)
         {
             var item = await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
             await AfterLoadAsync(item);
@@ -103,7 +104,7 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where,
-            IQueryContext<TEntity>? queryContext = null)
+            QueryContext<TEntity>? queryContext = null)
         {
             var query = where(GetBaseQuery(queryContext));
             var item = await query.FirstOrDefaultAsync();
@@ -112,7 +113,7 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<TEntity[]> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where,
-            IQueryContext<TEntity>? queryContext = null)
+            QueryContext<TEntity>? queryContext = null)
         {
             var query = where(GetBaseQuery(queryContext));
             var items = await query.ToArrayAsync();
@@ -127,7 +128,7 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
-        public virtual async Task<TEntity[]> GetByIdsAsync(Guid[] ids, IQueryContext<TEntity>? queryContext = null)
+        public virtual async Task<TEntity[]> GetByIdsAsync(Guid[] ids, QueryContext<TEntity>? queryContext = null)
         {
             var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToArrayAsync();
             await AfterLoadAsync(items);
@@ -282,12 +283,12 @@ namespace BioEngine.Core.Repository
             return (!failures.Any(), failures);
         }
 
-        protected virtual IQueryable<TEntity> GetBaseQuery(IQueryContext<TEntity>? queryContext = null)
+        protected virtual IQueryable<TEntity> GetBaseQuery(QueryContext<TEntity>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<TEntity>(), queryContext);
         }
 
-        protected virtual IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, IQueryContext<TEntity>? queryContext)
+        protected virtual IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, QueryContext<TEntity>? queryContext)
         {
             if (queryContext == null)
             {

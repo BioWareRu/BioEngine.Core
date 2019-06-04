@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Validation;
 using FluentValidation.Results;
 
@@ -25,7 +26,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new SectionEntityValidator<TEntity>());
         }
 
-        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, IQueryContext<TEntity>? queryContext)
+        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, QueryContext<TEntity>? queryContext)
         {
             if (queryContext != null && queryContext.SectionId != Guid.Empty)
             {

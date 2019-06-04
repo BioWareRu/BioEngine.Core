@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace BioEngine.Core.Repository
         {
         }
 
-        protected override IQueryable<TEntity> GetBaseQuery(IQueryContext<TEntity>? queryContext = null)
+        protected override IQueryable<TEntity> GetBaseQuery(QueryContext<TEntity>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<TEntity>().Include(p => p.Blocks), queryContext);
         }
