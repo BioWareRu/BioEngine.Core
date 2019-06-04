@@ -1,13 +1,11 @@
 using BioEngine.Core.API;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Extra.Ads.Entities;
 using BioEngine.Extra.Ads.Site;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 
 namespace BioEngine.Extra.Ads
 {
@@ -21,13 +19,13 @@ namespace BioEngine.Extra.Ads
             services.RegisterApiEntities(GetType().Assembly);
         }
 
-        public override void RegisterEntities(BioEntitiesManager entitiesManager)
+        public override void ConfigureDbContext(BioEntitiesManager entitiesManager)
         {
-            base.RegisterEntities(entitiesManager);
-            entitiesManager.Register<Ad>(builder =>
+            base.ConfigureDbContext(entitiesManager);
+            entitiesManager.Register<Ad>(modelBuilder =>
             {
-                builder.Entity<Ad>().Property(a => a.Picture).HasConversion(
-                    p => JsonConvert.SerializeObject(p), json => JsonConvert.DeserializeObject<StorageItem>(json));
+                modelBuilder.Entity<Ad>().HasMany(contentItem => contentItem.Blocks).WithOne()
+                    .HasForeignKey(c => c.ContentId);
             });
         }
     }

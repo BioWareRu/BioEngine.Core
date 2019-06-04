@@ -13,8 +13,7 @@ namespace BioEngine.Extra.Ads.Site
         {
             _adsRepository = adsRepository;
         }
-
-        [HttpGet("go/{adId}.html")]
+        
         public virtual async Task<ActionResult> RedirectAsync(Guid adId)
         {
             var ad = await _adsRepository.GetByIdAsync(adId);

@@ -35,7 +35,7 @@ namespace BioEngine.Extra.Ads.Site
         {
             if (_ads != null) return _ads;
 
-            var context = new QueryContext<Ad>
+            var context = new ContentEntityQueryContext<Ad>
             {
                 IncludeUnpublished = false
             };
