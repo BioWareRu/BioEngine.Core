@@ -34,13 +34,13 @@ namespace BioEngine.Core.Modules
             }
         }
 
-        public virtual void RegisterRepositories(IServiceCollection serviceCollection, BioEntityMetadataManager metadataManager)
+        public virtual void RegisterRepositories(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
         {
-            RegisterRepositories(GetType().Assembly, serviceCollection, metadataManager);
+            RegisterRepositories(GetType().Assembly, serviceCollection, entitiesManager);
         }
 
         protected void RegisterRepositories(Assembly assembly, IServiceCollection serviceCollection,
-            BioEntityMetadataManager metadataManager)
+            BioEntitiesManager entitiesManager)
         {
             var types = new HashSet<TypeInfo>();
             foreach (var definedType in assembly.DefinedTypes)
@@ -50,7 +50,7 @@ namespace BioEngine.Core.Modules
 
             foreach (var type in types)
             {
-                metadataManager.Register(type);
+                entitiesManager.Register(type);
             }
 
             serviceCollection.Scan(s =>

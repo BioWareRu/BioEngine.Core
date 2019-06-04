@@ -24,7 +24,7 @@ namespace BioEngine.Core.DB
 
         [UsedImplicitly] public DbSet<ContentItem> ContentItems { get; set; }
         [UsedImplicitly] public DbSet<Section> Sections { get; set; }
-        public DbSet<ContentBlock> Blocks { get; set; }
+        [UsedImplicitly] public DbSet<ContentBlock> Blocks { get; set; }
         [UsedImplicitly] public DbSet<StorageItem> StorageItems { get; set; }
         public DbSet<ContentVersion> PostVersions { get; set; }
 
@@ -69,9 +69,9 @@ namespace BioEngine.Core.DB
             var sectionEntityConversionsRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
                 nameof(ModelBuilderContextExtensions.RegisterSectionEntityConversions),
                 BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
-            var metadataManager = this.GetInfrastructure().GetService<BioEntityMetadataManager>();
+            var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
             var logger = this.GetInfrastructure().GetRequiredService<ILogger<BioContext>>();
-            foreach (var entityMetadata in metadataManager.GetBlocksMetadata())
+            foreach (var entityMetadata in entitiesManager.GetBlocksMetadata())
             {
                 logger.LogInformation(
                     "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Type,
@@ -84,7 +84,7 @@ namespace BioEngine.Core.DB
                     .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 
-            foreach (var entityMetadata in metadataManager.GetSectionsMetadata())
+            foreach (var entityMetadata in entitiesManager.GetSectionsMetadata())
             {
                 logger.LogInformation("Register section type {type} - {entityType} ({dataType})", entityMetadata.Type,
                     entityMetadata.ObjectType,
@@ -102,7 +102,7 @@ namespace BioEngine.Core.DB
                     .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 
-            foreach (var entityMetadata in metadataManager.GetContentItemsMetadata())
+            foreach (var entityMetadata in entitiesManager.GetContentItemsMetadata())
             {
                 logger.LogInformation("Register content item type {type} - {entityType} ({dataType})",
                     entityMetadata.Type,
@@ -124,7 +124,7 @@ namespace BioEngine.Core.DB
                     .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 
-            var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
+            
             var entitiesTypes = entitiesManager.GetTypes();
             foreach (var registration in entitiesTypes)
             {

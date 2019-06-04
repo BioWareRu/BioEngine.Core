@@ -10,7 +10,7 @@ namespace BioEngine.Core.Posts.Entities
     {
         public bool IsPinned { get; set; } = false;
         public override string TypeTitle { get; } = "Пост";
-        [NotMapped] public override string PublicRouteName { get; set; } = BioEngineCoreRoutes.PostPublic;
+        [NotMapped] public override string PublicRouteName { get; set; } = BioEngineCoreRoutes.Post;
     }
 
     public class PostData : ITypedData

@@ -14,8 +14,8 @@ namespace BioEngine.Core.Pages.Api
     public class PagesController : ContentEntityController<Page, PagesRepository, Entities.Page, Entities.Page>
     {
         public PagesController(BaseControllerContext<Page, ContentEntityQueryContext<Page>, PagesRepository> context,
-            BioEntityMetadataManager metadataManager, ContentBlocksRepository blocksRepository) : base(context,
-            metadataManager, blocksRepository)
+            BioEntitiesManager entitiesManager, ContentBlocksRepository blocksRepository) : base(context,
+            entitiesManager, blocksRepository)
         {
         }
 

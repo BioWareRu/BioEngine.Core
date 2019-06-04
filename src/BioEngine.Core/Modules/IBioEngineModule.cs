@@ -14,7 +14,7 @@ namespace BioEngine.Core.Modules
         void ConfigureHostBuilder(IHostBuilder hostBuilder);
         void ConfigureDbContext(BioEntitiesManager entitiesManager);
         void RegisterValidation(IServiceCollection serviceCollection);
-        void RegisterRepositories(IServiceCollection serviceCollection, BioEntityMetadataManager metadataManager);
+        void RegisterRepositories(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager);
     }
 
     public interface IBioEngineModule<TConfig> : IBioEngineModule where TConfig : class

@@ -13,7 +13,6 @@ namespace BioEngine.Core
     public class BioEngine
     {
         private readonly BioEntitiesManager _entitiesManager = new BioEntitiesManager();
-        private readonly BioEntityMetadataManager _entityMetadataManager = new BioEntityMetadataManager();
 
         private bool _coreConfigured;
         private readonly IHostBuilder _hostBuilder;
@@ -29,7 +28,7 @@ namespace BioEngine.Core
             {
                 services.AddScoped<PropertiesProvider>();
                 services.AddScoped<BioRepositoryHooksManager>();
-                services.AddSingleton(_entityMetadataManager);
+                services.AddSingleton(_entitiesManager);
                 services.AddScoped(typeof(BioRepositoryContext<>));
                 _coreConfigured = true;
             }
@@ -81,7 +80,7 @@ namespace BioEngine.Core
             module.ConfigureServices(collection, configuration, environment);
             module.ConfigureDbContext(_entitiesManager);
             module.RegisterValidation(collection);
-            module.RegisterRepositories(collection, _entityMetadataManager);
+            module.RegisterRepositories(collection, _entitiesManager);
             collection.TryAddSingleton(_entitiesManager);
         }
 

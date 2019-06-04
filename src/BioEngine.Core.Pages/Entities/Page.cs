@@ -9,7 +9,7 @@ namespace BioEngine.Core.Pages.Entities
     public class Page : ContentItem<PageData>
     {
         public override string TypeTitle { get; } = "Страница";
-        [NotMapped] public override string PublicRouteName { get; set; } = BioEngineCoreRoutes.PagePublic;
+        [NotMapped] public override string PublicRouteName { get; set; } = BioEngineCoreRoutes.Page;
     }
 
     public class PageData : ITypedData

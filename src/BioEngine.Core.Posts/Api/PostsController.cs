@@ -22,9 +22,9 @@ namespace BioEngine.Core.Posts.Api
 
         protected ApiPostsController(
             BaseControllerContext<Post, ContentEntityQueryContext<Post>, PostsRepository> context,
-            BioEntityMetadataManager metadataManager,
+            BioEntitiesManager entitiesManager,
             ContentBlocksRepository blocksRepository, IUserDataProvider userDataProvider) : base(context,
-            metadataManager, blocksRepository)
+            entitiesManager, blocksRepository)
         {
             _userDataProvider = userDataProvider;
         }
