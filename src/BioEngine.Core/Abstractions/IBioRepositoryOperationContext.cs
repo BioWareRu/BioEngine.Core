@@ -1,7 +1,7 @@
 using System;
 using BioEngine.Core.Users;
 
-namespace BioEngine.Core.Repository
+namespace BioEngine.Core.Abstractions
 {
     public interface IBioRepositoryOperationContext
     {

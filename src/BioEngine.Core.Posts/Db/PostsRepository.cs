@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Extensions;
 using BioEngine.Core.Posts.Entities;
@@ -29,7 +29,7 @@ namespace BioEngine.Core.Posts.Db
         }
 
         protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
-            ContentEntityQueryContext<Post>? queryContext)
+            IQueryContext<Post>? queryContext)
         {
             if (queryContext != null && queryContext.TagIds.Any())
             {

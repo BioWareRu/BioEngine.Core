@@ -1,4 +1,5 @@
 using System;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Users;
 
 namespace BioEngine.Core.Repository

@@ -1,7 +1,5 @@
-﻿using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
+﻿using BioEngine.Core.Abstractions;
 using BioEngine.Core.Properties;
-using BioEngine.Core.Repository;
 using BioEngine.Core.Storage;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -25,10 +23,9 @@ namespace BioEngine.Core.Web
         }
     }
 
-    public class BaseControllerContext<TEntity, TQueryContext, TRepository> : BaseControllerContext
+    public class BaseControllerContext<TEntity, TRepository> : BaseControllerContext
         where TEntity : class, IEntity
-        where TQueryContext : QueryContext<TEntity>
-        where TRepository : IBioRepository<TEntity, TQueryContext>
+        where TRepository : IBioRepository<TEntity>
     {
         public TRepository Repository { get; }
 

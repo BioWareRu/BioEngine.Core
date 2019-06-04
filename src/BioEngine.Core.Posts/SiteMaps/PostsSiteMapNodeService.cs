@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Posts.Entities;
-using BioEngine.Core.Repository;
 using BioEngine.Core.Site.Sitemaps;
 using cloudscribe.Web.SiteMap;
 using Microsoft.AspNetCore.Http;
@@ -17,9 +16,10 @@ namespace BioEngine.Core.Posts.SiteMaps
         protected override double Priority { get; } = 0.9;
 
         public PostsSiteMapNodeService(IHttpContextAccessor httpContextAccessor,
-            IBioRepository<Post, ContentEntityQueryContext<Post>> repository,
+            IQueryContext<Post> queryContext,
+            IBioRepository<Post> repository,
             LinkGenerator linkGenerator) :
-            base(httpContextAccessor, repository, linkGenerator)
+            base(httpContextAccessor, queryContext, repository, linkGenerator)
         {
         }
 

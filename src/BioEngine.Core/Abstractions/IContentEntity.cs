@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Routing;
 
-namespace BioEngine.Core.Entities
+namespace BioEngine.Core.Abstractions
 {
     public interface IContentEntity : ISiteEntity, IRoutable
     {

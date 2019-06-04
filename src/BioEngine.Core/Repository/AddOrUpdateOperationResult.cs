@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BioEngine.Core.Entities;
+using BioEngine.Core.Abstractions;
 using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository

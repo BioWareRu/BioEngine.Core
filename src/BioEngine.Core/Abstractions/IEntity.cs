@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using BioEngine.Core.Properties;
 
-namespace BioEngine.Core.Entities
+namespace BioEngine.Core.Abstractions
 {
     public interface IEntity
     {

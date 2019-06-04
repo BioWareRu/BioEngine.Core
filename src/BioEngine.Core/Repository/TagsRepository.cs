@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
-using BioEngine.Core.DB;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
-    public class TagsRepository : BioRepository<Tag, QueryContext<Tag>>
+    public class TagsRepository : BioRepository<Tag>
     {
         public TagsRepository(BioRepositoryContext<Tag> repositoryContext) : base(repositoryContext)
         {

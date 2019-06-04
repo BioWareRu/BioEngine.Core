@@ -12,7 +12,7 @@ namespace BioEngine.Core.Web
         {
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<BaseControllerContext>();
-            services.AddScoped(typeof(BaseControllerContext<,,>));
+            services.AddScoped(typeof(BaseControllerContext<,>));
         }
     }
 

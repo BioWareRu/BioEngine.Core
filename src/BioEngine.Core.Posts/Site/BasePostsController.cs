@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
-using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Posts.Db;
@@ -23,7 +23,7 @@ namespace BioEngine.Core.Posts.Site
         private readonly ICommentsProvider _commentsProvider;
 
         protected BasePostsController(
-            BaseControllerContext<Post, ContentEntityQueryContext<Post>, PostsRepository> context,
+            BaseControllerContext<Post, PostsRepository> context,
             TagsRepository tagsRepository,
             ICommentsProvider commentsProvider) : base(context)
         {
@@ -73,7 +73,8 @@ namespace BioEngine.Core.Posts.Site
             var context = GetQueryContext(page);
             context.SetTags(tags);
 
-            var (items, itemsCount) = await Repository.GetAllAsync(context);
+            var (items, itemsCount) =
+                await Repository.GetAllAsync(context, entities => entities.Where(e => e.IsPublished));
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags});
         }
@@ -90,7 +91,7 @@ namespace BioEngine.Core.Posts.Site
 
             var context = GetQueryContext();
 
-            var posts = await Repository.GetAllAsync(context);
+            var posts = await Repository.GetAllAsync(context,entities => entities.Where(e => e.IsPublished));
             var mostRecentPubDate = DateTime.MinValue;
             var commentsData =
                 await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());

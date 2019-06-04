@@ -1,4 +1,4 @@
-﻿namespace BioEngine.Core.Entities
+﻿namespace BioEngine.Core.Abstractions
 {
     public interface ITypedEntity : IEntity
     {

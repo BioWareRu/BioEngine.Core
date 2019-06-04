@@ -21,7 +21,7 @@ namespace BioEngine.Core.Posts.Api
         private readonly IUserDataProvider _userDataProvider;
 
         protected ApiPostsController(
-            BaseControllerContext<Post, ContentEntityQueryContext<Post>, PostsRepository> context,
+            BaseControllerContext<Post, PostsRepository> context,
             BioEntitiesManager entitiesManager,
             ContentBlocksRepository blocksRepository, IUserDataProvider userDataProvider) : base(context,
             entitiesManager, blocksRepository)

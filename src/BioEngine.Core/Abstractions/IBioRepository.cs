@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
+using BioEngine.Core.Repository;
 
-namespace BioEngine.Core.Repository
+namespace BioEngine.Core.Abstractions
 {
     public interface IBioRepository
     {
     }
 
-    public interface IBioRepository<TEntity, TQueryContext> : IBioRepository where TEntity : class, IEntity
-        where TQueryContext : QueryContext<TEntity>
+    public interface IBioRepository<TEntity> : IBioRepository where TEntity : class, IEntity
     {
-        Task<(TEntity[] items, int itemsCount)> GetAllAsync(TQueryContext? queryContext = null,
+        Task<(TEntity[] items, int itemsCount)> GetAllAsync(IQueryContext<TEntity>? queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? addConditionsCallback = null);
 
-        Task<int> CountAsync(TQueryContext? queryContext = null,
+        Task<int> CountAsync(IQueryContext<TEntity>? queryContext = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? addConditionsCallback = null);
 
-        Task<TEntity> GetByIdAsync(Guid id, TQueryContext? queryContext = null);
+        Task<TEntity> GetByIdAsync(Guid id, IQueryContext<TEntity>? queryContext = null);
 
         Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where,
-            TQueryContext? queryContext = null);
+            IQueryContext<TEntity>? queryContext = null);
 
         Task<TEntity[]> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where,
-            TQueryContext? queryContext = null);
+            IQueryContext<TEntity>? queryContext = null);
 
         Task<TEntity> NewAsync();
 
-        Task<TEntity[]> GetByIdsAsync(Guid[] ids, TQueryContext? queryContext = null);
+        Task<TEntity[]> GetByIdsAsync(Guid[] ids, IQueryContext<TEntity>? queryContext = null);
 
         Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item,
             IBioRepositoryOperationContext? operationContext = null);
@@ -45,13 +43,5 @@ namespace BioEngine.Core.Repository
 
 
         PropertyChange[] GetChanges(TEntity item, TEntity oldEntity);
-    }
-
-    public interface IContentEntityRepository<TEntity, TQueryContext> : IBioRepository<TEntity, TQueryContext>
-        where TEntity : class, IEntity, IContentEntity where TQueryContext : ContentEntityQueryContext<TEntity>
-    {
-        Task PublishAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
-
-        Task UnPublishAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
     }
 }

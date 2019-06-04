@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using Newtonsoft.Json.Linq;
 
-namespace BioEngine.Core.DB
+namespace BioEngine.Core.DB.Queries
 {
-    public class QueryContext
+    public class QueryContext : IQueryContext
     {
         public int? Limit { get; set; }
         public int? Offset { get; set; }
@@ -22,7 +22,7 @@ namespace BioEngine.Core.DB
         public List<(string propertyName, bool isDescending)> SortQueries { get; protected set; } =
             new List<(string propertyName, bool isDescending)>();
 
-        internal List<QueryContextConditionsGroup> ConditionsGroups { get; } =
+        public List<QueryContextConditionsGroup> ConditionsGroups { get; } =
             new List<QueryContextConditionsGroup>();
 
         public void SetSite(Site site)
@@ -41,7 +41,7 @@ namespace BioEngine.Core.DB
         }
     }
 
-    public class QueryContext<T> : QueryContext where T : class, IEntity
+    public class QueryContext<T> : QueryContext, IQueryContext<T> where T : class, IEntity
     {
         public Expression<Func<T, object>>? OrderBy { get; private set; }
 
@@ -175,140 +175,6 @@ namespace BioEngine.Core.DB
                 parsedValue = Convert.ChangeType(value.ToString(), propertyType);
 
             return parsedValue;
-        }
-    }
-
-    public class ContentEntityQueryContext<T> : QueryContext<T> where T : class, IEntity, IContentEntity
-    {
-        public bool IncludeUnpublished { get; set; }
-    }
-
-    internal static class FieldsResolver
-    {
-        private static readonly ConcurrentDictionary<string, Dictionary<string, (string name, Type type)>> Properties =
-            new ConcurrentDictionary<string, Dictionary<string, (string name, Type type)>>();
-
-        internal static (string name, Type type)? GetPropertyInfo<T>(string name)
-        {
-            var typeName = typeof(T).Name;
-            if (!Properties.ContainsKey(typeName))
-            {
-                Properties.TryAdd(typeName,
-                    typeof(T).GetProperties()
-                        .ToDictionary(p => p.Name.ToLowerInvariant(), p => (p.Name, p.PropertyType)));
-            }
-
-            name = name.ToLowerInvariant();
-
-            if (Properties[typeName].ContainsKey(name))
-            {
-                return Properties[typeName][name];
-            }
-
-            return null;
-        }
-    }
-
-    public enum SortDirection
-    {
-        Ascending = 1,
-        Descending = 2
-    }
-
-    internal struct SortQuery
-    {
-        public readonly string Name;
-        public readonly SortDirection SortDirection;
-
-        public SortQuery(string name, SortDirection sortDirection)
-        {
-            Name = name;
-            SortDirection = sortDirection;
-        }
-    }
-
-    public enum QueryContextOperator
-    {
-        Equal = 1,
-        NotEqual = 2,
-        Greater = 3,
-        GreaterOrEqual = 4,
-        Less = 5,
-        LessOrEqual = 6,
-        Contains = 7,
-        StartsWith = 8,
-        EndsWith = 9,
-        In = 10
-    }
-
-    public class QueryContextConditionsGroup
-    {
-        public QueryContextConditionsGroup(List<QueryContextCondition> conditions)
-        {
-            Conditions = conditions;
-        }
-
-        public List<QueryContextCondition> Conditions { get; }
-    }
-
-    public class QueryContextCondition
-    {
-        public string Property { get; set; }
-        public QueryContextOperator Operator { get; set; }
-        public object? Value { get; set; }
-        public Type ValueType { get; set; } = typeof(object);
-
-        public QueryContextCondition(string property, QueryContextOperator conditionOperator, object value)
-        {
-            Property = property;
-            Operator = conditionOperator;
-            Value = value;
-        }
-
-        public string? GetExpression(int valueIndex)
-        {
-            switch (Operator)
-            {
-                case QueryContextOperator.Equal:
-                    return $"{Property} == @{valueIndex.ToString()}";
-                case QueryContextOperator.NotEqual:
-                    return $"{Property} != @{valueIndex.ToString()}";
-                case QueryContextOperator.Greater:
-                    return $"{Property} > @{valueIndex.ToString()}";
-                case QueryContextOperator.GreaterOrEqual:
-                    return $"{Property} >= @{valueIndex.ToString()}";
-                case QueryContextOperator.Less:
-                    return $"{Property} < @{valueIndex.ToString()}";
-                case QueryContextOperator.LessOrEqual:
-                    return $"{Property} <= @{valueIndex.ToString()}";
-                case QueryContextOperator.Contains:
-                    if (ValueType == typeof(string) || typeof(IEnumerable).IsAssignableFrom(ValueType))
-                    {
-                        return $"{Property}.ToLower().Contains(@{valueIndex.ToString()})";
-                    }
-
-                    break;
-                case QueryContextOperator.StartsWith:
-                    if (ValueType == typeof(string))
-                    {
-                        return $"{Property}.ToLower().StartsWith(@{valueIndex.ToString()})";
-                    }
-
-                    break;
-                case QueryContextOperator.EndsWith:
-                    if (ValueType == typeof(string))
-                    {
-                        return $"{Property}.ToLower().EndsWith(@{valueIndex.ToString()})";
-                    }
-
-                    break;
-                case QueryContextOperator.In:
-                    return $"@{valueIndex.ToString()}.Contains({Property})";
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return null;
         }
     }
 }

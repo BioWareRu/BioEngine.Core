@@ -1,6 +1,6 @@
 using System;
 
-namespace BioEngine.Core.Entities
+namespace BioEngine.Core.Abstractions
 {
     public interface ISectionEntity : IEntity
     {

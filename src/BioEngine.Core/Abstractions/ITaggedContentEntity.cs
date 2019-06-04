@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using BioEngine.Core.Entities;
 
-namespace BioEngine.Core.Entities
+namespace BioEngine.Core.Abstractions
 {
     public interface ITaggedContentEntity : IContentEntity
     {

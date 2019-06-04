@@ -1,4 +1,4 @@
-﻿using BioEngine.Core.Entities;
+﻿using BioEngine.Core.Abstractions;
 using FluentValidation;
 
 namespace BioEngine.Core.Validation

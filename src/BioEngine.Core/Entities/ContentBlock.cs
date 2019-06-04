@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BioEngine.Core.Abstractions;
 using Newtonsoft.Json;
 
 namespace BioEngine.Core.Entities

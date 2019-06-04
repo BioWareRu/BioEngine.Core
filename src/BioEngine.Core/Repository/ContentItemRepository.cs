@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Users;
 using BioEngine.Core.Validation;
@@ -8,38 +8,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
-    public class ContentItemsRepository : SectionEntityRepository<ContentItem>
-    {
-        public ContentItemsRepository(BioRepositoryContext<ContentItem> repositoryContext,
-            SectionsRepository sectionsRepository) : base(repositoryContext, sectionsRepository)
-        {
-        }
-    }
-
-    public abstract class ContentItemRepository<T> : SectionEntityRepository<T>
-        where T : ContentItem, IEntity, ISiteEntity, ISectionEntity
+    public abstract class ContentItemRepository<TEntity> : SectionEntityRepository<TEntity>
+        where TEntity : ContentItem, IEntity, ISiteEntity, ISectionEntity
     {
         private readonly IUserDataProvider? _userDataProvider;
 
-        protected ContentItemRepository(BioRepositoryContext<T> repositoryContext,
+        protected ContentItemRepository(BioRepositoryContext<TEntity> repositoryContext,
             SectionsRepository sectionsRepository, IUserDataProvider? userDataProvider = null) : base(repositoryContext,
             sectionsRepository)
         {
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<T> GetBaseQuery(ContentEntityQueryContext<T>? queryContext = null)
+        protected override IQueryable<TEntity> GetBaseQuery(IQueryContext<TEntity>? queryContext = null)
         {
-            return ApplyContext(DbContext.Set<T>().Include(p => p.Blocks), queryContext);
+            return ApplyContext(DbContext.Set<TEntity>().Include(p => p.Blocks), queryContext);
         }
 
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new ContentItemValidator<T>(DbContext));
+            Validators.Add(new ContentItemValidator<TEntity>(DbContext));
         }
 
-        protected override async Task AfterLoadAsync(T[] entities)
+        protected override async Task AfterLoadAsync(TEntity[] entities)
         {
             if (_userDataProvider != null && entities != null && entities.Length > 0)
             {

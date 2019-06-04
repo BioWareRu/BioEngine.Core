@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
+using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
@@ -26,11 +26,7 @@ namespace BioEngine.Core.Tests
             var repository = scope.Get<SitesRepository>();
             var count = await repository.CountAsync();
             Assert.Equal(1, count);
-            var site = new Site
-            {
-                Title = "New site",
-                Url = "https://site.ru"
-            };
+            var site = new Site {Title = "New site", Url = "https://site.ru"};
             var result = await repository.AddAsync(site);
             Assert.True(result.IsSuccess);
             Assert.True(result.Entity.Id != Guid.Empty);
@@ -100,11 +96,10 @@ namespace BioEngine.Core.Tests
             await repository.UnPublishAsync(section);
             var count = await context.Set<TestSection>().CountAsync(s => s.IsPublished);
 
-            var queryContext = new ContentEntityQueryContext<TestSection>();
-            var result = await repository.GetAllAsync(queryContext);
+            var queryContext = new QueryContext<TestSection>();
+            var result = await repository.GetAllAsync(queryContext, sections => sections.Where(s => s.IsPublished));
             Assert.Equal(count, result.itemsCount);
 
-            queryContext.IncludeUnpublished = true;
             result = await repository.GetAllAsync(queryContext);
             Assert.Equal(count + 1, result.itemsCount);
         }

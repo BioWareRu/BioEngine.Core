@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
-using BioEngine.Core.Repository;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

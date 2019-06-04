@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Validation;
 using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository
 {
-    public abstract class SectionEntityRepository<T> : ContentEntityRepository<T>
-        where T : class, ISectionEntity, IContentEntity 
+    public abstract class SectionEntityRepository<TEntity> : ContentEntityRepository<TEntity>
+        where TEntity : class, ISectionEntity, IContentEntity 
     {
         protected readonly SectionsRepository SectionsRepository;
 
-        protected SectionEntityRepository(BioRepositoryContext<T> repositoryContext,
+        protected SectionEntityRepository(BioRepositoryContext<TEntity> repositoryContext,
             SectionsRepository sectionsRepository) : base(repositoryContext)
         {
             SectionsRepository = sectionsRepository;
@@ -23,10 +22,10 @@ namespace BioEngine.Core.Repository
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new SectionEntityValidator<T>());
+            Validators.Add(new SectionEntityValidator<TEntity>());
         }
 
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, ContentEntityQueryContext<T>? queryContext)
+        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, IQueryContext<TEntity>? queryContext)
         {
             if (queryContext != null && queryContext.SectionId != Guid.Empty)
             {
@@ -37,7 +36,7 @@ namespace BioEngine.Core.Repository
             return base.ApplyContext(query, queryContext);
         }
 
-        protected override async Task<bool> BeforeValidateAsync(T item,
+        protected override async Task<bool> BeforeValidateAsync(TEntity item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
         {

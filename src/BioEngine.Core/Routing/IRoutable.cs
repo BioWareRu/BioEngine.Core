@@ -1,4 +1,4 @@
-using BioEngine.Core.Entities;
+using BioEngine.Core.Abstractions;
 
 namespace BioEngine.Core.Routing
 {
