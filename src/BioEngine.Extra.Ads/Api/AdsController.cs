@@ -13,7 +13,7 @@ namespace BioEngine.Extra.Ads.Api
     public abstract class
         AdsApiController : ContentEntityController<Ad, AdsRepository, Entities.Ad, Entities.Ad>
     {
-        protected AdsApiController(BaseControllerContext<Ad, ContentEntityQueryContext<Ad>, AdsRepository> context,
+        protected AdsApiController(BaseControllerContext<Ad, AdsRepository> context,
             BioEntitiesManager entitiesManager, ContentBlocksRepository blocksRepository) : base(context,
             entitiesManager, blocksRepository)
         {

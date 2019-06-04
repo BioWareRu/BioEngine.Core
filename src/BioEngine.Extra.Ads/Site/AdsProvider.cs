@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
+using BioEngine.Core.Abstractions;
 using BioEngine.Extra.Ads.Entities;
 
 namespace BioEngine.Extra.Ads.Site
@@ -9,6 +10,7 @@ namespace BioEngine.Extra.Ads.Site
     public class AdsProvider
     {
         private readonly AdsRepository _adsRepository;
+        private readonly IQueryContext<Ad> _queryContext;
         private Stack<Ad>? _ads;
         private static readonly Random Rng = new Random();
 
@@ -25,9 +27,10 @@ namespace BioEngine.Extra.Ads.Site
             }
         }
 
-        public AdsProvider(AdsRepository adsRepository)
+        public AdsProvider(AdsRepository adsRepository, IQueryContext<Ad> queryContext)
         {
             _adsRepository = adsRepository;
+            _queryContext = queryContext;
             _ads = null;
         }
 
@@ -35,12 +38,9 @@ namespace BioEngine.Extra.Ads.Site
         {
             if (_ads != null) return _ads;
 
-            var context = new ContentEntityQueryContext<Ad>
-            {
-                IncludeUnpublished = false
-            };
+            var context = _queryContext;
             context.SetSite(site);
-            var ads = await _adsRepository.GetAllAsync(context);
+            var ads = await _adsRepository.GetAllAsync(context, queryable => queryable.Where(ad => ad.IsPublished));
             Shuffle(ads.items);
             _ads = new Stack<Ad>(ads.items);
             return _ads;
