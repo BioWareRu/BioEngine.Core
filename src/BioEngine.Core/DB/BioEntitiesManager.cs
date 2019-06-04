@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BioEngine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ namespace BioEngine.Core.DB
     {
         private readonly Dictionary<string, BioEntityRegistration> _registrations =
             new Dictionary<string, BioEntityRegistration>();
+
+        private readonly List<Action<ModelBuilder>> _configureActions = new List<Action<ModelBuilder>>();
 
         public void Register<TEntity>(Action<ModelBuilder>? configureContext = null) where TEntity : IEntity
         {
@@ -22,6 +25,16 @@ namespace BioEngine.Core.DB
         public IEnumerable<BioEntityRegistration> GetTypes()
         {
             return _registrations.Values;
+        }
+
+        public void ConfigureDbContext(Action<ModelBuilder> configureContext)
+        {
+            _configureActions.Add(configureContext);
+        }
+
+        public IEnumerable<Action<ModelBuilder>> GetConfigureActions()
+        {
+            return _configureActions.ToList();
         }
     }
 

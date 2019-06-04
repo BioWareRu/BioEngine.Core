@@ -12,22 +12,13 @@ namespace BioEngine.Core.Entities
         [Required] public virtual string Type { get; set; }
         public virtual Guid? ParentId { get; set; }
 
-        [Required]
-        [Column(TypeName = "jsonb")]
-        public virtual StorageItem Logo { get; set; }
-
-        [Required]
-        [Column(TypeName = "jsonb")]
-        public virtual StorageItem LogoSmall { get; set; }
-
-        [InverseProperty(nameof(ContentBlock.Section))]
         public List<ContentBlock> Blocks { get; set; }
 
-        [Required] public virtual string Hashtag { get; set; }
+        public bool IsPublished { get; set; }
+        public DateTimeOffset? DatePublished { get; set; }
 
-
-        public abstract string PublicUrl { get; }
-        public abstract string PostsUrl { get; }
+        
+        [NotMapped] public abstract string PublicRouteName { get; set; }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
     public abstract class Section<T> : Section, ITypedEntity<T> where T : ITypedData, new()

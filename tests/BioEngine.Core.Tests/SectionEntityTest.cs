@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
-using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,9 +22,9 @@ namespace BioEngine.Core.Tests
         public async Task SaveWithoutSectionIdsFails()
         {
             var scope = GetScope();
-            var repository = scope.Get<PostsRepository>();
+            var repository = scope.Get<TestContentRepository>();
 
-            var content = new Post {Title = "Test Content 2", Url = "content2"};
+            var content = new TestContent {Title = "Test Content 2", Url = "content2"};
 
             var result = await repository.AddAsync(content);
             Assert.False(result.IsSuccess);
@@ -37,13 +36,14 @@ namespace BioEngine.Core.Tests
         public async Task SiteIdsAutoFillFromSections()
         {
             var scope = GetScope();
-            var repository = scope.Get<PostsRepository>();
-            var sectionRepository = scope.Get<SectionRepository>();
-            var section = (await sectionRepository.GetAllAsync(new QueryContext<TestSection>())).items.First();
+            var repository = scope.Get<TestContentRepository>();
+            var sectionRepository = scope.Get<TestSectionRepository>();
+            var section =
+                (await sectionRepository.GetAllAsync(new ContentEntityQueryContext<TestSection>())).items.First();
 
             Assert.NotEmpty(section.SiteIds);
 
-            var content = new Post
+            var content = new TestContent
             {
                 Title = "Test Content 2",
                 Url = "content2",
@@ -52,9 +52,10 @@ namespace BioEngine.Core.Tests
                 Blocks = new List<ContentBlock> {new TextBlock {Data = new TextBlockData {Text = "Bla"}}}
             };
 
-            Assert.Empty(content.SiteIds);
+            Assert.Null(content.SiteIds);
             var result = await repository.AddAsync(content);
             Assert.True(result.IsSuccess, $"Errors: {result.ErrorsString}");
+            Assert.NotNull(content.SiteIds);
             Assert.NotEmpty(content.SiteIds);
             Assert.Equal(section.SiteIds, content.SiteIds);
         }

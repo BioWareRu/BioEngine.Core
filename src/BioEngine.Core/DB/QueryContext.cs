@@ -18,7 +18,6 @@ namespace BioEngine.Core.DB
         public Guid[] TagIds { get; private set; } = new Guid[0];
 
         public bool OrderByDescending { get; protected set; }
-        public bool IncludeUnpublished { get; set; }
 
         public List<(string propertyName, bool isDescending)> SortQueries { get; protected set; } =
             new List<(string propertyName, bool isDescending)>();
@@ -177,6 +176,11 @@ namespace BioEngine.Core.DB
 
             return parsedValue;
         }
+    }
+
+    public class ContentEntityQueryContext<T> : QueryContext<T> where T : class, IEntity, IContentEntity
+    {
+        public bool IncludeUnpublished { get; set; }
     }
 
     internal static class FieldsResolver

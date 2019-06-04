@@ -13,7 +13,5 @@ namespace BioEngine.Core.Entities
         string Url { get; set; }
         DateTimeOffset DateAdded { get; set; }
         DateTimeOffset DateUpdated { get; set; }
-        bool IsPublished { get; set; }
-        DateTimeOffset? DatePublished { get; set; }
     }
 }

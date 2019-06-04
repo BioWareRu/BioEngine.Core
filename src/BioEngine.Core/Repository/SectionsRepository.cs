@@ -15,13 +15,13 @@ namespace BioEngine.Core.Repository
         }
     }
 
-    public abstract class SectionRepository<T> : SiteEntityRepository<T> where T : Section
+    public abstract class SectionRepository<T> : ContentEntityRepository<T> where T : Section
     {
         protected SectionRepository(BioRepositoryContext<T> repositoryContext) : base(repositoryContext)
         {
         }
 
-        protected override IQueryable<T> GetBaseQuery(QueryContext<T>? queryContext = null)
+        protected override IQueryable<T> GetBaseQuery(ContentEntityQueryContext<T>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<T>().Include(p => p.Blocks), queryContext);
         }
@@ -34,14 +34,14 @@ namespace BioEngine.Core.Repository
             if (res && changes != null && changes.Any(c => c.Name == nameof(Section.SiteIds)))
             {
                 var hasChanges = false;
-                var posts = await DbContext.Posts.Where(p => p.SectionIds.Contains(item.Id)).ToArrayAsync();
-                foreach (var post in posts)
+                var contentItems = await DbContext.ContentItems.Where(p => p.SectionIds.Contains(item.Id)).ToArrayAsync();
+                foreach (var contentItem in contentItems)
                 {
-                    var sections = await DbContext.Sections.Where(s => post.SectionIds.Contains(s.Id)).ToArrayAsync();
-                    post.SiteIds = sections.SelectMany(s => s.SiteIds).Distinct().ToArray();
-                    if (post.SiteIds.Any())
+                    var sections = await DbContext.Sections.Where(s => contentItem.SectionIds.Contains(s.Id)).ToArrayAsync();
+                    contentItem.SiteIds = sections.SelectMany(s => s.SiteIds).Distinct().ToArray();
+                    if (contentItem.SiteIds.Any())
                     {
-                        DbContext.Update(post);
+                        DbContext.Update(contentItem);
                         hasChanges = true;
                     }
                 }

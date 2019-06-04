@@ -21,7 +21,7 @@ namespace BioEngine.Core.Publishers
             _dbContext = dbContext;
         }
 
-        public virtual async Task<bool> PublishAsync(IContentEntity entity, Site site, TConfig config)
+        public virtual async Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace BioEngine.Core.Publishers
             }
         }
 
-        public virtual async Task<bool> DeleteAsync(IContentEntity entity, TConfig config, Site site = null)
+        public virtual async Task<bool> DeleteAsync(ContentItem entity, TConfig config, Site site = null)
         {
             var records = (await GetRecordsAsync(entity)).ToArray();
             if (!records.Any())
@@ -68,7 +68,7 @@ namespace BioEngine.Core.Publishers
             return true;
         }
 
-        protected async Task<TPublishRecord> GetRecordAsync(IContentEntity entity, Site site = null)
+        protected async Task<TPublishRecord> GetRecordAsync(ContentItem entity, Site site = null)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
@@ -76,7 +76,7 @@ namespace BioEngine.Core.Publishers
                     (site == null || r.SiteIds.Contains(site.Id)));
         }
 
-        protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(IContentEntity entity)
+        protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(ContentItem entity)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .Where(r =>
@@ -84,7 +84,7 @@ namespace BioEngine.Core.Publishers
                 .ToListAsync();
         }
 
-        protected abstract Task<TPublishRecord> DoPublishAsync(IContentEntity entity, Site site, TConfig config);
+        protected abstract Task<TPublishRecord> DoPublishAsync(ContentItem entity, Site site, TConfig config);
         protected abstract Task<bool> DoDeleteAsync(TPublishRecord record, TConfig config);
     }
 }

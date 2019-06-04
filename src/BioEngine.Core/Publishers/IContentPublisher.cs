@@ -7,8 +7,8 @@ namespace BioEngine.Core.Publishers
 {
     public interface IContentPublisher<TConfig> where TConfig : IContentPublisherConfig
     {
-        Task<bool> PublishAsync(IContentEntity entity, Site site, TConfig config);
-        Task<bool> DeleteAsync(IContentEntity entity, TConfig config, Site site = null);
+        Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config);
+        Task<bool> DeleteAsync(ContentItem entity, TConfig config, Site site = null);
     }
 
     public interface IContentPublisherConfig

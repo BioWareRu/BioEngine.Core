@@ -1,11 +1,13 @@
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.Entities;
+using BioEngine.Core.Posts.Db;
+using BioEngine.Core.Posts.Entities;
 using BioEngine.Core.Repository;
+using BioEngine.Core.Search;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 
-namespace BioEngine.Core.Search
+namespace BioEngine.Core.Posts.Search
 {
     [UsedImplicitly]
     public class PostsSearchProvider : BaseSearchProvider<Post>

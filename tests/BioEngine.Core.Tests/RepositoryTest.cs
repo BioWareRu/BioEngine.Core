@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
+using BioEngine.Core.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
@@ -94,12 +95,12 @@ namespace BioEngine.Core.Tests
         {
             var scope = GetScope();
             var context = scope.GetDbContext();
-            var repository = scope.Get<SitesRepository>();
-            var site = await context.Sites.FirstAsync();
-            await repository.UnPublishAsync(site);
-            var count = await context.Sites.CountAsync(s => s.IsPublished);
+            var repository = scope.Get<TestSectionRepository>();
+            var section = await context.Set<TestSection>().FirstAsync();
+            await repository.UnPublishAsync(section);
+            var count = await context.Set<TestSection>().CountAsync(s => s.IsPublished);
 
-            var queryContext = new QueryContext<Site>();
+            var queryContext = new ContentEntityQueryContext<TestSection>();
             var result = await repository.GetAllAsync(queryContext);
             Assert.Equal(count, result.itemsCount);
 

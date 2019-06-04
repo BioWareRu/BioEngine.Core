@@ -1,5 +1,4 @@
-﻿using System;
-using BioEngine.Core.Entities;
+﻿using BioEngine.Core.Entities;
 using FluentValidation;
 using JetBrains.Annotations;
 
@@ -11,15 +10,6 @@ namespace BioEngine.Core.Validation
         public SiteEntityValidator()
         {
             RuleFor(e => e.SiteIds).NotEmpty();
-        }
-    }
-
-    [UsedImplicitly]
-    internal class SingleSiteEntityValidator<T> : AbstractValidator<T> where T : ISingleSiteEntity
-    {
-        public SingleSiteEntityValidator()
-        {
-            RuleFor(e => e.SiteId).NotEmpty().NotEqual(Guid.Empty);
         }
     }
 }

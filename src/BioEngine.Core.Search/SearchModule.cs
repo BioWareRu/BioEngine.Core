@@ -13,9 +13,6 @@ namespace BioEngine.Core.Search
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            services.RegisterSearchRepositoryHook<Page>().RegisterSearchRepositoryHook<Post>()
-                .RegisterSearchProvider<PagesSearchProvider, Page>()
-                .RegisterSearchProvider<PostsSearchProvider, Post>();
             ConfigureSearch(services);
         }
 

@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
+using BioEngine.Core.Pages.Entities;
+using BioEngine.Core.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace BioEngine.Core.Repository
+namespace BioEngine.Core.Pages.Db
 {
-    public class PagesRepository : SiteEntityRepository<Page>
+    public class PagesRepository : ContentEntityRepository<Page>
     {
-        protected override IQueryable<Page> GetBaseQuery(QueryContext<Page>? queryContext = null)
+        protected override IQueryable<Page> GetBaseQuery(ContentEntityQueryContext<Page>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<Page>().Include(p => p.Blocks), queryContext);
         }

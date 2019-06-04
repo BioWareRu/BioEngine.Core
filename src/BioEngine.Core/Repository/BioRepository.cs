@@ -15,9 +15,9 @@ using Microsoft.EntityFrameworkCore;
 namespace BioEngine.Core.Repository
 {
     [PublicAPI]
-    public abstract class BioRepository<T> : IBioRepository<T> where T : class, IEntity
+    public abstract class BioRepository<T, TQueryContext> : IBioRepository<T, TQueryContext> where T : class, IEntity where TQueryContext : QueryContext<T>
     {
-        internal readonly BioContext DbContext;
+        protected readonly BioContext DbContext;
         protected readonly List<IValidator<T>> Validators;
         protected readonly PropertiesProvider PropertiesProvider;
         public BioRepositoryHooksManager HooksManager { get; set; }
@@ -42,7 +42,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new EntityValidator());
         }
 
-        public virtual async Task<(T[] items, int itemsCount)> GetAllAsync(QueryContext<T>? queryContext = null,
+        public virtual async Task<(T[] items, int itemsCount)> GetAllAsync(TQueryContext? queryContext = null,
             Func<IQueryable<T>, IQueryable<T>>? addConditionsCallback = null)
         {
             var itemsCount = await CountAsync(queryContext, addConditionsCallback);
@@ -82,7 +82,7 @@ namespace BioEngine.Core.Repository
             await PropertiesProvider.LoadPropertiesAsync(entities);
         }
 
-        public virtual async Task<int> CountAsync(QueryContext<T>? queryContext = null,
+        public virtual async Task<int> CountAsync(TQueryContext? queryContext = null,
             Func<IQueryable<T>, IQueryable<T>>? addConditionsCallback = null)
         {
             var query = GetBaseQuery(queryContext);
@@ -95,7 +95,7 @@ namespace BioEngine.Core.Repository
             return await query.CountAsync();
         }
 
-        public virtual async Task<T> GetByIdAsync(Guid id, QueryContext<T>? queryContext = null)
+        public virtual async Task<T> GetByIdAsync(Guid id, TQueryContext? queryContext = null)
         {
             var item = await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
             await AfterLoadAsync(item);
@@ -103,7 +103,7 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<T> GetAsync(Func<IQueryable<T>, IQueryable<T>> where,
-            QueryContext<T>? queryContext = null)
+            TQueryContext? queryContext = null)
         {
             var query = where(GetBaseQuery(queryContext));
             var item = await query.FirstOrDefaultAsync();
@@ -112,7 +112,7 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<T[]> GetAllAsync(Func<IQueryable<T>, IQueryable<T>> where,
-            QueryContext<T>? queryContext = null)
+            TQueryContext? queryContext = null)
         {
             var query = where(GetBaseQuery(queryContext));
             var items = await query.ToArrayAsync();
@@ -127,7 +127,7 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
-        public virtual async Task<T[]> GetByIdsAsync(Guid[] ids, QueryContext<T>? queryContext = null)
+        public virtual async Task<T[]> GetByIdsAsync(Guid[] ids, TQueryContext? queryContext = null)
         {
             var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToArrayAsync();
             await AfterLoadAsync(items);
@@ -223,19 +223,6 @@ namespace BioEngine.Core.Repository
             return SaveChangesAsync();
         }
 
-        public virtual async Task PublishAsync(T item, IBioRepositoryOperationContext? operationContext = null)
-        {
-            item.IsPublished = true;
-            item.DatePublished = DateTimeOffset.UtcNow;
-            await UpdateAsync(item, operationContext);
-        }
-
-        public virtual async Task UnPublishAsync(T item, IBioRepositoryOperationContext? operationContext = null)
-        {
-            item.IsPublished = false;
-            item.DatePublished = null;
-            await UpdateAsync(item, operationContext);
-        }
 
         public virtual async Task<T> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null)
         {
@@ -295,19 +282,16 @@ namespace BioEngine.Core.Repository
             return (!failures.Any(), failures);
         }
 
-        protected virtual IQueryable<T> GetBaseQuery(QueryContext<T>? queryContext = null)
+        protected virtual IQueryable<T> GetBaseQuery(TQueryContext? queryContext = null)
         {
             return ApplyContext(DbContext.Set<T>(), queryContext);
         }
 
-        protected virtual IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T>? queryContext)
+        protected virtual IQueryable<T> ApplyContext(IQueryable<T> query, TQueryContext? queryContext)
         {
             if (queryContext == null)
-                return query;
-
-            if (!queryContext.IncludeUnpublished)
             {
-                query = query.Where(x => x.IsPublished);
+                return query;
             }
 
             if (queryContext.OrderBy != null)

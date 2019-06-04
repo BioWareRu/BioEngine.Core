@@ -21,10 +21,10 @@ namespace BioEngine.Core.Modules
         {
         }
 
-        public virtual void RegisterEntities(BioEntitiesManager entitiesManager)
+        public virtual void ConfigureDbContext(BioEntitiesManager entitiesManager)
         {
         }
-
+        
         public virtual void RegisterValidation(IServiceCollection serviceCollection)
         {
             var validators = AssemblyScanner.FindValidatorsInAssembly(GetType().Assembly);

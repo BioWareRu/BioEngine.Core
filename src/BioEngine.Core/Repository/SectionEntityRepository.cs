@@ -9,8 +9,8 @@ using FluentValidation.Results;
 
 namespace BioEngine.Core.Repository
 {
-    public abstract class SectionEntityRepository<T> : SiteEntityRepository<T>
-        where T : class, IEntity, ISiteEntity, ISectionEntity
+    public abstract class SectionEntityRepository<T> : ContentEntityRepository<T>
+        where T : class, ISectionEntity, IContentEntity 
     {
         protected readonly SectionsRepository SectionsRepository;
 
@@ -26,7 +26,7 @@ namespace BioEngine.Core.Repository
             Validators.Add(new SectionEntityValidator<T>());
         }
 
-        protected override IQueryable<T> ApplyContext(IQueryable<T> query, QueryContext<T>? queryContext)
+        protected override IQueryable<T> ApplyContext(IQueryable<T> query, ContentEntityQueryContext<T>? queryContext)
         {
             if (queryContext != null && queryContext.SectionId != Guid.Empty)
             {

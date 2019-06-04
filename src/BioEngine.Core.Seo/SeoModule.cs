@@ -16,7 +16,6 @@ namespace BioEngine.Core.Seo
             PropertiesProvider.RegisterBioEngineSectionProperties<SeoPropertiesSet>("seo");
             PropertiesProvider.RegisterBioEngineContentProperties<SeoPropertiesSet>("seo");
             PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Site>("seo");
-            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Page>("seo");
         }
     }
 }

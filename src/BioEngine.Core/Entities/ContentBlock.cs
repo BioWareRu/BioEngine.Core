@@ -8,7 +8,6 @@ namespace BioEngine.Core.Entities
     [Table("ContentBlocks")]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public abstract class ContentBlock : BaseEntity, ITypedEntity
-
     {
         [NotMapped] public override string Title => TypeTitle;
         [NotMapped] public override string Url { get; set; }
@@ -19,12 +18,7 @@ namespace BioEngine.Core.Entities
 
         public abstract object GetData();
         public abstract void SetData(object data);
-
-        [ForeignKey(nameof(ContentId))] public Post Post { get; set; }
-        [ForeignKey(nameof(ContentId))] public Page Page { get; set; }
-
-        [ForeignKey(nameof(ContentId))] public Section Section { get; set; }
-
+        
         public override string ToString()
         {
             return GetType().Name;

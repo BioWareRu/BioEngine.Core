@@ -79,7 +79,7 @@ namespace BioEngine.Core
         {
             ConfigureCore(collection);
             module.ConfigureServices(collection, configuration, environment);
-            module.RegisterEntities(_entitiesManager);
+            module.ConfigureDbContext(_entitiesManager);
             module.RegisterValidation(collection);
             module.RegisterRepositories(collection, _entityMetadataManager);
             collection.TryAddSingleton(_entitiesManager);

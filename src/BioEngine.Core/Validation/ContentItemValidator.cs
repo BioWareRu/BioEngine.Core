@@ -7,17 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Validation
 {
-    public class PostValidator<T> : AbstractValidator<T> where T : Post
+    public class ContentItemValidator<T> : AbstractValidator<T> where T : ContentItem
     {
-        public PostValidator(BioContext dbContext)
+        public ContentItemValidator(BioContext dbContext)
         {
             RuleFor(e => e.Title).NotEmpty();
             RuleFor(e => e.Url).NotEmpty();
             RuleFor(e => e.Url).CustomAsync(async (url, context, _) =>
             {
-                if (context.InstanceToValidate is Post post && post.Id != Guid.Empty)
+                if (context.InstanceToValidate is ContentItem contentItem && contentItem.Id != Guid.Empty)
                 {
-                    var count = await dbContext.Set<Post>().Where(p => p.Url == url && p.Id != post.Id).CountAsync();
+                    var count = await dbContext.ContentItems.Where(p => p.Url == url && p.Id != contentItem.Id)
+                        .CountAsync();
                     if (count > 0)
                     {
                         context.AddFailure(

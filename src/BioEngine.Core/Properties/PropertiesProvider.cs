@@ -71,7 +71,7 @@ namespace BioEngine.Core.Properties
         public static void RegisterBioEngineContentProperties<TProperties>(string key)
             where TProperties : PropertiesSet, new()
         {
-            RegisterBioEngineProperties<TProperties>(key, typeof(Post), PropertiesRegistrationType.Content);
+            RegisterBioEngineProperties<TProperties>(key, typeof(ContentItem), PropertiesRegistrationType.Content);
         }
 
         private static void RegisterBioEngineProperties<TProperties>(string key, Type entityType,
@@ -248,7 +248,7 @@ namespace BioEngine.Core.Properties
                             schema.Value.IsRegisteredForSections()));
                     }
 
-                    if (groupEntity is Post)
+                    if (groupEntity is ContentItem)
                     {
                         schemas.AddRange(Schema.Where(schema =>
                             schema.Value.IsRegisteredForContent()));

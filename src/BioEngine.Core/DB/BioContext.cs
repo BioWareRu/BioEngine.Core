@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace BioEngine.Core.DB
 {
@@ -24,13 +20,13 @@ namespace BioEngine.Core.DB
 
         [UsedImplicitly] public DbSet<Site> Sites { get; set; }
         [UsedImplicitly] public DbSet<Tag> Tags { get; set; }
-        [UsedImplicitly] public DbSet<Page> Pages { get; set; }
         [UsedImplicitly] public DbSet<Menu> Menus { get; set; }
-        [UsedImplicitly] public DbSet<Post> Posts { get; set; }
+
+        [UsedImplicitly] public DbSet<ContentItem> ContentItems { get; set; }
         [UsedImplicitly] public DbSet<Section> Sections { get; set; }
         public DbSet<ContentBlock> Blocks { get; set; }
         [UsedImplicitly] public DbSet<StorageItem> StorageItems { get; set; }
-        public DbSet<PostVersion> PostVersions { get; set; }
+        public DbSet<ContentVersion> PostVersions { get; set; }
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public DbSet<PropertiesRecord> Properties { get; set; }
@@ -40,35 +36,39 @@ namespace BioEngine.Core.DB
             base.OnModelCreating(modelBuilder);
             modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
 
-            RegisterJsonConversion<Menu, List<MenuItem>>(modelBuilder, s => s.Items);
-            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.Logo);
-            RegisterJsonConversion<Section, StorageItem>(modelBuilder, s => s.LogoSmall);
-            RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(modelBuilder, s => s.PictureInfo);
+            modelBuilder.RegisterJsonConversion<Menu, List<MenuItem>>(s => s.Items);
+            modelBuilder.RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(s => s.PictureInfo);
             modelBuilder.Entity<StorageItem>().Property(i => i.PublicUri)
                 .HasConversion(u => u.ToString(), s => new Uri(s));
             if (Database.IsInMemory())
             {
-                RegisterSiteEntityConversions<Page>(modelBuilder);
-                RegisterSiteEntityConversions<Post>(modelBuilder);
-                RegisterSiteEntityConversions<Section>(modelBuilder);
-                RegisterSectionEntityConversions<Post>(modelBuilder);
+                modelBuilder.RegisterSiteEntityConversions<Section>();
+                modelBuilder.RegisterSiteEntityConversions<ContentItem>();
+                modelBuilder.RegisterSiteEntityConversions<Menu>();
             }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
             modelBuilder.Entity<Section>().HasIndex(s => s.IsPublished);
             modelBuilder.Entity<Section>().HasIndex(s => s.Type);
             modelBuilder.Entity<Section>().HasIndex(s => s.Url);
+            modelBuilder.Entity<Section>().HasMany(section => section.Blocks).WithOne().HasForeignKey(c => c.ContentId);
 
-            modelBuilder.Entity<Post>().HasIndex(i => i.SiteIds);
-            modelBuilder.Entity<Post>().HasIndex(i => i.TagIds);
-            modelBuilder.Entity<Post>().HasIndex(i => i.SectionIds);
-            modelBuilder.Entity<Post>().HasIndex(i => i.IsPublished);
-            modelBuilder.Entity<Post>().HasIndex(i => i.Url).IsUnique();
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.SiteIds);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.TagIds);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.SectionIds);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.IsPublished);
+            modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url).IsUnique();
+            modelBuilder.Entity<ContentItem>().HasMany(contentItem => contentItem.Blocks).WithOne().HasForeignKey(c => c.ContentId);
 
-            var dataConversionRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterDataConversion),
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-            var siteConversionsRegistrationMethod = typeof(BioContext).GetMethod(nameof(RegisterSiteEntityConversions),
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            var dataConversionRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
+                nameof(ModelBuilderContextExtensions.RegisterDataConversion),
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            var siteConversionsRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
+                nameof(ModelBuilderContextExtensions.RegisterSiteEntityConversions),
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            var sectionEntityConversionsRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
+                nameof(ModelBuilderContextExtensions.RegisterSectionEntityConversions),
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
             var metadataManager = this.GetInfrastructure().GetService<BioEntityMetadataManager>();
             var logger = this.GetInfrastructure().GetRequiredService<ILogger<BioContext>>();
             foreach (var entityMetadata in metadataManager.GetBlocksMetadata())
@@ -77,11 +77,11 @@ namespace BioEngine.Core.DB
                     "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Type,
                     entityMetadata.ObjectType,
                     entityMetadata.DataType);
-                RegisterDiscriminator<ContentBlock>(modelBuilder, entityMetadata.ObjectType,
+                modelBuilder.RegisterDiscriminator<ContentBlock>(entityMetadata.ObjectType,
                     entityMetadata.Type);
                 dataConversionRegistrationMethod
                     ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
-                    .Invoke(this, new object[] {modelBuilder});
+                    .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 
             foreach (var entityMetadata in metadataManager.GetSectionsMetadata())
@@ -89,17 +89,39 @@ namespace BioEngine.Core.DB
                 logger.LogInformation("Register section type {type} - {entityType} ({dataType})", entityMetadata.Type,
                     entityMetadata.ObjectType,
                     entityMetadata.DataType);
-                RegisterDiscriminator<Section>(modelBuilder, entityMetadata.ObjectType,
+                modelBuilder.RegisterDiscriminator<Section>(entityMetadata.ObjectType,
                     entityMetadata.Type);
                 if (Database.IsInMemory())
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
-                        .Invoke(this, new object[] {modelBuilder});
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
                 }
 
                 dataConversionRegistrationMethod
                     ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
-                    .Invoke(this, new object[] {modelBuilder});
+                    .Invoke(modelBuilder, new object[] {modelBuilder});
+            }
+
+            foreach (var entityMetadata in metadataManager.GetContentItemsMetadata())
+            {
+                logger.LogInformation("Register content item type {type} - {entityType} ({dataType})",
+                    entityMetadata.Type,
+                    entityMetadata.ObjectType,
+                    entityMetadata.DataType);
+                modelBuilder.RegisterDiscriminator<ContentItem>(entityMetadata.ObjectType,
+                    entityMetadata.Type);
+                if (Database.IsInMemory())
+                {
+                    siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
+                }
+
+                dataConversionRegistrationMethod
+                    ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
+                    .Invoke(modelBuilder, new object[] {modelBuilder});
+
+                sectionEntityConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
+                    .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 
             var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
@@ -110,76 +132,12 @@ namespace BioEngine.Core.DB
                 registration.ConfigureContext?.Invoke(modelBuilder);
             }
 
+            foreach (var configureAction in entitiesManager.GetConfigureActions())
+            {
+                configureAction.Invoke(modelBuilder);
+            }
+
             logger.LogInformation("Done registering");
-        }
-
-        private void RegisterDiscriminator<TBase>(ModelBuilder modelBuilder, Type objectType, string discriminator)
-            where TBase : class
-        {
-            var discriminatorBuilder =
-                modelBuilder.Entity<TBase>().HasDiscriminator<string>(nameof(Section.Type));
-            var method = discriminatorBuilder.GetType().GetMethods()
-                .First(m => m.Name == nameof(DiscriminatorBuilder.HasValue) && m.IsGenericMethod);
-            var typedMethod = method?.MakeGenericMethod(objectType);
-            typedMethod?.Invoke(discriminatorBuilder, new object[] {discriminator});
-        }
-
-        private void RegisterDataConversion<TEntity, TData>(ModelBuilder modelBuilder)
-            where TEntity : class, ITypedEntity<TData> where TData : ITypedData, new()
-        {
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(e => e.Data)
-                .HasColumnType("jsonb")
-                .HasColumnName(nameof(ITypedEntity<TData>.Data))
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<TData>(v));
-        }
-
-        private void RegisterJsonConversion<TEntity, TProperty>(ModelBuilder modelBuilder,
-            Expression<Func<TEntity, TProperty>> propertySelector)
-            where TEntity : class
-        {
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(propertySelector)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<TProperty>(v));
-        }
-
-
-        private void RegisterSiteEntityConversions<TEntity>(ModelBuilder modelBuilder)
-            where TEntity : class, ISiteEntity
-        {
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(s => s.SiteIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Guid[]>(v));
-        }
-
-        private void RegisterSectionEntityConversions<TEntity>(ModelBuilder modelBuilder)
-            where TEntity : class, ISectionEntity
-        {
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(s => s.SectionIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Guid[]>(v));
-            modelBuilder
-                .Entity<TEntity>()
-                .Property(s => s.TagIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Guid[]>(v));
         }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.

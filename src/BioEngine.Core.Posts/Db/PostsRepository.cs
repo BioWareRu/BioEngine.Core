@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Extensions;
+using BioEngine.Core.Posts.Entities;
+using BioEngine.Core.Repository;
 using BioEngine.Core.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace BioEngine.Core.Repository
+namespace BioEngine.Core.Posts.Db
 {
     [UsedImplicitly]
     public class PostsRepository : ContentItemRepository<Post>
@@ -27,7 +29,7 @@ namespace BioEngine.Core.Repository
         }
 
         protected override IQueryable<Post> ApplyContext(IQueryable<Post> query,
-            QueryContext<Post>? queryContext)
+            ContentEntityQueryContext<Post>? queryContext)
         {
             if (queryContext != null && queryContext.TagIds.Any())
             {
@@ -67,11 +69,8 @@ namespace BioEngine.Core.Repository
         protected override async Task<bool> AfterSaveAsync(Post item, PropertyChange[]? changes = null,
             Post? oldItem = null, IBioRepositoryOperationContext? operationContext = null)
         {
-            var version = new PostVersion
-            {
-                Id = Guid.NewGuid(), PostId = item.Id, IsPublished = true, DatePublished = DateTimeOffset.UtcNow,
-            };
-            version.SetPost(item);
+            var version = new ContentVersion {Id = Guid.NewGuid(), ContentId = item.Id};
+            version.SetContent(item);
             if (operationContext?.User != null)
             {
                 version.ChangeAuthorId = operationContext.User.Id;
@@ -83,14 +82,14 @@ namespace BioEngine.Core.Repository
             return await base.AfterSaveAsync(item, changes, oldItem, operationContext);
         }
 
-        public async Task<List<PostVersion>> GetVersionsAsync(Guid itemId)
+        public async Task<List<ContentVersion>> GetVersionsAsync(Guid itemId)
         {
-            return await DbContext.PostVersions.Where(v => v.PostId == itemId).ToListAsync();
+            return await DbContext.PostVersions.Where(v => v.ContentId == itemId).ToListAsync();
         }
 
-        public async Task<PostVersion> GetVersionAsync(Guid itemId, Guid versionId)
+        public async Task<ContentVersion> GetVersionAsync(Guid itemId, Guid versionId)
         {
-            return await DbContext.PostVersions.Where(v => v.PostId == itemId && v.Id == versionId)
+            return await DbContext.PostVersions.Where(v => v.ContentId == itemId && v.Id == versionId)
                 .FirstOrDefaultAsync();
         }
     }

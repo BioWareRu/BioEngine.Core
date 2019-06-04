@@ -24,7 +24,13 @@ namespace BioEngine.Core.Search
         {
             if (item is TEntity entity)
             {
-                if (entity.IsPublished)
+                var needIndex = true;
+                if (entity is IContentEntity contentEntity)
+                {
+                    needIndex = contentEntity.IsPublished;
+                }
+
+                if (needIndex)
                 {
                     await _searchProvider.AddOrUpdateEntityAsync(entity);
                 }

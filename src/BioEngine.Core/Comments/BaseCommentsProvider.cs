@@ -25,28 +25,25 @@ namespace BioEngine.Core.Comments
             Logger = logger;
         }
 
-        public Task<int> GetCommentsCountAsync(IContentEntity entity)
+        public Task<int> GetCommentsCountAsync(ContentItem entity)
         {
-            return GetDbSet().Where(c => c.ContentId == entity.Id && c.Type == entity.GetType().FullName)
-                .CountAsync();
+            return GetDbSet().Where(c => c.ContentId == entity.Id).CountAsync();
         }
 
         protected abstract IQueryable<BaseComment> GetDbSet();
 
         public virtual async Task<Dictionary<Guid, (int count, Uri? uri)>> GetCommentsDataAsync(
-            IContentEntity[] entities)
+            ContentItem[] entities)
         {
             var result = new Dictionary<Guid, (int count, Uri? uri)>();
-            var types = entities.Select(e => e.GetType().FullName).Distinct().ToArray();
             var ids = entities.Select(e => e.Id).ToArray();
-            var counts = await GetDbSet().Where(c => types.Contains(c.Type) && ids.Contains(c.ContentId))
-                .GroupBy(c => new {c.Type, c.ContentId}).Select(g => new {g.Key, count = g.Count()})
+            var counts = await GetDbSet().Where(c => ids.Contains(c.ContentId))
+                .GroupBy(c => c.ContentId).Select(g => new {g.Key, count = g.Count()})
                 .ToListAsync();
             var urls = await GetCommentsUrlAsync(entities);
             foreach (var entity in entities)
             {
-                var entityData = counts
-                    .FirstOrDefault(c => c.Key.Type == entity.GetType().FullName && c.Key.ContentId == entity.Id);
+                var entityData = counts.FirstOrDefault(c => c.Key == entity.Id);
 
                 var count = 0;
                 Uri? uri = null;
@@ -66,70 +63,38 @@ namespace BioEngine.Core.Comments
             return result;
         }
 
-        public abstract Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(IContentEntity[] entities);
+        public abstract Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities);
 
         public virtual async Task<IEnumerable<BaseComment>> GetLastCommentsAsync(Site site, int count)
         {
             var comments = await GetDbSet().Where(c => c.SiteIds.Contains(site.Id))
                 .OrderByDescending(c => c.DateUpdated).Take(count).ToListAsync();
             var authors = await _userDataProvider.GetDataAsync(comments.Select(c => c.AuthorId).ToArray());
+            var contentIds = comments.Select(c => c.ContentId).Distinct().ToList();
+            var contentItems = await DbContext.ContentItems.Where(c => contentIds.Contains(c.Id)).ToListAsync();
             foreach (var comment in comments)
             {
-                if (comment.Type == typeof(Post).FullName)
-                {
-                    comment.Content =
-                        await DbContext.Posts.Where(p => p.Id == comment.ContentId).FirstOrDefaultAsync();
-                }
-
-                if (comment.Type == typeof(Page).FullName)
-                {
-                    comment.Content =
-                        await DbContext.Pages.Where(p => p.Id == comment.ContentId).FirstOrDefaultAsync();
-                }
-
-                if (comment.Type == typeof(Section).FullName)
-                {
-                    comment.Content = await DbContext.Sections.Where(s => s.Id == comment.ContentId)
-                        .FirstOrDefaultAsync();
-                }
-
                 comment.Author = authors.FirstOrDefault(a => a.Id == comment.AuthorId);
+                comment.ContentItem = contentItems.FirstOrDefault(a => a.Id == comment.ContentId);
             }
 
             return comments;
         }
 
-        public virtual async Task<List<(IContentEntity entity, int commentsCount)>> GetMostCommentedAsync(Site site,
+        public virtual async Task<List<(ContentItem entity, int commentsCount)>> GetMostCommentedAsync(Site site,
             int count,
             TimeSpan period)
         {
             var ids = await GetDbSet()
                 .Where(c => c.DateUpdated >= DateTimeOffset.Now - period && c.SiteIds.Contains(site.Id))
-                .GroupBy(c => new {c.ContentId, c.Type}).OrderByDescending(c => c.Count()).Select(c => c.Key)
+                .GroupBy(c => c.ContentId).OrderByDescending(c => c.Count()).Select(c => c.Key)
                 .Take(count)
                 .ToListAsync();
-            var results = new List<(IContentEntity entity, int commentsCount)>();
+            var results = new List<(ContentItem entity, int commentsCount)>();
+            var contentItems = await DbContext.ContentItems.Where(c => ids.Contains(c.Id)).ToListAsync();
             foreach (var id in ids)
             {
-                IContentEntity? entity = null;
-                if (id.Type == typeof(Post).FullName)
-                {
-                    entity =
-                        await DbContext.Posts.Where(p => p.Id == id.ContentId).FirstOrDefaultAsync();
-                }
-
-                if (id.Type == typeof(Page).FullName)
-                {
-                    entity =
-                        await DbContext.Pages.Where(p => p.Id == id.ContentId).FirstOrDefaultAsync();
-                }
-
-                if (id.Type == typeof(Section).FullName)
-                {
-                    entity = await DbContext.Sections.Where(s => s.Id == id.ContentId)
-                        .FirstOrDefaultAsync();
-                }
-
+                var entity = contentItems.FirstOrDefault(c => c.Id == id);
                 if (entity != null)
                 {
                     var commentsCount = await GetCommentsCountAsync(entity);

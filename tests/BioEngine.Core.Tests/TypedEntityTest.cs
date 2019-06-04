@@ -17,7 +17,7 @@ namespace BioEngine.Core.Tests
         public async Task DiscriminatorFill()
         {
             var scope = GetScope();
-            var repository = scope.Get<SectionRepository>();
+            var repository = scope.Get<TestSectionRepository>();
             var section = new TestSection
             {
                 Title = "Test type", Url = "testurl", SiteIds = new[] {CoreTestScope.SiteId}

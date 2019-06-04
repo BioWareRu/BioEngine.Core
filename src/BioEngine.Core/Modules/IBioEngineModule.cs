@@ -12,7 +12,7 @@ namespace BioEngine.Core.Modules
             IHostEnvironment environment);
 
         void ConfigureHostBuilder(IHostBuilder hostBuilder);
-        void RegisterEntities(BioEntitiesManager entitiesManager);
+        void ConfigureDbContext(BioEntitiesManager entitiesManager);
         void RegisterValidation(IServiceCollection serviceCollection);
         void RegisterRepositories(IServiceCollection serviceCollection, BioEntityMetadataManager metadataManager);
     }

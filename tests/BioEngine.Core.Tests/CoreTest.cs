@@ -15,14 +15,7 @@ namespace BioEngine.Core.Tests
 
         protected override void InitDbContext(BioContext dbContext)
         {
-            var site = new Site
-            {
-                Id = SiteId,
-                Title = "Test site",
-                Url = "https://test.ru",
-                DatePublished = DateTimeOffset.Now,
-                IsPublished = true
-            };
+            var site = new Site {Id = SiteId, Title = "Test site", Url = "https://test.ru"};
             dbContext.Add(site);
             dbContext.SaveChanges();
 
@@ -37,7 +30,7 @@ namespace BioEngine.Core.Tests
             dbContext.Add(section);
             dbContext.SaveChanges();
 
-            var content = new Post
+            var content = new TestContent
             {
                 Title = "Test content",
                 Url = "test",
@@ -48,7 +41,7 @@ namespace BioEngine.Core.Tests
             };
             dbContext.Add(content);
 
-            var page = new Page
+            var page = new TestContent
             {
                 Title = "Test page",
                 Url = "test",

@@ -51,6 +51,10 @@ namespace BioEngine.Core.Web
             endpoints.MapControllers();
             endpoints.MapHealthChecks("/health");
         }
+        
+        public virtual void RegisterEndpoints(IEndpointRouteBuilder endpoints)
+        {
+        }
 
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
@@ -80,6 +84,7 @@ namespace BioEngine.Core.Web
             app.UseEndpoints(endpoints =>
             {
                 ConfigureEndpoints(app, env, endpoints);
+                RegisterEndpoints(endpoints);
             });
         }
     }

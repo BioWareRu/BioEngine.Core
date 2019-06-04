@@ -8,8 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
+    public class ContentItemsRepository : SectionEntityRepository<ContentItem>
+    {
+        public ContentItemsRepository(BioRepositoryContext<ContentItem> repositoryContext,
+            SectionsRepository sectionsRepository) : base(repositoryContext, sectionsRepository)
+        {
+        }
+    }
+
     public abstract class ContentItemRepository<T> : SectionEntityRepository<T>
-        where T : Post, IEntity, ISiteEntity, ISectionEntity
+        where T : ContentItem, IEntity, ISiteEntity, ISectionEntity
     {
         private readonly IUserDataProvider? _userDataProvider;
 
@@ -20,7 +28,7 @@ namespace BioEngine.Core.Repository
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<T> GetBaseQuery(QueryContext<T>? queryContext = null)
+        protected override IQueryable<T> GetBaseQuery(ContentEntityQueryContext<T>? queryContext = null)
         {
             return ApplyContext(DbContext.Set<T>().Include(p => p.Blocks), queryContext);
         }
@@ -28,7 +36,7 @@ namespace BioEngine.Core.Repository
         protected override void RegisterValidators()
         {
             base.RegisterValidators();
-            Validators.Add(new PostValidator<T>(DbContext));
+            Validators.Add(new ContentItemValidator<T>(DbContext));
         }
 
         protected override async Task AfterLoadAsync(T[] entities)

@@ -153,7 +153,6 @@ namespace BioEngine.Core.Storage
             storageItem.FilePath = destinationPath;
             storageItem.Path = Path.GetDirectoryName(destinationPath).Replace("\\", "/");
             storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
-            storageItem.IsPublished = true;
             storageItem.Hash = hash;
 
             await TryProcessImageAsync(storageItem, tmpPath, basePath);

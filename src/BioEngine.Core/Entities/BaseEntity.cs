@@ -14,8 +14,6 @@ namespace BioEngine.Core.Entities
         [Required] public virtual string Url { get; set; }
         [Required] public virtual DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
         [Required] public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
-        public virtual bool IsPublished { get; set; }
-        public virtual DateTimeOffset? DatePublished { get; set; }
         [NotMapped] public virtual List<PropertiesEntry> Properties { get; set; } = new List<PropertiesEntry>();
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
@@ -23,10 +21,5 @@ namespace BioEngine.Core.Entities
     public abstract class BaseSiteEntity : BaseEntity, ISiteEntity
     {
         public virtual Guid[] SiteIds { get; set; } = new Guid[0];
-    }
-
-    public abstract class BaseSingleSiteEntity : BaseEntity, ISingleSiteEntity
-    {
-        public virtual Guid SiteId { get; set; }
     }
 }

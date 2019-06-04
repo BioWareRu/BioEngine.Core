@@ -10,6 +10,7 @@ namespace BioEngine.Core.DB
     {
         private readonly List<EntityMetadata> _blocks = new List<EntityMetadata>();
         private readonly List<EntityMetadata> _sections = new List<EntityMetadata>();
+        private readonly List<EntityMetadata> _contentItems = new List<EntityMetadata>();
 
         public void Register(Type type)
         {
@@ -25,7 +26,19 @@ namespace BioEngine.Core.DB
                 {
                     throw new Exception($"Section with type {metaData.Type} already registered");
                 }
+
                 _sections.Add(metaData);
+            }
+
+            if (typeof(ContentItem).IsAssignableFrom(type))
+            {
+                var metaData = GetTypeMetadata(type);
+                if (_contentItems.Any(m => m.Type == metaData.Type))
+                {
+                    throw new Exception($"Content item with type {metaData.Type} already registered");
+                }
+
+                _contentItems.Add(metaData);
             }
 
             if (typeof(ContentBlock).IsAssignableFrom(type))
@@ -35,10 +48,9 @@ namespace BioEngine.Core.DB
                 {
                     throw new Exception($"Block with type {metaData.Type} already registered");
                 }
+
                 _blocks.Add(metaData);
             }
-
-            
         }
 
         private static EntityMetadata GetTypeMetadata(Type type)
@@ -67,6 +79,11 @@ namespace BioEngine.Core.DB
         public EntityMetadata[] GetSectionsMetadata()
         {
             return _sections.ToArray();
+        }
+
+        public EntityMetadata[] GetContentItemsMetadata()
+        {
+            return _contentItems.ToArray();
         }
     }
 
