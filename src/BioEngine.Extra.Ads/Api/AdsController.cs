@@ -13,16 +13,17 @@ namespace BioEngine.Extra.Ads.Api
     public abstract class
         AdsApiController : ContentEntityController<Ad, AdsRepository, Entities.Ad, Entities.Ad>
     {
-        protected AdsApiController(BaseControllerContext<Ad, ContentEntityQueryContext<Ad>, AdsRepository> context, BioEntityMetadataManager metadataManager, ContentBlocksRepository blocksRepository) : base(context, metadataManager, blocksRepository)
+        protected AdsApiController(BaseControllerContext<Ad, ContentEntityQueryContext<Ad>, AdsRepository> context,
+            BioEntitiesManager entitiesManager, ContentBlocksRepository blocksRepository) : base(context,
+            entitiesManager, blocksRepository)
         {
         }
+
         public override async Task<ActionResult<StorageItem>> UploadAsync(string name)
         {
             var file = await GetBodyAsFileAsync();
             return await Storage.SaveFileAsync(file, name,
                 $"ads/{DateTimeOffset.UtcNow.Year.ToString()}/{DateTimeOffset.UtcNow.Month.ToString()}");
         }
-
-        
     }
 }
