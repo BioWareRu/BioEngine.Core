@@ -71,7 +71,160 @@ public override void ConfigureEntities(IServiceCollection serviceCollection, Bio
 
 Для упрощения базовых операций в ядре реализована система репозиториев. Репозиторий это класс реализующий `IBioRepository<TEntity>`. 
 В нём присутствуют методы для поиска, подсчёта, создания, обновления, валидации и удаления сущностей.
-Подробнее об этом описано в документации к интерфейсу.
+
+### Выборка списка
+
+Возвращает кортеж, в котором первым элементом идёт массив сущностей, а вторым - полное количество подходящих под условия сущностей.
+
+```csharp
+Task<(TEntity[] items, int itemsCount)> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+```
+
+Пример использования
+
+```csharp
+var (items, itemsCount) = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished));
+```
+
+### Выборка списка по ID
+
+Возвращает массив сущностей по их ID
+
+```csharp
+Task<TEntity[]> GetByIdsAsync(Guid[] ids, Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+```
+
+Пример использования
+
+```csharp
+var entities = await Repository.GetByIdsAsync(new []{
+    "a2721c9d-6770-42f1-accd-0f08a5ea4407",
+    "ffd80adf-6dbf-4b86-b486-1546c37ed29a", 
+    "88c40418-f6cb-4568-8f0e-e4b361ba8657",
+    "07278a8b-98a1-45ef-8582-73bed3c9c728"
+});
+```
+
+### Выбор одной сущности
+
+Возвращает первую сущность, удовлетворяющую результатам запроса
+
+```csharp
+Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> configureQuery);
+```
+
+Пример использования:
+
+```csharp
+var entity = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
+```
+
+### Выбор одной сущности по ID
+
+Возвращает сущность с указанным ID
+
+```csharp
+Task<TEntity> GetByIdAsync(Guid id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+```
+
+Пример использования:
+
+```csharp
+var entity = await Repository.GetByIdAsync("df5ca168-f3e8-4b8b-a561-fd79a978028d");
+```
+
+### Подсчёт результатов
+
+Возвращается количество попадающих под условия запроса сущностей
+
+```csharp
+Task<int> CountAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+```
+
+Пример использования
+
+```csharp
+var count = await Repository.CountAsync(entities => entities.Where(e => e.IsPublished));
+```
+
+### Создание сущности
+
+Создаёт новый экземпляр сущности и инициализирует её
+
+```csharp
+Task<TEntity> NewAsync();
+```
+
+Пример использования
+
+```csharp
+var entity = await Repository.NewAsync();
+``` 
+
+Валидирует и записывает сущность в базу данных. Возвращает объект `AddOrUpdateOperationResult<TEntity>` со статусом успешности операции, сущностью и ошибками валидации
+
+```csharp
+Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
+```
+
+Пример использования
+
+```csharp
+var result = await Repository.AddAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+if (result.IsSuccess)
+{
+    await AfterSaveAsync(result.Entity, result.Changes, item);
+    return Created(await MapRestModelAsync(result.Entity));
+}
+```
+
+### Обновление сущности
+
+Валидирует и обновляет сущность в базе данных. Возвращает объект `AddOrUpdateOperationResult<TEntity>` со статусом успешности операции, сущностью, ошибками валидации и списком изменившихся свойств.
+
+```csharp
+Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
+```
+
+Пример использования
+
+```csharp
+var result = await Repository.UpdateAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+if (result.IsSuccess)
+{
+    await AfterSaveAsync(result.Entity, result.Changes, item);
+    return Updated(await MapRestModelAsync(result.Entity));
+}
+```
+
+### Удаление сущности
+
+Удаляет сущность. Возвращает удалённую сущность.
+
+```csharp
+Task<TEntity> DeleteAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
+```
+
+Пример использования
+
+```csharp
+var deletedEntity = await Repository.DeleteAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+```
+
+### Удаление сущности по ID
+
+Удаляет сущность. Выбрасывает ArgumentException если сущность не найдена. Возвращает удалённую сущность.
+
+```csharp
+Task<TEntity> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null);
+```
+
+Пример использования
+
+```csharp
+var deletedEntity = await Repository.DeleteAsync(id, new BioRepositoryOperationContext {User = CurrentUser});
+```
+
 
 Валидация сущностей реализована с помощью библиотеки `FluentValidation`. Настройка валидации сущностей происходит путём добавления в DI-контейнер классов, реализующих `IValidator<TEntity>`. По умолчанию все валидаторы из сборки модуля будут зарегистрированы автоматически. Чтобы изменить это поведение модель должен переопределить метод `RegisterValidation`. 
 
