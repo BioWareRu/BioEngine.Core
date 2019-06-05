@@ -7,7 +7,7 @@ using BioEngine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace BioEngine.Core.Publishers
+namespace BioEngine.Core.Social
 {
     public abstract class BaseContentPublisher<TConfig, TPublishRecord> : IContentPublisher<TConfig>
         where TConfig : IContentPublisherConfig where TPublishRecord : BasePublishRecord
