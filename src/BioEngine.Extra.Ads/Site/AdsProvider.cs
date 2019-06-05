@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB.Queries;
+using BioEngine.Core.Extensions;
 using BioEngine.Extra.Ads.Entities;
 
 namespace BioEngine.Extra.Ads.Site
@@ -36,9 +36,8 @@ namespace BioEngine.Extra.Ads.Site
         {
             if (_ads != null) return _ads;
 
-            var context = new QueryContext<Ad>();
-            context.SetSite(site);
-            var ads = await _adsRepository.GetAllAsync(context, queryable => queryable.Where(ad => ad.IsPublished));
+            var ads = await _adsRepository.GetAllAsync(queryable =>
+                queryable.ForSite(site).Where(ad => ad.IsPublished));
             Shuffle(ads.items);
             _ads = new Stack<Ad>(ads.items);
             return _ads;
