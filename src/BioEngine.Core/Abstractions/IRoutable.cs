@@ -1,6 +1,4 @@
-using BioEngine.Core.Abstractions;
-
-namespace BioEngine.Core.Routing
+namespace BioEngine.Core.Abstractions
 {
     public interface IRoutable : IEntity
     {
