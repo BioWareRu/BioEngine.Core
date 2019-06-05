@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Storage
 {
-    public abstract class StorageModule<T> : BioEngineModule<T> where T : StorageModuleConfig
+    public abstract class StorageModule<T> : BaseBioEngineModule<T> where T : StorageModuleConfig
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)

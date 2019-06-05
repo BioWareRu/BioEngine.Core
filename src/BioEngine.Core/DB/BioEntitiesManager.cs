@@ -18,15 +18,19 @@ namespace BioEngine.Core.DB
         private readonly List<EntityMetadata> _sections = new List<EntityMetadata>();
         private readonly List<EntityMetadata> _contentItems = new List<EntityMetadata>();
 
-        public void Register<TEntity>(Action<ModelBuilder>? configureContext = null) where TEntity : IEntity
+        public void RegisterEntity<TEntity>() where TEntity : IEntity
         {
-            if (!_registrations.ContainsKey(typeof(TEntity).FullName))
+            RegisterEntity(typeof(TEntity));
+        }
+
+        public void RegisterEntity(Type entityType)
+        {
+            if (!_registrations.ContainsKey(entityType.FullName))
             {
-                _registrations.Add(typeof(TEntity).FullName,
-                    new BioEntityRegistration(typeof(TEntity), configureContext));
+                _registrations.Add(entityType.FullName, new BioEntityRegistration(entityType));
             }
         }
-        
+
         public void Register(Type type)
         {
             if (type.IsAbstract || type.BaseType == null)
@@ -45,7 +49,7 @@ namespace BioEngine.Core.DB
                 _sections.Add(metaData);
             }
 
-            if (typeof(ContentItem).IsAssignableFrom(type))
+            else if (typeof(ContentItem).IsAssignableFrom(type))
             {
                 var metaData = GetTypeMetadata(type);
                 if (_contentItems.Any(m => m.Type == metaData.Type))
@@ -56,7 +60,7 @@ namespace BioEngine.Core.DB
                 _contentItems.Add(metaData);
             }
 
-            if (typeof(ContentBlock).IsAssignableFrom(type))
+            else if (typeof(ContentBlock).IsAssignableFrom(type))
             {
                 var metaData = GetTypeMetadata(type);
                 if (_blocks.Any(m => m.Type == metaData.Type))
@@ -66,8 +70,12 @@ namespace BioEngine.Core.DB
 
                 _blocks.Add(metaData);
             }
+            else if (typeof(IEntity).IsAssignableFrom(type))
+            {
+                RegisterEntity(type);
+            }
         }
-        
+
         private static EntityMetadata GetTypeMetadata(Type type)
         {
             var dataType = type.BaseType?.GenericTypeArguments[0];
@@ -100,7 +108,7 @@ namespace BioEngine.Core.DB
         {
             return _configureActions.ToList();
         }
-        
+
         public EntityMetadata[] GetBlocksMetadata()
         {
             return _blocks.ToArray();
@@ -120,11 +128,8 @@ namespace BioEngine.Core.DB
     public class BioEntityRegistration
     {
         public Type Type { get; }
-        public Action<ModelBuilder>? ConfigureContext { get; }
-
-        public BioEntityRegistration(Type type, Action<ModelBuilder>? configureContext = null)
+        public BioEntityRegistration(Type type)
         {
-            ConfigureContext = configureContext;
             Type = type;
         }
     }

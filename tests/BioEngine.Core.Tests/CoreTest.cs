@@ -67,7 +67,7 @@ namespace BioEngine.Core.Tests
         }
     }
 
-    public class TestsModule : BioEngineModule
+    public class TestsModule : BaseBioEngineModule
     {
     }
 }

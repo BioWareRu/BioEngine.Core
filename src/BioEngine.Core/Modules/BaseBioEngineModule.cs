@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Modules
 {
-    public abstract class BioEngineModule : IBioEngineModule
+    public abstract class BaseBioEngineModule : IBioEngineModule
     {
         public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
@@ -21,20 +21,13 @@ namespace BioEngine.Core.Modules
         {
         }
 
-        public virtual void ConfigureDbContext(BioEntitiesManager entitiesManager)
+        public virtual AssemblyScanner RegisterValidation()
         {
-        }
-        
-        public virtual void RegisterValidation(IServiceCollection serviceCollection)
-        {
-            var validators = AssemblyScanner.FindValidatorsInAssembly(GetType().Assembly);
-            foreach (var validator in validators)
-            {
-                serviceCollection.AddScoped(validator.InterfaceType, validator.ValidatorType);
-            }
+            return AssemblyScanner.FindValidatorsInAssembly(GetType().Assembly);
         }
 
-        public virtual void RegisterRepositories(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
+        public virtual void ConfigureEntities(IServiceCollection serviceCollection,
+            BioEntitiesManager entitiesManager)
         {
             RegisterRepositories(GetType().Assembly, serviceCollection, entitiesManager);
         }
@@ -63,7 +56,8 @@ namespace BioEngine.Core.Modules
         }
     }
 
-    public abstract class BioEngineModule<TConfig> : BioEngineModule, IBioEngineModule<TConfig> where TConfig : class
+    public abstract class BaseBioEngineModule<TConfig> : BaseBioEngineModule, IBioEngineModule<TConfig>
+        where TConfig : class
     {
         protected TConfig Config { get; private set; }
 

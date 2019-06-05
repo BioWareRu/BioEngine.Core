@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
 using BioEngine.Core.Properties;
@@ -78,15 +79,21 @@ namespace BioEngine.Core
         {
             ConfigureCore(collection);
             module.ConfigureServices(collection, configuration, environment);
-            module.ConfigureDbContext(_entitiesManager);
-            module.RegisterValidation(collection);
-            module.RegisterRepositories(collection, _entitiesManager);
+            var validators = module.RegisterValidation();
+            if (validators != null && validators.Any())
+            {
+                foreach (var validator in validators)
+                {
+                    collection.AddScoped(validator.InterfaceType, validator.ValidatorType);
+                }
+            }
+
+            module.ConfigureEntities(collection, _entitiesManager);
             collection.TryAddSingleton(_entitiesManager);
         }
 
         private void ConfigureModule(IBioEngineModule module)
         {
-            module.ConfigureHostBuilder(_hostBuilder);
             _hostBuilder.ConfigureServices(
                 (context, collection) =>
                 {
@@ -98,7 +105,6 @@ namespace BioEngine.Core
         private void ConfigureModule<TModuleConfig>(IBioEngineModule<TModuleConfig> module,
             Func<IConfiguration, IHostEnvironment, TModuleConfig> configure) where TModuleConfig : class
         {
-            module.ConfigureHostBuilder(_hostBuilder);
             _hostBuilder.ConfigureServices(
                 (context, collection) =>
                 {

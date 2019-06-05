@@ -1,5 +1,6 @@
 ﻿using System;
 using BioEngine.Core.DB;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,10 +12,8 @@ namespace BioEngine.Core.Abstractions
         void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment);
 
-        void ConfigureHostBuilder(IHostBuilder hostBuilder);
-        void ConfigureDbContext(BioEntitiesManager entitiesManager);
-        void RegisterValidation(IServiceCollection serviceCollection);
-        void RegisterRepositories(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager);
+        AssemblyScanner RegisterValidation();
+        void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager);
     }
 
     public interface IBioEngineModule<TConfig> : IBioEngineModule where TConfig : class

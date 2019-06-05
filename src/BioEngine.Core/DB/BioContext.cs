@@ -58,7 +58,8 @@ namespace BioEngine.Core.DB
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.SectionIds);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.IsPublished);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url).IsUnique();
-            modelBuilder.Entity<ContentItem>().HasMany(contentItem => contentItem.Blocks).WithOne().HasForeignKey(c => c.ContentId);
+            modelBuilder.Entity<ContentItem>().HasMany(contentItem => contentItem.Blocks).WithOne()
+                .HasForeignKey(c => c.ContentId);
 
             var dataConversionRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
                 nameof(ModelBuilderContextExtensions.RegisterDataConversion),
@@ -124,12 +125,11 @@ namespace BioEngine.Core.DB
                     .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 
-            
+
             var entitiesTypes = entitiesManager.GetTypes();
             foreach (var registration in entitiesTypes)
             {
                 modelBuilder.Entity(registration.Type);
-                registration.ConfigureContext?.Invoke(modelBuilder);
             }
 
             foreach (var configureAction in entitiesManager.GetConfigureActions())

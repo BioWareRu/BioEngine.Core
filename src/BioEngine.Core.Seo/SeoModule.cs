@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Seo
 {
-    public class SeoModule : BioEngineModule
+    public class SeoModule : BaseBioEngineModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
