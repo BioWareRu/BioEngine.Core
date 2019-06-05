@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Routing;
 using JetBrains.Annotations;
 
 namespace BioEngine.Core.Comments
@@ -18,6 +17,6 @@ namespace BioEngine.Core.Comments
         [NotMapped] public IUser? Author { get; set; }
 
         [ForeignKey(nameof(ContentId))] public ContentItem ContentItem { get; set; }
-        [NotMapped] public string PublicRouteName { get; set; } = BioEngineCoreRoutes.Comment;
+        [NotMapped] public string PublicRouteName { get; set; } = BioEngineCommentsRoutes.Comment;
     }
 }
