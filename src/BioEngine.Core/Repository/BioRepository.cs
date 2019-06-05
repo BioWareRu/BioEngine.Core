@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
-using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Validation;
 using FluentValidation;
@@ -43,29 +41,13 @@ namespace BioEngine.Core.Repository
             Validators.Add(new EntityValidator());
         }
 
-        public virtual async Task<(TEntity[] items, int itemsCount)> GetAllAsync(QueryContext<TEntity>? queryContext = null,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? addConditionsCallback = null)
+        public virtual async Task<(TEntity[] items, int itemsCount)> GetAllAsync(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
         {
-            var itemsCount = await CountAsync(queryContext, addConditionsCallback);
+            var itemsCount = await CountAsync(configureQuery);
 
-            var query = GetBaseQuery(queryContext);
-            if (addConditionsCallback != null)
-            {
-                query = addConditionsCallback(query);
-            }
+            var query = ConfigureQuery(GetBaseQuery(), configureQuery);
 
-            if (queryContext != null)
-            {
-                if (queryContext.Offset.HasValue)
-                {
-                    query = query.Skip(queryContext.Offset.Value);
-                }
-
-                if (queryContext.Limit.HasValue)
-                {
-                    query = query.Take(queryContext.Limit.Value);
-                }
-            }
 
             var items = await query.ToArrayAsync();
             await AfterLoadAsync(items);
@@ -83,43 +65,31 @@ namespace BioEngine.Core.Repository
             await PropertiesProvider.LoadPropertiesAsync(entities);
         }
 
-        public virtual async Task<int> CountAsync(QueryContext<TEntity>? queryContext = null,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? addConditionsCallback = null)
+        public virtual async Task<int> CountAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
         {
-            var query = GetBaseQuery(queryContext);
-            if (addConditionsCallback != null)
-            {
-                query = addConditionsCallback(query);
-            }
-
+            var query = ConfigureQuery(GetBaseQuery(), configureQuery);
 
             return await query.CountAsync();
         }
 
-        public virtual async Task<TEntity> GetByIdAsync(Guid id, QueryContext<TEntity>? queryContext = null)
+        public virtual async Task<TEntity> GetByIdAsync(Guid id,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
         {
-            var item = await GetBaseQuery(queryContext).FirstOrDefaultAsync(i => i.Id.Equals(id));
-            await AfterLoadAsync(item);
-            return item;
-        }
+            var query = ConfigureQuery(GetBaseQuery().Where(i => i.Id.Equals(id)), configureQuery);
 
-        public virtual async Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where,
-            QueryContext<TEntity>? queryContext = null)
-        {
-            var query = where(GetBaseQuery(queryContext));
             var item = await query.FirstOrDefaultAsync();
             await AfterLoadAsync(item);
             return item;
         }
 
-        public virtual async Task<TEntity[]> GetAllAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> where,
-            QueryContext<TEntity>? queryContext = null)
+        public virtual async Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> configureQuery)
         {
-            var query = where(GetBaseQuery(queryContext));
-            var items = await query.ToArrayAsync();
-            await AfterLoadAsync(items);
-            return items;
+            var query = ConfigureQuery(GetBaseQuery(), configureQuery);
+            var item = await query.FirstOrDefaultAsync();
+            await AfterLoadAsync(item);
+            return item;
         }
+
 
         public virtual async Task<TEntity> NewAsync()
         {
@@ -128,9 +98,11 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
-        public virtual async Task<TEntity[]> GetByIdsAsync(Guid[] ids, QueryContext<TEntity>? queryContext = null)
+        public virtual async Task<TEntity[]> GetByIdsAsync(Guid[] ids,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
         {
-            var items = await GetBaseQuery(queryContext).Where(i => ids.Contains(i.Id)).ToArrayAsync();
+            var query = GetBaseQuery().Where(i => ids.Contains(i.Id));
+            var items = await ConfigureQuery(query, configureQuery).ToArrayAsync();
             await AfterLoadAsync(items);
 
             return items;
@@ -283,67 +255,22 @@ namespace BioEngine.Core.Repository
             return (!failures.Any(), failures);
         }
 
-        protected virtual IQueryable<TEntity> GetBaseQuery(QueryContext<TEntity>? queryContext = null)
+        protected virtual IQueryable<TEntity> GetBaseQuery()
         {
-            return ApplyContext(DbContext.Set<TEntity>(), queryContext);
+            return DbContext.Set<TEntity>().AsQueryable();
         }
 
-        protected virtual IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, QueryContext<TEntity>? queryContext)
+        protected virtual IQueryable<TEntity> ConfigureQuery(IQueryable<TEntity> query,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
         {
-            if (queryContext == null)
+            if (configureQuery != null)
             {
-                return query;
-            }
-
-            if (queryContext.OrderBy != null)
-            {
-                query = !queryContext.OrderByDescending
-                    ? query.OrderBy(queryContext.OrderBy)
-                    : query.OrderByDescending(queryContext.OrderBy);
-            }
-            else
-            {
-                query = query.OrderByDescending(e => e.DateAdded);
-            }
-
-            if (queryContext.SortQueries.Any())
-            {
-                foreach (var sortQuery in queryContext.SortQueries)
-                {
-                    query = sortQuery.isDescending
-                        ? query.OrderByDescending(e => EF.Property<TEntity>(e, sortQuery.propertyName))
-                        : query.OrderBy(e => EF.Property<TEntity>(e, sortQuery.propertyName));
-                }
-            }
-
-            if (queryContext.ConditionsGroups.Any())
-            {
-                var where = new List<string>();
-                var valueIndex = 0;
-                var values = new List<object?>();
-                foreach (var conditionsGroup in queryContext.ConditionsGroups)
-                {
-                    var groupWhere = new List<string>();
-                    foreach (var condition in conditionsGroup.Conditions)
-                    {
-                        var expression = condition.GetExpression(valueIndex);
-                        if (!string.IsNullOrEmpty(expression))
-                        {
-                            groupWhere.Add(expression);
-                            values.Add(condition.Value);
-                            valueIndex++;
-                        }
-                    }
-
-                    where.Add($"({string.Join(" OR ", groupWhere)})");
-                }
-
-                var whereStr = string.Join(" AND ", where);
-                query = query.Where(whereStr, values.ToArray());
+                query = configureQuery.Invoke(query);
             }
 
             return query;
         }
+
 
         protected virtual Task<bool> BeforeValidateAsync(TEntity item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
@@ -359,7 +286,8 @@ namespace BioEngine.Core.Repository
             return HooksManager.BeforeSaveAsync(item, validationResult, changes, operationContext);
         }
 
-        protected virtual async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null, TEntity? oldItem = null,
+        protected virtual async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null,
+            TEntity? oldItem = null,
             IBioRepositoryOperationContext? operationContext = null)
         {
             var result = await HooksManager.AfterSaveAsync(item, changes, operationContext);

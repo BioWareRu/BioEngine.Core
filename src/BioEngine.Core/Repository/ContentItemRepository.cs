@@ -1,9 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
-using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Users;
 using BioEngine.Core.Validation;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,9 +19,9 @@ namespace BioEngine.Core.Repository
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<TEntity> GetBaseQuery(QueryContext<TEntity>? queryContext = null)
+        protected override IQueryable<TEntity> GetBaseQuery()
         {
-            return ApplyContext(DbContext.Set<TEntity>().Include(p => p.Blocks), queryContext);
+            return DbContext.Set<TEntity>().Include(p => p.Blocks);
         }
 
         protected override void RegisterValidators()
@@ -34,7 +32,7 @@ namespace BioEngine.Core.Repository
 
         protected override async Task AfterLoadAsync(TEntity[] entities)
         {
-            if (_userDataProvider != null && entities != null && entities.Length > 0)
+            if (_userDataProvider != null && entities?.Length > 0)
             {
                 await base.AfterLoadAsync(entities);
                 var userIds = entities.Select(e => e.AuthorId).Distinct().ToArray();

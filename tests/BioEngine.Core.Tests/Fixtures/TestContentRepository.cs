@@ -1,5 +1,5 @@
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Repository;
-using BioEngine.Core.Users;
 
 namespace BioEngine.Core.Tests.Fixtures
 {

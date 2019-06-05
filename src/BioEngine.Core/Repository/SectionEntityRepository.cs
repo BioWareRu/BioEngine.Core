@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
-using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Validation;
 using FluentValidation.Results;
 
@@ -24,17 +22,6 @@ namespace BioEngine.Core.Repository
         {
             base.RegisterValidators();
             Validators.Add(new SectionEntityValidator<TEntity>());
-        }
-
-        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, QueryContext<TEntity>? queryContext)
-        {
-            if (queryContext != null && queryContext.SectionId != Guid.Empty)
-            {
-                var sectionId = queryContext.SectionId;
-                query = query.Where(e => e.SectionIds.Contains(sectionId));
-            }
-
-            return base.ApplyContext(query, queryContext);
         }
 
         protected override async Task<bool> BeforeValidateAsync(TEntity item,

@@ -1,5 +1,4 @@
 using System;
-using BioEngine.Core.Users;
 
 namespace BioEngine.Core.Abstractions
 {

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Tests.Fixtures;
@@ -39,7 +38,7 @@ namespace BioEngine.Core.Tests
             var repository = scope.Get<TestContentRepository>();
             var sectionRepository = scope.Get<TestSectionRepository>();
             var section =
-                (await sectionRepository.GetAllAsync(new QueryContext<TestSection>())).items.First();
+                (await sectionRepository.GetAllAsync()).items.First();
 
             Assert.NotEmpty(section.SiteIds);
 

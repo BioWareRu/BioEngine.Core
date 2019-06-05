@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using BioEngine.Core.Abstractions;
-using BioEngine.Core.DB.Queries;
+﻿using BioEngine.Core.Abstractions;
 using BioEngine.Core.Validation;
 
 namespace BioEngine.Core.Repository
@@ -17,17 +14,6 @@ namespace BioEngine.Core.Repository
         {
             base.RegisterValidators();
             Validators.Add(new SiteEntityValidator<TEntity>());
-        }
-
-        protected override IQueryable<TEntity> ApplyContext(IQueryable<TEntity> query, QueryContext<TEntity>? queryContext)
-        {
-            if (queryContext != null && queryContext.SiteId != Guid.Empty)
-            {
-                var siteId = queryContext.SiteId;
-                query = query.Where(e => e.SiteIds.Contains(siteId));
-            }
-
-            return base.ApplyContext(query, queryContext);
         }
     }
 }

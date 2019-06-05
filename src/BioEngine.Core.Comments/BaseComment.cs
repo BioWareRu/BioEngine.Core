@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Routing;
-using BioEngine.Core.Users;
 using JetBrains.Annotations;
 
 namespace BioEngine.Core.Comments

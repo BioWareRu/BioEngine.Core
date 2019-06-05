@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
@@ -79,8 +78,7 @@ namespace BioEngine.Core.Tests
             var scope = GetScope();
             var context = scope.GetDbContext();
             var repository = scope.Get<SitesRepository>();
-            var queryContext = new QueryContext<Site>();
-            var result = await repository.GetAllAsync(queryContext);
+            var result = await repository.GetAllAsync();
             var count = await context.Sites.CountAsync();
             Assert.NotEmpty(result.items);
             Assert.Equal(count, result.itemsCount);
@@ -96,11 +94,10 @@ namespace BioEngine.Core.Tests
             await repository.UnPublishAsync(section);
             var count = await context.Set<TestSection>().CountAsync(s => s.IsPublished);
 
-            var queryContext = new QueryContext<TestSection>();
-            var result = await repository.GetAllAsync(queryContext, sections => sections.Where(s => s.IsPublished));
+            var result = await repository.GetAllAsync(sections => sections.Where(s => s.IsPublished));
             Assert.Equal(count, result.itemsCount);
 
-            result = await repository.GetAllAsync(queryContext);
+            result = await repository.GetAllAsync();
             Assert.Equal(count + 1, result.itemsCount);
         }
 

@@ -1,4 +1,4 @@
-﻿namespace BioEngine.Core.Users
+﻿namespace BioEngine.Core.Abstractions
 {
     public interface ICurrentUserFeature
     {
