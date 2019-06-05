@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Extra.Ads
 {
-    public class AdsModule : BioEngineModule
+    public class AdsModule : BaseBioEngineModule
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
@@ -19,10 +19,10 @@ namespace BioEngine.Extra.Ads
             services.RegisterApiEntities(GetType().Assembly);
         }
 
-        public override void ConfigureDbContext(BioEntitiesManager entitiesManager)
+        public override void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
         {
-            base.ConfigureDbContext(entitiesManager);
-            entitiesManager.Register<Ad>(modelBuilder =>
+            base.ConfigureEntities(serviceCollection, entitiesManager);
+            entitiesManager.ConfigureDbContext(modelBuilder =>
             {
                 modelBuilder.Entity<Ad>().HasMany(contentItem => contentItem.Blocks).WithOne()
                     .HasForeignKey(c => c.ContentId);
