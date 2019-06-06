@@ -2,6 +2,28 @@
 
 Модуль реализует функции поиска по контенту сайта на BioEngine. Функции модуля разделены между двумя интерфейсами - `ISearcher` и `ISearchProvider` и классом `SearchModel`.
 
+## Использование
+
+Для использования необходимо подключить какую либо реализацию модуля. После этого необходимо зарегистрировать хук и провайдер для каждой сущности. 
+
+```csharp
+services.RegisterSearchRepositoryHook<Post>().RegisterSearchProvider<PostsSearchProvider, Post>();
+```
+
+После этого можно инжектить либо конкретный провайдер, либо все провайдеры разом как `Enumerable<ISearchProvider> searchProviders`. 
+
+Получаем провайдер для конкретного типа сущности
+
+```csharp
+var provider = searchProviders.FirstOrDefault(s => s.CanProcess(typeof(MyEntity)));
+``` 
+
+Ищем сущности по запросу
+
+```csharp
+await provider.SearchAsync("купить слона", 10, site);
+```
+
 ## SearchModel
 
 Общий класс, к которому приводятся все сущности перед добавление в поисковой индекс. Используется для унификации структуру поискового индекса. 
