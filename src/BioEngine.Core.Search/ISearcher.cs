@@ -9,7 +9,7 @@ namespace BioEngine.Core.Search
         Task<bool> AddOrUpdateAsync(string indexName, IEnumerable<SearchModel> searchModels);
         Task<bool> DeleteAsync(string indexName, IEnumerable<SearchModel> searchModels);
         Task<bool> DeleteAsync(string indexName);
-        Task<long> CountAsync(string indexName, string term);
+        Task<long> CountAsync(string indexName, string term, Site site);
         Task<SearchModel[]> SearchAsync(string indexName, string term, int limit, Site site);
         Task InitAsync(string indexName);
     }

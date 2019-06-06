@@ -8,7 +8,7 @@ namespace BioEngine.Core.Search
     {
         bool CanProcess(Type type);
         Task DeleteIndexAsync();
-        Task<long> CountAsync(string term);
+        Task<long> CountAsync(string term, Site site);
         Task InitAsync();
     }
 
@@ -18,5 +18,6 @@ namespace BioEngine.Core.Search
         Task AddOrUpdateEntityAsync(T entity);
         Task<bool> AddOrUpdateEntitiesAsync(T[] entities);
         Task<bool> DeleteEntityAsync(T entity);
+        Task<bool> DeleteEntitiesAsync(T[] entities);
     }
 }

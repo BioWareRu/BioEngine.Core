@@ -99,11 +99,14 @@ namespace BioEngine.Core.Search.ElasticSearch
             return result.Acknowledged;
         }
 
-        public async Task<long> CountAsync(string indexName, string term)
+        public async Task<long> CountAsync(string indexName, string term, Site site)
         {
             var names = GetSearchText(term);
             var resultsCount = await GetClient().CountAsync<SearchModel>(x =>
-                x.Query(q => q.QueryString(qs => qs.Query(names))).Index(indexName.ToLowerInvariant()));
+                x.Query(q =>
+                        q.QueryString(qs => qs.Query(names)) &&
+                        q.Match(c => c.Field(p => p.SiteIds).Query(site.Id.ToString())))
+                    .Index(indexName.ToLowerInvariant()));
             return resultsCount.Count;
         }
 

@@ -28,9 +28,9 @@ namespace BioEngine.Core.Search
             return _searcher.DeleteAsync(IndexName);
         }
 
-        public Task<long> CountAsync(string term)
+        public Task<long> CountAsync(string term, Site site)
         {
-            return _searcher.CountAsync(IndexName, term);
+            return _searcher.CountAsync(IndexName, term, site);
         }
 
         public Task InitAsync()
@@ -57,6 +57,11 @@ namespace BioEngine.Core.Search
         public async Task<bool> DeleteEntityAsync(T entity)
         {
             return await _searcher.DeleteAsync(IndexName, await GetSearchModelsAsync(new[] {entity}));
+        }
+
+        public async Task<bool> DeleteEntitiesAsync(T[] entities)
+        {
+            return await _searcher.DeleteAsync(IndexName, await GetSearchModelsAsync(entities));
         }
 
         protected abstract Task<SearchModel[]> GetSearchModelsAsync(T[] entities);
