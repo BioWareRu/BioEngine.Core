@@ -232,7 +232,11 @@ var deletedEntity = await Repository.DeleteAsync(id, new BioRepositoryOperationC
 ### Хуки
 
 Репозитории поддерживают возможность расширения с помощью хуков - зарегистрированных обработчиков, которые вызываются по определённым событиям.
-Класс хука должен реализовать интерфейс `IRepositoryHook`
+Класс хука должен реализовать интерфейс `IRepositoryHook`. Регистрация хука происходит добавлением его в DI контейнер
+
+```csharp
+serviceCollection.AddScoped<IRepositoryHook, SearchRepositoryHook<TEntity>>();
+```
 
 #### Проверка на возможность обработки хуком типа сущности
 
