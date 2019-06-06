@@ -225,8 +225,40 @@ Task<TEntity> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationCont
 var deletedEntity = await Repository.DeleteAsync(id, new BioRepositoryOperationContext {User = CurrentUser});
 ```
 
+### Валидация
 
-Валидация сущностей реализована с помощью библиотеки `FluentValidation`. Настройка валидации сущностей происходит путём добавления в DI-контейнер классов, реализующих `IValidator<TEntity>`. По умолчанию все валидаторы из сборки модуля будут зарегистрированы автоматически. Чтобы изменить это поведение модель должен переопределить метод `RegisterValidation`. 
+Валидация сущностей реализована с помощью библиотеки `FluentValidation`. Настройка валидации сущностей происходит путём добавления в DI-контейнер классов, реализующих `IValidator<TEntity>`. По умолчанию все валидаторы из сборки модуля будут зарегистрированы автоматически. Чтобы изменить это поведение модель должен переопределить метод `RegisterValidation`.
+
+### Хуки
+
+Репозитории поддерживают возможность расширения с помощью хуков - зарегистрированных обработчиков, которые вызываются по определённым событиям.
+Класс хука должен реализовать интерфейс `IRepositoryHook`
+
+#### Проверка на возможность обработки хуком типа сущности
+
+```csharp
+bool CanProcess(Type type);
+```
+
+#### Вызывается перед валидацией сущности и позволяет её как-то модифицировать либо прервать процесс сохранения
+```csharp
+Task<bool> BeforeValidateAsync<T>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
+    PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
+    where T : class, IEntity;
+```
+    
+#### Вызывается после валидации сущности и перед её сохранением. Позволяет её как-то модифицировать либо прервать процесс сохранения
+
+```csharp
+Task<bool> BeforeSaveAsync<T>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
+    PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
+    where T : class, IEntity;
+```
+
+#### Вызывается после сохранения сущности. Позволяет выполнить какие действия, например обновление поискового индекса.
+```csharp
+Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null) where T : class, IEntity;
+``` 
 
 ## Сайты, разделы, контент и блоки
 
