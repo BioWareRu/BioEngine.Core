@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -14,6 +17,8 @@ namespace BioEngine.Core
     public class BioEngine
     {
         private readonly BioEntitiesManager _entitiesManager = new BioEntitiesManager();
+        private readonly List<IBioEngineModule> _modules = new List<IBioEngineModule>();
+        private IHost _appHost;
 
         private bool _coreConfigured;
         private readonly IHostBuilder _hostBuilder;
@@ -47,14 +52,45 @@ namespace BioEngine.Core
             return this;
         }
 
-        public IHost Build()
+        public async Task RunAsync()
         {
-            return _hostBuilder.Build();
+            await InitAsync();
+
+            await GetAppHost().RunAsync();
         }
 
-        public IHostBuilder GetHostBuilder()
+        public async Task RunAsync<TStartup>() where TStartup : class
         {
-            return _hostBuilder;
+            _hostBuilder.ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<TStartup>();
+            });
+
+            await RunAsync();
+        }
+
+        public IServiceProvider GetServices()
+        {
+            return GetAppHost().Services;
+        }
+
+        private IHost GetAppHost()
+        {
+            return _appHost ??= _hostBuilder.Build();
+        }
+
+        public async Task InitAsync()
+        {
+            var host = GetAppHost();
+            using (var scope = host.Services.CreateScope())
+            {
+                foreach (var module in _modules)
+                {
+                    await module.InitAsync(scope.ServiceProvider,
+                        scope.ServiceProvider.GetRequiredService<IConfiguration>(),
+                        scope.ServiceProvider.GetRequiredService<IHostEnvironment>());
+                }
+            }
         }
 
         public BioEngine AddModule<TModule, TModuleConfig>(
@@ -63,13 +99,16 @@ namespace BioEngine.Core
         {
             var module = new TModule();
             ConfigureModule(module, configure);
+            _modules.Add(module);
             return this;
         }
 
         public BioEngine AddModule<TModule>()
             where TModule : IBioEngineModule, new()
         {
-            ConfigureModule(new TModule());
+            var module = new TModule();
+            ConfigureModule(module);
+            _modules.Add(module);
             return this;
         }
 
@@ -116,6 +155,12 @@ namespace BioEngine.Core
                     ConfigureModule(module, collection, context.HostingEnvironment, context.Configuration);
                 }
             );
+        }
+
+        public BioEngine ConfigureAppConfiguration(Action<IConfigurationBuilder> action)
+        {
+            _hostBuilder.ConfigureAppConfiguration(action);
+            return this;
         }
     }
 }

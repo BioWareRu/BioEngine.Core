@@ -84,7 +84,7 @@ namespace BioEngine.Core.Tests
                 return new InMemoryDatabaseModuleConfig(dbName);
             });
             bioEngine = ConfigureBioEngine(bioEngine);
-            ServiceProvider = bioEngine.Build().Services;
+            ServiceProvider = bioEngine.GetServices();
         }
 
         protected virtual BioEngine ConfigureBioEngine(BioEngine bioEngine)

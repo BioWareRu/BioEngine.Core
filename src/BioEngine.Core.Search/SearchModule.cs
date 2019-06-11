@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
@@ -17,6 +19,19 @@ namespace BioEngine.Core.Search
         }
 
         protected abstract void ConfigureSearch(IServiceCollection services);
+
+        public override async Task InitAsync(IServiceProvider serviceProvider, IConfiguration configuration,
+            IHostEnvironment environment)
+        {
+            var searchProviders = serviceProvider.GetServices<ISearchProvider>();
+            if (searchProviders != null)
+            {
+                foreach (var searchProvider in searchProviders)
+                {
+                    await searchProvider.InitAsync();
+                }
+            }
+        }
     }
 
     public static class SearchModuleExtensions

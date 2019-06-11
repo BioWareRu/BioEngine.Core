@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,21 @@ namespace BioEngine.Core.DB
             if (Config.Port == 0)
             {
                 throw new ArgumentException("Postgres host is empty");
+            }
+        }
+
+        public override async Task InitAsync(IServiceProvider serviceProvider, IConfiguration configuration,
+            IHostEnvironment environment)
+        {
+            await base.InitAsync(serviceProvider, configuration, environment);
+
+            if (environment.IsProduction())
+            {
+                var dbContext = serviceProvider.GetRequiredService<BioContext>();
+                if (dbContext.Database.GetPendingMigrations().Any())
+                {
+                    await dbContext.Database.MigrateAsync();
+                }
             }
         }
 

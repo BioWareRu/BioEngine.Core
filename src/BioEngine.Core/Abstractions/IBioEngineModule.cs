@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,9 @@ namespace BioEngine.Core.Abstractions
 
         AssemblyScanner RegisterValidation();
         void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager);
+
+        Task InitAsync(IServiceProvider serviceProvider, IConfiguration configuration,
+            IHostEnvironment environment);
     }
 
     public interface IBioEngineModule<TConfig> : IBioEngineModule where TConfig : class

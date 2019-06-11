@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
 using FluentValidation;
@@ -30,6 +31,12 @@ namespace BioEngine.Core.Modules
             BioEntitiesManager entitiesManager)
         {
             RegisterRepositories(GetType().Assembly, serviceCollection, entitiesManager);
+        }
+
+        public virtual Task InitAsync(IServiceProvider serviceProvider, IConfiguration configuration,
+            IHostEnvironment environment)
+        {
+            return Task.CompletedTask;
         }
 
         protected void RegisterRepositories(Assembly assembly, IServiceCollection serviceCollection,
