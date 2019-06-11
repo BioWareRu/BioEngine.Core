@@ -38,7 +38,7 @@ namespace BioEngine.Core.Social
             }
         }
 
-        public virtual async Task<bool> DeleteAsync(ContentItem entity, TConfig config, Site site = null)
+        public virtual async Task<bool> DeleteAsync(ContentItem entity, TConfig config, Site? site = null)
         {
             var records = (await GetRecordsAsync(entity)).ToArray();
             if (!records.Any())
@@ -68,7 +68,7 @@ namespace BioEngine.Core.Social
             return true;
         }
 
-        protected async Task<TPublishRecord> GetRecordAsync(ContentItem entity, Site site = null)
+        protected async Task<TPublishRecord> GetRecordAsync(ContentItem entity, Site? site = null)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>

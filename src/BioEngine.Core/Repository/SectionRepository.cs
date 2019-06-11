@@ -17,9 +17,9 @@ namespace BioEngine.Core.Repository
             return DbContext.Set<TEntity>().Include(p => p.Blocks);
         }
 
-        protected override async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[] changes = null,
-            TEntity oldItem = null,
-            IBioRepositoryOperationContext operationContext = null)
+        protected override async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null,
+            TEntity? oldItem = null,
+            IBioRepositoryOperationContext? operationContext = null)
         {
             var res = await base.AfterSaveAsync(item, changes, oldItem, operationContext);
             if (res && changes != null && changes.Any(c => c.Name == nameof(Section.SiteIds)))

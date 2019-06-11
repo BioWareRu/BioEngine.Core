@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
 {
-    [SuppressMessage("AsyncUsage.CSharp.Naming", "UseAsyncSuffix", Justification = "Reviewed.")]
+    [SuppressMessage("ReSharper", "VSTHRD200")]
     public class SectionEntityTest : CoreTest
     {
         public SectionEntityTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
