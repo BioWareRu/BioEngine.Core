@@ -5,20 +5,20 @@ using BioEngine.Core.Abstractions;
 
 namespace BioEngine.Core.Users
 {
-    public class LocalUserDataProvider : IUserDataProvider
+    public class TestUserDataProvider : IUserDataProvider
     {
         public Task<List<IUser>> GetDataAsync(int[] userIds)
         {
             var users = userIds
                 .Select(userId =>
-                    new LocalUser {Id = userId, Name = $"User{userId.ToString()}", PhotoUrl = "", ProfileUrl = ""})
+                    new TestUser {Id = userId, Name = $"User{userId.ToString()}", PhotoUrl = "", ProfileUrl = ""})
                 .Cast<IUser>().ToList();
 
             return Task.FromResult(users);
         }
     }
 
-    public class LocalUser : IUser
+    public class TestUser : IUser
     {
         public int Id { get; set; }
         public string Name { get; set; }
