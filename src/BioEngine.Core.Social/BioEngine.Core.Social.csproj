@@ -10,9 +10,6 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NEST" Version="6.8.0" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj" />
   </ItemGroup>
 </Project>

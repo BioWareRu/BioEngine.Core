@@ -34,7 +34,7 @@ namespace BioEngine.Core.DB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
+
 
             modelBuilder.RegisterJsonConversion<Menu, List<MenuItem>>(s => s.Items);
             modelBuilder.RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(s => s.PictureInfo);
@@ -45,6 +45,10 @@ namespace BioEngine.Core.DB
                 modelBuilder.RegisterSiteEntityConversions<Section>();
                 modelBuilder.RegisterSiteEntityConversions<ContentItem>();
                 modelBuilder.RegisterSiteEntityConversions<Menu>();
+            }
+            else
+            {
+                modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
             }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
