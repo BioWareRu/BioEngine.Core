@@ -1,11 +1,12 @@
 using System;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
 namespace BioEngine.Core.Routing
 {
-    public static class LinkGeneratorExtensions
+    public static class RoutingExtensions
     {
         public static Uri GeneratePublicUrl(this LinkGenerator linkGenerator, IRoutable routable, Site? site = null)
         {
@@ -22,6 +23,14 @@ namespace BioEngine.Core.Routing
             }
 
             return new Uri(path, UriKind.Relative);
+        }
+
+        public static IEndpointRouteBuilder MapRoute(this IEndpointRouteBuilder endpoints, string name, string pattern,
+            string controller, string action)
+        {
+            endpoints.MapControllerRoute(name, pattern,
+                new {controller, action});
+            return endpoints;
         }
     }
 }
