@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using BioEngine.Core.API.Models;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Repository;
+using Microsoft.AspNetCore.Routing;
 using ContentBlock = BioEngine.Core.API.Entities.ContentBlock;
 
 namespace BioEngine.Extra.Ads.Api.Entities
@@ -25,6 +27,10 @@ namespace BioEngine.Extra.Ads.Api.Entities
         }
 
         public List<ContentBlock> Blocks { get; set; }
+
+        public Ad(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        {
+        }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
 }
