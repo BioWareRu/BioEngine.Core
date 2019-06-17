@@ -7,12 +7,12 @@ steps:
   - task: Bash@3
     inputs:
       targetType: 'inline'
-      script: 'mkdir -p dotnet && /
-        export DOTNET_SDK_VERSION=3.0.100-preview6-012264 && /
-        curl -SL --output dotnet.tar.gz https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$DOTNET_SDK_VERSION/dotnet-sdk-$DOTNET_SDK_VERSION-linux-x64.tar.gz && /
-        tar -zxf dotnet.tar.gz -C dotnet && /
-        export DOTNET_ROOT=$(pwd)/dotnet && /
-        export PATH=$(pwd)/dotnet:$PATH'
+      script: 'mkdir -p dotnet \
+        && export DOTNET_SDK_VERSION=3.0.100-preview6-012264 \
+        && curl -SL --output dotnet.tar.gz https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$DOTNET_SDK_VERSION/dotnet-sdk-$DOTNET_SDK_VERSION-linux-x64.tar.gz \
+        && tar -zxf dotnet.tar.gz -C dotnet \
+        && export DOTNET_ROOT=$(pwd)/dotnet \
+        && export PATH=$(pwd)/dotnet:$PATH'
   - task: DotNetCoreCLI@2
     inputs:
       command: build
