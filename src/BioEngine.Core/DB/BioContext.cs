@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -134,6 +135,11 @@ namespace BioEngine.Core.DB
             foreach (var registration in entitiesTypes)
             {
                 modelBuilder.Entity(registration.Type);
+                if (typeof(ISiteEntity).IsAssignableFrom(registration.Type) && Database.IsInMemory())
+                {
+                    siteConversionsRegistrationMethod?.MakeGenericMethod(registration.Type)
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
+                }
             }
 
             foreach (var configureAction in entitiesManager.GetConfigureActions())
