@@ -17,6 +17,11 @@ namespace BioEngine.Core.Routing
             Site? site = null)
         {
             var path = linkGenerator.GetPathByName(routeName, routeParams);
+            if (path == null)
+            {
+                throw new Exception($"Can't generate url for route {routeName} with params {routeParams}");
+            }
+
             if (site != null)
             {
                 return new Uri(site.Url + path, UriKind.Absolute);
