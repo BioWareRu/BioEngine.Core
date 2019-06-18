@@ -59,6 +59,20 @@ namespace BioEngine.Core
             await GetAppHost().RunAsync();
         }
 
+        public async Task ExecuteAsync(Func<IServiceProvider, Task> command)
+        {
+            await InitAsync();
+
+            var host = GetAppHost();
+
+            var serviceProvider = host.Services;
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                await command(scope.ServiceProvider);
+            }
+        }
+
         public async Task RunAsync<TStartup>() where TStartup : class
         {
             _hostBuilder.ConfigureWebHostDefaults(webBuilder =>
