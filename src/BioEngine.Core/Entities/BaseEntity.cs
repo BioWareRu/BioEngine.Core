@@ -12,7 +12,6 @@ namespace BioEngine.Core.Entities
     {
         [Key] public virtual Guid Id { get; set; } = Guid.Empty;
         [Required] public virtual string Title { get; set; }
-        [Required] public virtual string Url { get; set; }
         [Required] public virtual DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
         [Required] public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         [NotMapped] public virtual List<PropertiesEntry> Properties { get; set; } = new List<PropertiesEntry>();

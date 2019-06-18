@@ -22,6 +22,7 @@ namespace BioEngine.Core.Entities
         [NotMapped] public List<Section> Sections { get; set; }
         [NotMapped] public List<Tag> Tags { get; set; }
         [NotMapped] public abstract string PublicRouteName { get; set; }
+        [Required] public string Url { get; set; }
     }
 
     public abstract class ContentItem<T> : ContentItem, ITypedEntity<T> where T : ITypedData, new()

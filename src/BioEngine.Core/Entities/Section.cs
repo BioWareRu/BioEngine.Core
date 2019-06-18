@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,7 +17,7 @@ namespace BioEngine.Core.Entities
 
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }
-
+        [Required] public string Url { get; set; }
         
         [NotMapped] public abstract string PublicRouteName { get; set; }
     }

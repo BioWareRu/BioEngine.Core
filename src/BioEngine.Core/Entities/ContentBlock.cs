@@ -11,7 +11,6 @@ namespace BioEngine.Core.Entities
     public abstract class ContentBlock : BaseEntity, ITypedEntity
     {
         [NotMapped] public override string Title => TypeTitle;
-        [NotMapped] public override string Url { get; set; }
         [Required] public Guid ContentId { get; set; }
         [Required] public string Type { get; set; }
         [Required] public int Position { get; set; }
@@ -30,6 +29,7 @@ namespace BioEngine.Core.Entities
     public abstract class ContentBlock<T> : ContentBlock, ITypedEntity<T> where T : ContentBlockData, new()
 
     {
+        [Column(TypeName = "jsonb")]
         public T Data { get; set; }
 
         public override object GetData()

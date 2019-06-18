@@ -18,5 +18,6 @@ namespace BioEngine.Core.Comments
 
         [ForeignKey(nameof(ContentId))] public ContentItem ContentItem { get; set; }
         [NotMapped] public string PublicRouteName { get; set; } = BioEngineCommentsRoutes.Comment;
+        [NotMapped] public string Url { get; set; }
     }
 }

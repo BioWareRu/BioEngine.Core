@@ -10,7 +10,6 @@ namespace BioEngine.Core.Abstractions
 
         Guid Id { get; set; }
         string Title { get; set; }
-        string Url { get; set; }
         DateTimeOffset DateAdded { get; set; }
         DateTimeOffset DateUpdated { get; set; }
     }

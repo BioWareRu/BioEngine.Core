@@ -8,7 +8,6 @@ namespace BioEngine.Core.Entities
     public class StorageItem : BaseEntity
     {
         [NotMapped] public override string Title => FileName;
-        [NotMapped] public override string Url => PublicUri.ToString();
         public string FileName { get; set; }
         public long FileSize { get; set; }
         public Uri PublicUri { get; set; }
