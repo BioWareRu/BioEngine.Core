@@ -42,14 +42,25 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<(TEntity[] items, int itemsCount)> GetAllAsync(
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
+            Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
-            var itemsCount = await CountAsync(configureQuery);
+            var query = CreateRepositoryQuery().Configure(configureQuery);
+            var dbQuery = query.BuildQuery();
+            var needCount = false;
+            if (query.Offset != null)
+            {
+                dbQuery = dbQuery.Skip(query.Offset.Value);
+                needCount = true;
+            }
 
-            var query = ConfigureQuery(GetBaseQuery(), configureQuery);
+            if (query.Limit != null)
+            {
+                dbQuery = dbQuery.Take(query.Limit.Value);
+                needCount = true;
+            }
 
-
-            var items = await query.ToArrayAsync();
+            var items = await dbQuery.ToArrayAsync();
+            var itemsCount = needCount && items.Length == query.Limit ? await CountAsync(configureQuery) : items.Length;
             await AfterLoadAsync(items);
 
             return (items, itemsCount);
@@ -65,26 +76,24 @@ namespace BioEngine.Core.Repository
             await PropertiesProvider.LoadPropertiesAsync(entities);
         }
 
-        public virtual async Task<int> CountAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
+        public virtual Task<int> CountAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
-            var query = ConfigureQuery(GetBaseQuery(), configureQuery);
-
-            return await query.CountAsync();
+            return CreateRepositoryQuery().Configure(configureQuery).BuildQuery().CountAsync();
         }
 
         public virtual async Task<TEntity> GetByIdAsync(Guid id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
+            Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
-            var query = ConfigureQuery(GetBaseQuery().Where(i => i.Id.Equals(id)), configureQuery);
+            var query = CreateRepositoryQuery().Where(i => i.Id.Equals(id)).Configure(configureQuery).BuildQuery();
 
             var item = await query.FirstOrDefaultAsync();
             await AfterLoadAsync(item);
             return item;
         }
 
-        public virtual async Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> configureQuery)
+        public virtual async Task<TEntity> GetAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
-            var query = ConfigureQuery(GetBaseQuery(), configureQuery);
+            var query = CreateRepositoryQuery().Configure(configureQuery).BuildQuery();
             var item = await query.FirstOrDefaultAsync();
             await AfterLoadAsync(item);
             return item;
@@ -99,10 +108,10 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<TEntity[]> GetByIdsAsync(Guid[] ids,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
+            Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
-            var query = GetBaseQuery().Where(i => ids.Contains(i.Id));
-            var items = await ConfigureQuery(query, configureQuery).ToArrayAsync();
+            var query = CreateRepositoryQuery().Where(i => ids.Contains(i.Id)).Configure(configureQuery).BuildQuery();
+            var items = await query.ToArrayAsync();
             await AfterLoadAsync(items);
 
             return items;
@@ -260,18 +269,11 @@ namespace BioEngine.Core.Repository
             return DbContext.Set<TEntity>().AsQueryable();
         }
 
-        protected virtual IQueryable<TEntity> ConfigureQuery(IQueryable<TEntity> query,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null)
+        protected virtual BioRepositoryQuery<TEntity> CreateRepositoryQuery()
         {
-            if (configureQuery != null)
-            {
-                query = configureQuery.Invoke(query);
-            }
-
-            return query;
+            return new BioRepositoryQuery<TEntity>(GetBaseQuery());
         }
-
-
+        
         protected virtual Task<bool> BeforeValidateAsync(TEntity item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Repository;
 
@@ -11,19 +10,18 @@ namespace BioEngine.Core.Abstractions
 
     public interface IBioRepository<TEntity> : IBioRepository where TEntity : class, IEntity
     {
-        Task<(TEntity[] items, int itemsCount)> GetAllAsync(
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+        Task<(TEntity[] items, int itemsCount)> GetAllAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null);
 
-        Task<int> CountAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+        Task<int> CountAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null);
 
-        Task<TEntity> GetByIdAsync(Guid id, Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+        Task<TEntity> GetByIdAsync(Guid id, Action<BioRepositoryQuery<TEntity>>? configureQuery = null);
 
-        Task<TEntity> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>> configureQuery);
+        Task<TEntity> GetAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null);
 
         Task<TEntity> NewAsync();
 
         Task<TEntity[]> GetByIdsAsync(Guid[] ids,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? configureQuery = null);
+            Action<BioRepositoryQuery<TEntity>>? configureQuery = null);
 
         Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item,
             IBioRepositoryOperationContext? operationContext = null);
