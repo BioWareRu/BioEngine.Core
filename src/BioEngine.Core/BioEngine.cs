@@ -93,6 +93,11 @@ namespace BioEngine.Core
             return _appHost ??= _hostBuilder.Build();
         }
 
+        public IHostBuilder GetHostBuilder()
+        {
+            return _hostBuilder;
+        }
+
         public async Task InitAsync()
         {
             var host = GetAppHost();
