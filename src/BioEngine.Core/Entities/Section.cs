@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,7 +24,7 @@ namespace BioEngine.Core.Entities
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
     public abstract class Section<T> : Section, ITypedEntity<T> where T : ITypedData, new()
     {
-        public virtual T Data { get; set; } = new T();
+        [Column(TypeName = "jsonb")] public virtual T Data { get; set; } = new T();
         [NotMapped] public abstract string TypeTitle { get; set; }
     }
 }

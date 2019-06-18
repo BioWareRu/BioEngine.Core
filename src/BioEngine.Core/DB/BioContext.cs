@@ -120,13 +120,13 @@ namespace BioEngine.Core.DB
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
                         .Invoke(modelBuilder, new object[] {modelBuilder});
+
+                    sectionEntityConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
                 }
 
                 dataConversionRegistrationMethod
                     ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
-                    .Invoke(modelBuilder, new object[] {modelBuilder});
-
-                sectionEntityConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
                     .Invoke(modelBuilder, new object[] {modelBuilder});
             }
 

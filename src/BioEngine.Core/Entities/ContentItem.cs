@@ -28,6 +28,6 @@ namespace BioEngine.Core.Entities
     public abstract class ContentItem<T> : ContentItem, ITypedEntity<T> where T : ITypedData, new()
     {
         [NotMapped] public abstract string TypeTitle { get; }
-        public T Data { get; set; }
+        [Column(TypeName = "jsonb")] public T Data { get; set; }
     }
 }
