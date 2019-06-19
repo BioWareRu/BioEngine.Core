@@ -12,14 +12,17 @@ namespace BioEngine.Core.Storage
     [UsedImplicitly]
     public class FileStorage : Storage
     {
+        private readonly string _storagePath;
+
         public FileStorage(FileStorageModuleConfig options, StorageItemsRepository repository,
             BioContext dbContext, ILogger<FileStorage> logger) : base(options, repository, dbContext, logger)
         {
+            _storagePath = options.StoragePath;
         }
 
         protected override Task<bool> DoSaveAsync(string path, string tmpPath)
         {
-            var dirPath = Path.GetDirectoryName(path);
+            var dirPath = Path.Combine(_storagePath, Path.GetDirectoryName(path));
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath ?? throw new Exception($"Empty dir path in {path}"));
