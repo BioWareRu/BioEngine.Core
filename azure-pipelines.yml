@@ -2,7 +2,7 @@ pool:
     vmImage: Ubuntu 16.04
 variables:
     Version: 3.0.$(Build.BuildId)
-    DOTNET_SDK_VERSION: 3.0.100-preview6-012264
+
 steps:
     - task: UseDotNet@2
       displayName: 'Install .Net Core 3.0'
@@ -10,17 +10,22 @@ steps:
           packageType: sdk
           version: 3.0.100-preview6-012264
           includePreviewVersions: true
+          
     - task: DotNetCoreCLI@2
+      displayName: 'Build project'
       inputs:
           command: build
           projects: '**/*.csproj'
           arguments: '-c Release'
+          
     - task: DotNetCoreCLI@2
       inputs:
           command: test
           publishTestResults: true
           projects: 'tests/**/*.csproj'
+          
     - task: DotNetCoreCLI@2
+      displayName: 'Create package'
       inputs:
           command: pack
           configuration: Release
@@ -28,14 +33,18 @@ steps:
           versionEnvVar: Version
           verbosityPack: minimal
           projects: src/**/*.csproj
+          
     - task: DotNetCoreCLI@2
+      displayName: 'Push package'
       inputs:
           command: push
           nuGetFeedType: internal
           publishVstsFeed: BioEngine
           versioningScheme: byEnvVar
           versionEnvVar: Version
+          
     - task: PublishPipelineArtifact@0
+      displayName: 'Publish package as artifact'
       inputs:
           artifactName: 'packages'
           targetPath: '$(Build.ArtifactStagingDirectory)'
