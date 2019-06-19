@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Tests.Fixtures;
 using Xunit;
@@ -15,7 +14,7 @@ namespace BioEngine.Core.Tests
         }
 
         [Fact]
-        public async Task SaveWithoutSiteIdsFails()
+        public async Task SiteIdsAutoFill()
         {
             var scope = GetScope();
             var repository = scope.Get<TestSectionRepository>();
@@ -27,9 +26,8 @@ namespace BioEngine.Core.Tests
             };
 
             var result = await repository.AddAsync(section);
-            Assert.False(result.IsSuccess);
-            var error = result.Errors.FirstOrDefault(e => e.PropertyName == nameof(section.SiteIds));
-            Assert.NotNull(error);
+            Assert.True(result.IsSuccess);
+            Assert.Single(section.SiteIds);
         }
     }
 }
