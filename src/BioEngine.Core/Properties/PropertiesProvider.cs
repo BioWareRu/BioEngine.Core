@@ -181,7 +181,7 @@ namespace BioEngine.Core.Properties
                 throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
             }
 
-            var record = await LoadFromDatabaseAsync<TProperties>(entity) ?? new PropertiesRecord
+            var record = await LoadFromDatabaseAsync<TProperties>(entity, siteId) ?? new PropertiesRecord
             {
                 Key = schema.Key,
                 EntityType = entity.GetType().FullName,
@@ -226,7 +226,7 @@ namespace BioEngine.Core.Properties
                 : await _dbContext.Properties.FirstOrDefaultAsync(s =>
                     s.Key == schema.Key
                     && s.EntityType == entity.GetType().FullName && s.EntityId == entity.Id &&
-                    (siteId == null || s.SiteId == siteId));
+                    (siteId == null || s.SiteId == siteId.Value));
         }
 
         public async Task LoadPropertiesAsync<T>(IEnumerable<T> entities) where T : class, IEntity
