@@ -133,7 +133,7 @@ namespace BioEngine.Core.Properties
                 .FirstOrDefault(x => x.SiteId == siteId)?.Value is TProperties properties))
             {
                 properties = new TProperties();
-                var propertiesRecord = await LoadFromDatabaseAsync<TProperties>(entity, siteId);
+                var propertiesRecord = await LoadFromDatabaseAsync(schema.Value, entity, siteId);
                 if (propertiesRecord != null)
                 {
                     properties = JsonConvert.DeserializeObject<TProperties>(propertiesRecord.Data);
@@ -181,7 +181,7 @@ namespace BioEngine.Core.Properties
                 throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
             }
 
-            var record = await LoadFromDatabaseAsync<TProperties>(entity, siteId) ?? new PropertiesRecord
+            var record = await LoadFromDatabaseAsync(schema, entity, siteId) ?? new PropertiesRecord
             {
                 Key = schema.Key,
                 EntityType = entity.GetType().FullName,
@@ -216,11 +216,9 @@ namespace BioEngine.Core.Properties
                     && s.EntityType == null && s.EntityId == null);
         }
 
-        private async Task<PropertiesRecord?> LoadFromDatabaseAsync<TProperties>(IEntity entity,
+        private async Task<PropertiesRecord?> LoadFromDatabaseAsync(PropertiesSchema schema, IEntity entity,
             Guid? siteId = null)
-            where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
             return schema == null || !_checkIfExists
                 ? null
                 : await _dbContext.Properties.FirstOrDefaultAsync(s =>
