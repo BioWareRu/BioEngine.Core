@@ -16,13 +16,6 @@ stages:
                       includePreviewVersions: true
 
                 - task: DotNetCoreCLI@2
-                  displayName: 'Build project'
-                  inputs:
-                      command: build
-                      projects: '**/*.csproj'
-                      arguments: '-c Release'
-
-                - task: DotNetCoreCLI@2
                   inputs:
                       command: test
                       publishTestResults: true
@@ -63,6 +56,7 @@ stages:
                       publishVstsFeed: BioEngine
                       versioningScheme: byEnvVar
                       versionEnvVar: Version
+                      searchPatternPush: '$(Pipeline.Workspace)/**/*.nupkg'
 
                 - task: NuGetCommand@2
                   displayName: 'Push package to nuget'
