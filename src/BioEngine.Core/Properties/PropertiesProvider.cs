@@ -259,7 +259,7 @@ namespace BioEngine.Core.Properties
                     foreach (var entity in group)
                     {
                         entity.Properties = new List<PropertiesEntry>();
-                        foreach (var schema in schemas.Select(s => s.Value))
+                        foreach (var schema in schemas.Select(s => s.Value).OrderBy(s => s.Key))
                         {
                             var entry = new PropertiesEntry(schema.Key);
 
