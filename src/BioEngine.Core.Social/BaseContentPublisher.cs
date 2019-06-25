@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace BioEngine.Core.Social
 {
     public abstract class BaseContentPublisher<TConfig, TPublishRecord> : IContentPublisher<TConfig>
-        where TConfig : IContentPublisherConfig where TPublishRecord : BasePublishRecord
+        where TConfig : IContentPublisherConfig where TPublishRecord : BasePublishRecord, new()
     {
         protected ILogger<IContentPublisher<TConfig>> Logger { get; }
         private readonly BioContext _dbContext;
@@ -25,8 +25,30 @@ namespace BioEngine.Core.Social
         {
             try
             {
-                var record = await DoPublishAsync(entity, site, config);
-                _dbContext.Add(record);
+                var isNew = false;
+                var record = await GetRecordAsync(entity, site);
+                if (record == null)
+                {
+                    isNew = true;
+                    record = new TPublishRecord
+                    {
+                        Id = Guid.NewGuid(),
+                        ContentId = entity.Id,
+                        Type = entity.GetType().FullName,
+                        SiteIds = new[] {site.Id}
+                    };
+                }
+
+                await DoPublishAsync(record, entity, site, config);
+                if (isNew)
+                {
+                    _dbContext.Set<TPublishRecord>().Add(record);
+                }
+                else
+                {
+                    _dbContext.Set<TPublishRecord>().Update(record);
+                }
+
                 await _dbContext.SaveChangesAsync();
                 return true;
             }
@@ -60,7 +82,7 @@ namespace BioEngine.Core.Social
                     return false;
                 }
 
-                _dbContext.Remove(record);
+                _dbContext.Set<TPublishRecord>().Remove(record);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -84,7 +106,9 @@ namespace BioEngine.Core.Social
                 .ToListAsync();
         }
 
-        protected abstract Task<TPublishRecord> DoPublishAsync(ContentItem entity, Site site, TConfig config);
+        protected abstract Task<TPublishRecord> DoPublishAsync(TPublishRecord record, ContentItem entity, Site site,
+            TConfig config);
+
         protected abstract Task<bool> DoDeleteAsync(TPublishRecord record, TConfig config);
     }
 }
