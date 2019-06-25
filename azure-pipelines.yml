@@ -38,6 +38,12 @@ stages:
                       verbosityPack: minimal
                       projects: src/**/*.csproj
                       
+                - task: PublishPipelineArtifact@0
+                  displayName: 'Publish package as artifact'
+                  inputs:
+                      artifactName: 'packages'
+                      targetPath: '$(Build.ArtifactStagingDirectory)'
+                      
     - stage: Deploy
       dependsOn: Build
       condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
@@ -46,6 +52,9 @@ stages:
             pool:
                 vmImage: Ubuntu 16.04
             steps:
+                - download: current
+                  artifact: packages
+                  
                 - task: DotNetCoreCLI@2
                   displayName: 'Push package to internal feed'
                   inputs:
@@ -59,12 +68,8 @@ stages:
                   displayName: 'Push package to nuget'
                   inputs:
                       command: 'push'
-                      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+                      packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
                       nuGetFeedType: 'external'
                       publishFeedCredentials: 'BRC Nuget'
 
-                - task: PublishPipelineArtifact@0
-                  displayName: 'Publish package as artifact'
-                  inputs:
-                      artifactName: 'packages'
-                      targetPath: '$(Build.ArtifactStagingDirectory)'
+
