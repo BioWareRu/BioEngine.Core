@@ -3,7 +3,7 @@ using BioEngine.Core.DB;
 
 namespace BioEngine.Core.Entities.Blocks
 {
-    [TypedEntity("gallery")]
+    [Entity("galleryblock")]
     public class GalleryBlock : ContentBlock<GalleryBlockData>
     {
         public override string TypeTitle { get; set; } = "Галерея";

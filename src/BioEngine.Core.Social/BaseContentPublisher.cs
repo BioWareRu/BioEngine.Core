@@ -14,11 +14,13 @@ namespace BioEngine.Core.Social
     {
         protected ILogger<IContentPublisher<TConfig>> Logger { get; }
         private readonly BioContext _dbContext;
+        private readonly BioEntitiesManager _entitiesManager;
 
-        protected BaseContentPublisher(BioContext dbContext, ILogger<IContentPublisher<TConfig>> logger)
+        protected BaseContentPublisher(BioContext dbContext, ILogger<IContentPublisher<TConfig>> logger, BioEntitiesManager entitiesManager)
         {
             Logger = logger;
             _dbContext = dbContext;
+            _entitiesManager = entitiesManager;
         }
 
         public virtual async Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config)
@@ -34,7 +36,7 @@ namespace BioEngine.Core.Social
                     {
                         Id = Guid.NewGuid(),
                         ContentId = entity.Id,
-                        Type = entity.GetType().FullName,
+                        Type = _entitiesManager.GetKey(entity),
                         SiteIds = new[] {site.Id}
                     };
                 }
@@ -94,7 +96,7 @@ namespace BioEngine.Core.Social
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
-                    r.Type == entity.GetType().FullName && r.ContentId == entity.Id &&
+                    r.Type == _entitiesManager.GetKey(entity) && r.ContentId == entity.Id &&
                     (site == null || r.SiteIds.Contains(site.Id)));
         }
 
@@ -102,7 +104,7 @@ namespace BioEngine.Core.Social
         {
             return await _dbContext.Set<TPublishRecord>()
                 .Where(r =>
-                    r.Type == entity.GetType().FullName && r.ContentId == entity.Id)
+                    r.Type == _entitiesManager.GetKey(entity) && r.ContentId == entity.Id)
                 .ToListAsync();
         }
 

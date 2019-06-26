@@ -2,7 +2,7 @@ using BioEngine.Core.DB;
 
 namespace BioEngine.Core.Entities.Blocks
 {
-    [TypedEntity("youtube")]
+    [Entity("youtubeblock")]
     public class YoutubeBlock : ContentBlock<YoutubeBlockData>
     {
         public override string TypeTitle { get; set; } = "Youtube";

@@ -2,7 +2,7 @@
 
 namespace BioEngine.Core.Entities.Blocks
 {
-    [TypedEntity("quote")]
+    [Entity("quoteblock")]
     public class QuoteBlock : ContentBlock<QuoteBlockData>
     {
         public override string TypeTitle { get; set; } = "Цитата";

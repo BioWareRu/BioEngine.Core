@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
@@ -10,8 +11,8 @@ namespace BioEngine.Core.Search
     public abstract class SectionsSearchProvider<T> : BaseSearchProvider<T>
         where T : Section
     {
-        public SectionsSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<T>> logger) : base(searcher,
-            logger)
+        public SectionsSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<T>> logger, BioEntitiesManager entitiesManager) : base(searcher,
+            logger, entitiesManager)
         {
         }
 

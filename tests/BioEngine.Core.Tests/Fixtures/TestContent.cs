@@ -4,7 +4,7 @@ using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Tests.Fixtures
 {
-    [TypedEntity("testcontent")]
+    [Entity("testcontentitem")]
     public class TestContent : ContentItem<TestContentData>
     {
         public override string PublicRouteName { get; set; }

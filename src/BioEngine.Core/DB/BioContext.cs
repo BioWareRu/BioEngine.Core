@@ -80,11 +80,11 @@ namespace BioEngine.Core.DB
             foreach (var entityMetadata in entitiesManager.GetBlocksMetadata())
             {
                 logger.LogInformation(
-                    "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Type,
+                    "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Key,
                     entityMetadata.ObjectType,
                     entityMetadata.DataType);
                 modelBuilder.RegisterDiscriminator<ContentBlock>(entityMetadata.ObjectType,
-                    entityMetadata.Type);
+                    entityMetadata.Key);
                 dataConversionRegistrationMethod
                     ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
                     .Invoke(modelBuilder, new object[] {modelBuilder});
@@ -92,11 +92,11 @@ namespace BioEngine.Core.DB
 
             foreach (var entityMetadata in entitiesManager.GetSectionsMetadata())
             {
-                logger.LogInformation("Register section type {type} - {entityType} ({dataType})", entityMetadata.Type,
+                logger.LogInformation("Register section type {type} - {entityType} ({dataType})", entityMetadata.Key,
                     entityMetadata.ObjectType,
                     entityMetadata.DataType);
                 modelBuilder.RegisterDiscriminator<Section>(entityMetadata.ObjectType,
-                    entityMetadata.Type);
+                    entityMetadata.Key);
                 if (Database.IsInMemory())
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
@@ -111,11 +111,11 @@ namespace BioEngine.Core.DB
             foreach (var entityMetadata in entitiesManager.GetContentItemsMetadata())
             {
                 logger.LogInformation("Register content item type {type} - {entityType} ({dataType})",
-                    entityMetadata.Type,
+                    entityMetadata.Key,
                     entityMetadata.ObjectType,
                     entityMetadata.DataType);
                 modelBuilder.RegisterDiscriminator<ContentItem>(entityMetadata.ObjectType,
-                    entityMetadata.Type);
+                    entityMetadata.Key);
                 if (Database.IsInMemory())
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
@@ -134,10 +134,10 @@ namespace BioEngine.Core.DB
             var entitiesTypes = entitiesManager.GetTypes();
             foreach (var registration in entitiesTypes)
             {
-                modelBuilder.Entity(registration.Type);
-                if (typeof(ISiteEntity).IsAssignableFrom(registration.Type) && Database.IsInMemory())
+                modelBuilder.Entity(registration.ObjectType);
+                if (typeof(ISiteEntity).IsAssignableFrom(registration.ObjectType) && Database.IsInMemory())
                 {
-                    siteConversionsRegistrationMethod?.MakeGenericMethod(registration.Type)
+                    siteConversionsRegistrationMethod?.MakeGenericMethod(registration.ObjectType)
                         .Invoke(modelBuilder, new object[] {modelBuilder});
                 }
             }

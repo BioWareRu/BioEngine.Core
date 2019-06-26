@@ -1,12 +1,15 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB;
 using Newtonsoft.Json;
 
 namespace BioEngine.Core.Entities
 {
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
-    [Table("ContentVersions")]public class ContentVersion : BaseEntity
+    [Table("ContentVersions")]
+    [Entity("contentversion")]
+    public class ContentVersion : BaseEntity
     {
         [NotMapped] public override string Title { get; set; }
         public Guid ContentId { get; set; }

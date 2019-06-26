@@ -2,7 +2,7 @@ using BioEngine.Core.DB;
 
 namespace BioEngine.Core.Entities.Blocks
 {
-    [TypedEntity("cut")]
+    [Entity("cutblock")]
     public class CutBlock : ContentBlock<CutBlockData>
     {
         public override string TypeTitle { get; set; } = "Кат";

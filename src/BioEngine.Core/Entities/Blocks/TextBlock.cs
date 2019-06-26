@@ -2,7 +2,7 @@
 
 namespace BioEngine.Core.Entities.Blocks
 {
-    [TypedEntity("text")]
+    [Entity("textblock")]
     public class TextBlock : ContentBlock<TextBlockData>
     {
         public override string TypeTitle { get; set; } = "Пост";

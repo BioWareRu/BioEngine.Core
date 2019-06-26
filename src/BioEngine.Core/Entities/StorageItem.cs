@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using BioEngine.Core.DB;
 
 namespace BioEngine.Core.Entities
 {
     [Table("StorageItems")]
+    [Entity("storageitem")]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class StorageItem : BaseEntity
     {

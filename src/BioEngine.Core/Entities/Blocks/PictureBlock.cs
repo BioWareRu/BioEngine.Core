@@ -2,7 +2,7 @@
 
 namespace BioEngine.Core.Entities.Blocks
 {
-    [TypedEntity("picture")]
+    [Entity("pictureblock")]
     public class PictureBlock : ContentBlock<PictureBlockData>
     {
         public override string TypeTitle { get; set; } = "Галерея";

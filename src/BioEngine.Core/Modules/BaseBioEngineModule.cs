@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
@@ -15,10 +15,6 @@ namespace BioEngine.Core.Modules
     {
         public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
-        {
-        }
-
-        public virtual void ConfigureHostBuilder(IHostBuilder hostBuilder)
         {
         }
 
@@ -42,15 +38,11 @@ namespace BioEngine.Core.Modules
         protected void RegisterRepositories(Assembly assembly, IServiceCollection serviceCollection,
             BioEntitiesManager entitiesManager)
         {
-            var types = new HashSet<TypeInfo>();
-            foreach (var definedType in assembly.DefinedTypes)
+            var method = entitiesManager.GetType().GetMethod(nameof(BioEntitiesManager.RegisterEntity),
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            foreach (var definedType in assembly.DefinedTypes.Where(type => !type.IsAbstract && typeof(IEntity).IsAssignableFrom(type)))
             {
-                types.Add(definedType);
-            }
-
-            foreach (var type in types)
-            {
-                entitiesManager.Register(type);
+                method.MakeGenericMethod(definedType).Invoke(entitiesManager, null);
             }
 
             serviceCollection.Scan(s =>

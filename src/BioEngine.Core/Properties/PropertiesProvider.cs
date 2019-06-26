@@ -16,15 +16,17 @@ namespace BioEngine.Core.Properties
     public class PropertiesProvider
     {
         private readonly BioContext _dbContext;
+        private readonly BioEntitiesManager _entitiesManager;
         private bool _batchMode;
         private bool _checkIfExists = true;
 
         private static readonly ConcurrentDictionary<string, PropertiesSchema> Schema =
             new ConcurrentDictionary<string, PropertiesSchema>();
 
-        public PropertiesProvider(BioContext dbContext)
+        public PropertiesProvider(BioContext dbContext, BioEntitiesManager entitiesManager)
         {
             _dbContext = dbContext;
+            _entitiesManager = entitiesManager;
         }
 
         public void BeginBatch()
@@ -184,7 +186,7 @@ namespace BioEngine.Core.Properties
             var record = await LoadFromDatabaseAsync(schema, entity, siteId) ?? new PropertiesRecord
             {
                 Key = schema.Key,
-                EntityType = entity.GetType().FullName,
+                EntityType = _entitiesManager.GetKey(entity),
                 EntityId = entity.Id,
                 SiteId = siteId
             };
@@ -223,7 +225,7 @@ namespace BioEngine.Core.Properties
                 ? null
                 : await _dbContext.Properties.FirstOrDefaultAsync(s =>
                     s.Key == schema.Key
-                    && s.EntityType == entity.GetType().FullName && s.EntityId == entity.Id &&
+                    && s.EntityType == _entitiesManager.GetKey(entity) && s.EntityId == entity.Id &&
                     (siteId == null || s.SiteId == siteId.Value));
         }
 
@@ -233,7 +235,7 @@ namespace BioEngine.Core.Properties
             if (entitiesArray.Any())
             {
                 var sites = await _dbContext.Sites.ToListAsync();
-                var groups = entitiesArray.GroupBy(e => e.GetType().FullName);
+                var groups = entitiesArray.GroupBy(e => _entitiesManager.GetKey(e));
                 foreach (var group in groups)
                 {
                     var ids = group.Where(e => e.Id != default).Select(e => e.Id);

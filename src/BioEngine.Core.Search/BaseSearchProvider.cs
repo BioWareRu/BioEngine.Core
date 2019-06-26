@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -9,14 +10,16 @@ namespace BioEngine.Core.Search
     {
         private readonly ISearcher _searcher;
         protected readonly ILogger<BaseSearchProvider<T>> Logger;
+        private readonly BioEntitiesManager _entitiesManager;
 
-        protected BaseSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<T>> logger)
+        protected BaseSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<T>> logger, BioEntitiesManager entitiesManager)
         {
             _searcher = searcher;
             Logger = logger;
+            _entitiesManager = entitiesManager;
         }
 
-        private string IndexName => typeof(T).FullName.ToLowerInvariant();
+        private string IndexName => _entitiesManager.GetKey<T>();
 
         public bool CanProcess(Type type)
         {

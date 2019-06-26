@@ -10,91 +10,72 @@ namespace BioEngine.Core.DB
 {
     public class BioEntitiesManager
     {
-        private readonly Dictionary<string, BioEntityRegistration> _registrations =
-            new Dictionary<string, BioEntityRegistration>();
+        private readonly Dictionary<string, EntityMetadata> _registrations =
+            new Dictionary<string, EntityMetadata>();
 
         private readonly List<Action<ModelBuilder>> _configureActions = new List<Action<ModelBuilder>>();
-        private readonly List<EntityMetadata> _blocks = new List<EntityMetadata>();
-        private readonly List<EntityMetadata> _sections = new List<EntityMetadata>();
-        private readonly List<EntityMetadata> _contentItems = new List<EntityMetadata>();
 
         public void RegisterEntity<TEntity>() where TEntity : IEntity
         {
             RegisterEntity(typeof(TEntity));
         }
 
-        public void RegisterEntity(Type entityType)
+        private void RegisterEntity(Type entityType)
         {
-            if (!_registrations.ContainsKey(entityType.FullName))
-            {
-                _registrations.Add(entityType.FullName, new BioEntityRegistration(entityType));
-            }
-        }
-
-        public void Register(Type type)
-        {
-            if (type.IsAbstract || type.BaseType == null)
+            if (entityType.IsAbstract || entityType.BaseType == null)
             {
                 return;
             }
 
-            if (typeof(Section).IsAssignableFrom(type))
-            {
-                var metaData = GetTypeMetadata(type);
-                if (_sections.Any(m => m.Type == metaData.Type))
-                {
-                    throw new Exception($"Section with type {metaData.Type} already registered");
-                }
+            var metaData = GetTypeMetadata(entityType);
 
-                _sections.Add(metaData);
+            if (_registrations.ContainsKey(metaData.Key))
+            {
+                throw new Exception($"Entity with key {metaData.Key} already registerd");
             }
 
-            else if (typeof(ContentItem).IsAssignableFrom(type))
-            {
-                var metaData = GetTypeMetadata(type);
-                if (_contentItems.Any(m => m.Type == metaData.Type))
-                {
-                    throw new Exception($"Content item with type {metaData.Type} already registered");
-                }
 
-                _contentItems.Add(metaData);
+            if (typeof(Section).IsAssignableFrom(entityType))
+            {
+                metaData.MarkAsSection();
             }
 
-            else if (typeof(ContentBlock).IsAssignableFrom(type))
+            else if (typeof(ContentItem).IsAssignableFrom(entityType))
             {
-                var metaData = GetTypeMetadata(type);
-                if (_blocks.Any(m => m.Type == metaData.Type))
-                {
-                    throw new Exception($"Block with type {metaData.Type} already registered");
-                }
+                metaData.MarkAsContentItem();
+            }
 
-                _blocks.Add(metaData);
-            }
-            else if (typeof(IEntity).IsAssignableFrom(type))
+            else if (typeof(ContentBlock).IsAssignableFrom(entityType))
             {
-                RegisterEntity(type);
+                metaData.MarkAsContentBlock();
             }
+
+            _registrations.Add(metaData.Key, metaData);
         }
 
         private static EntityMetadata GetTypeMetadata(Type type)
         {
-            var dataType = type.BaseType?.GenericTypeArguments[0];
-
-            if (dataType == null)
+            Type? dataType = null;
+            if (typeof(ITypedEntity).IsAssignableFrom(type))
             {
-                throw new ArgumentException($"Entity type without data type: {type}");
+                dataType = type.BaseType?.GenericTypeArguments[0];
+
+                if (dataType == null)
+                {
+                    throw new ArgumentException($"Entity type without data type: {type}");
+                }
             }
 
-            var typedAttribute = type.GetCustomAttribute<TypedEntityAttribute>();
+            var typedAttribute = type.GetCustomAttribute<EntityAttribute>();
             if (typedAttribute == null)
             {
                 throw new ArgumentException($"Entity type without type attribute: {type}");
             }
 
-            return new EntityMetadata(type, typedAttribute.Type, dataType);
+            return new EntityMetadata(type, typedAttribute.Key, dataType);
         }
 
-        public IEnumerable<BioEntityRegistration> GetTypes()
+        public IEnumerable<EntityMetadata> GetTypes()
         {
             return _registrations.Values;
         }
@@ -111,26 +92,39 @@ namespace BioEngine.Core.DB
 
         public EntityMetadata[] GetBlocksMetadata()
         {
-            return _blocks.ToArray();
+            return _registrations.Values.Where(m => m.IsContentBlock).ToArray();
         }
 
         public EntityMetadata[] GetSectionsMetadata()
         {
-            return _sections.ToArray();
+            return _registrations.Values.Where(m => m.IsSection).ToArray();
         }
 
         public EntityMetadata[] GetContentItemsMetadata()
         {
-            return _contentItems.ToArray();
+            return _registrations.Values.Where(m => m.IsContentItem).ToArray();
         }
-    }
 
-    public class BioEntityRegistration
-    {
-        public Type Type { get; }
-        public BioEntityRegistration(Type type)
+        public string GetKey<T>() where T : IEntity
         {
-            Type = type;
+            return GetKey(typeof(T));
+        }
+
+        private string GetKey(Type entityType)
+        {
+            var key = _registrations.Values.Where(m => m.ObjectType == entityType).Select(m => m.Key)
+                .FirstOrDefault();
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new Exception($"Can't find key for entity {entityType}");
+            }
+
+            return key;
+        }
+
+        public string GetKey(IEntity entity)
+        {
+            return GetKey(entity.GetType());
         }
     }
 }
