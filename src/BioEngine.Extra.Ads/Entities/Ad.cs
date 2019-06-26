@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 
 namespace BioEngine.Extra.Ads.Entities
 {
     [Table("Ads")]
+    [Entity("ad")]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class Ad : BaseSiteEntity, IContentEntity
     {

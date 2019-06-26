@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using BioEngine.Core.API.Models;
+using BioEngine.Core.Api.Models;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Routing;
-using ContentBlock = BioEngine.Core.API.Entities.ContentBlock;
+using ContentBlock = BioEngine.Core.Api.Entities.ContentBlock;
 
 namespace BioEngine.Extra.Ads.Api.Entities
 {
