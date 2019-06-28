@@ -1,5 +1,4 @@
 using BioEngine.Core.Api;
-using BioEngine.Core.Posts.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,7 +11,7 @@ namespace BioEngine.Core.Posts.Api
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            services.RegisterApiEntities<Post>();
+            services.RegisterApiEntities<PostsApiModule>();
         }
     }
 }
