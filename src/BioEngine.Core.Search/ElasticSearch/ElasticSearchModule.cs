@@ -22,13 +22,15 @@ namespace BioEngine.Core.Search.ElasticSearch
 
     public class ElasticSearchModuleConfig : SearchModuleConfig
     {
-        public ElasticSearchModuleConfig(string url, string login = "", string password = "")
+        public ElasticSearchModuleConfig(string prefix, string url, string login = "", string password = "")
         {
+            Prefix = prefix;
             Url = url;
             Login = login;
             Password = password;
         }
 
+        public string Prefix { get; }
         public string Url { get; }
         public string Login { get; }
         public string Password { get; }

@@ -59,6 +59,7 @@ namespace BioEngine.Core.Search.ElasticSearch
             Site site,
             int limit = 0)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var names = GetSearchText(term);
 
             return descriptor.Query(q =>
@@ -82,18 +83,21 @@ namespace BioEngine.Core.Search.ElasticSearch
 
         public async Task<bool> AddOrUpdateAsync(string indexName, IEnumerable<SearchModel> searchModels)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var result = await GetClient().IndexManyAsync(searchModels, indexName.ToLowerInvariant());
             return !result.Errors;
         }
 
         public async Task<bool> DeleteAsync(string indexName, IEnumerable<SearchModel> searchModels)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var result = await GetClient().DeleteManyAsync(searchModels, indexName.ToLowerInvariant());
             return !result.Errors;
         }
 
         public async Task<bool> DeleteAsync(string indexName)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var result = await GetClient()
                 .DeleteIndexAsync(Indices.All, descriptor => descriptor.Index(indexName.ToLowerInvariant()));
             return result.Acknowledged;
@@ -101,6 +105,7 @@ namespace BioEngine.Core.Search.ElasticSearch
 
         public async Task<long> CountAsync(string indexName, string term, Site site)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var names = GetSearchText(term);
             var resultsCount = await GetClient().CountAsync<SearchModel>(x =>
                 x.Query(q =>
@@ -112,6 +117,7 @@ namespace BioEngine.Core.Search.ElasticSearch
 
         public async Task<SearchModel[]> SearchAsync(string indexName, string term, int limit, Site site)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var results = await GetClient()
                 .SearchAsync<SearchModel>(x => GetSearchRequest(x, indexName, term, site, limit));
 
@@ -136,6 +142,7 @@ namespace BioEngine.Core.Search.ElasticSearch
 
         public async Task InitAsync(string indexName)
         {
+            indexName = $"{_options.Prefix}_{indexName}";
             var indexExists = await GetClient().IndexExistsAsync(indexName);
             if (indexExists.Exists)
             {
