@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
@@ -12,15 +10,13 @@ namespace BioEngine.Core.Api.Models
         IContentRequestRestModel<TEntity>
         where TEntity : Section, ISiteEntity, IEntity
     {
-        
-        public List<Entities.ContentBlock> Blocks { get; set; }
-        
         public async Task<TEntity> GetEntityAsync(TEntity entity)
         {
             return await FillEntityAsync(entity);
         }
 
-        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator,
+            sitesRepository)
         {
         }
     }
@@ -38,7 +34,8 @@ namespace BioEngine.Core.Api.Models
             return entity;
         }
 
-        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator,
+            sitesRepository)
         {
         }
     }
@@ -59,14 +56,14 @@ namespace BioEngine.Core.Api.Models
         {
             await base.ParseEntityAsync(entity);
             Type = entity.Type;
-            Blocks = entity.Blocks?.Select(Entities.ContentBlock.Create).ToList();
             if (entity is ITypedEntity typedEntity)
             {
                 TypeTitle = typedEntity.TypeTitle;
             }
         }
 
-        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(
+            linkGenerator, sitesRepository)
         {
         }
     }
@@ -89,13 +86,13 @@ namespace BioEngine.Core.Api.Models
         {
             await base.ParseEntityAsync(entity);
             Type = entity.Type;
-            Blocks = entity.Blocks?.Select(Entities.ContentBlock.Create).ToList();
             TypeTitle = entity.TypeTitle;
 
             Data = entity.Data;
         }
 
-        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(
+            linkGenerator, sitesRepository)
         {
         }
     }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.Api.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Routing;
 using Microsoft.AspNetCore.Routing;
@@ -15,6 +17,7 @@ namespace BioEngine.Core.Api.Models
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }
         public List<PublicUrl> PublicUrls = new List<PublicUrl>();
+        public List<ContentBlock> Blocks { get; set; }
         public string Url { get; set; }
 
         public ContentEntityRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository)
@@ -34,6 +37,10 @@ namespace BioEngine.Core.Api.Models
             {
                 PublicUrls.Add(new PublicUrl {Url = _linkGenerator.GeneratePublicUrl(entity, site), Site = site});
             }
+
+            Blocks = entity.Blocks != null
+                ? entity.Blocks.Select(ContentBlock.Create).ToList()
+                : new List<ContentBlock>();
         }
 
         protected override async Task<TEntity> FillEntityAsync(TEntity entity)

@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
-using BioEngine.Core.Api.Entities;
 using BioEngine.Core.Api.Models;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Routing;
@@ -12,8 +9,6 @@ namespace BioEngine.Core.Posts.Api.Entities
     public class PostRequestItem : SectionEntityRestModel<Core.Posts.Entities.Post>,
         IContentRequestRestModel<Core.Posts.Entities.Post>
     {
-        public List<ContentBlock> Blocks { get; set; }
-
         public async Task<Core.Posts.Entities.Post> GetEntityAsync(Core.Posts.Entities.Post entity)
         {
             return await FillEntityAsync(entity);
@@ -25,7 +20,8 @@ namespace BioEngine.Core.Posts.Api.Entities
             return entity;
         }
 
-        public PostRequestItem(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        public PostRequestItem(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator,
+            sitesRepository)
         {
         }
     }
@@ -38,9 +34,6 @@ namespace BioEngine.Core.Posts.Api.Entities
         protected override async Task ParseEntityAsync(Core.Posts.Entities.Post entity)
         {
             await base.ParseEntityAsync(entity);
-            Blocks = entity.Blocks != null
-                ? entity.Blocks.OrderBy(b => b.Position).Select(ContentBlock.Create).ToList()
-                : new List<ContentBlock>();
             AuthorId = entity.AuthorId;
             Author = entity.Author;
         }
