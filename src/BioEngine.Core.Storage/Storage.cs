@@ -38,6 +38,10 @@ namespace BioEngine.Core.Storage
         public async Task<IEnumerable<StorageNode>> ListItemsAsync(string path, string root = "/")
         {
             var nodes = await GetNodesAsync(root);
+            if (!nodes.Any())
+            {
+                return new List<StorageNode>();
+            }
             var items = await GetNodesByPathAsync(nodes, $"{root}/{path}".Trim('/').Replace("//", "/"));
             return items.Select(i => new StorageNode(i, root)).OrderByDescending(i => i.IsDirectory)
                 .ThenBy(i => i.Name);
