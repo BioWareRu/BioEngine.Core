@@ -10,6 +10,11 @@ namespace BioEngine.Core.Routing
     {
         public static Uri GeneratePublicUrl(this LinkGenerator linkGenerator, IRoutable routable, Site? site = null)
         {
+            if (string.IsNullOrEmpty(routable.PublicRouteName))
+            {
+                return null;
+            }
+
             return linkGenerator.GenerateUrl(routable.PublicRouteName, new {url = routable.Url}, site);
         }
 
