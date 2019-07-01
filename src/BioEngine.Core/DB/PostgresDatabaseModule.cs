@@ -10,7 +10,8 @@ using Npgsql;
 
 namespace BioEngine.Core.DB
 {
-    public class PostgresDatabaseModule : DatabaseModule<PostgresDatabaseModuleConfig>
+    public class PostgresDatabaseModule<TDbContext> : DatabaseModule<PostgresDatabaseModuleConfig>
+        where TDbContext : DbContext
     {
         protected override void CheckConfig()
         {
@@ -44,7 +45,7 @@ namespace BioEngine.Core.DB
 
             if (environment.IsProduction())
             {
-                var dbContext = serviceProvider.GetRequiredService<BioContext>();
+                var dbContext = serviceProvider.GetRequiredService<TDbContext>();
                 if (dbContext.Database.GetPendingMigrations().Any())
                 {
                     await dbContext.Database.MigrateAsync();
@@ -69,7 +70,7 @@ namespace BioEngine.Core.DB
 
             Config.DbConfigure?.Invoke(connBuilder, configuration);
             services.AddEntityFrameworkNpgsql();
-            services.AddDbContextPool<BioContext>((p, options) =>
+            services.AddDbContextPool<TDbContext>((p, options) =>
             {
                 options.UseNpgsql(connBuilder.ConnectionString,
                     builder => builder.MigrationsAssembly(Config.MigrationsAssembly != null

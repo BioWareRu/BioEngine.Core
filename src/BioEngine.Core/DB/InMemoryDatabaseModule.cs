@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.DB
 {
-    public class InMemoryDatabaseModule : DatabaseModule<InMemoryDatabaseModuleConfig>
+    public class InMemoryDatabaseModule<TDbContext> : DatabaseModule<InMemoryDatabaseModuleConfig> where TDbContext: DbContext
     {
         protected override void CheckConfig()
         {
@@ -22,7 +22,7 @@ namespace BioEngine.Core.DB
             IHostEnvironment environment)
         {
             services.AddEntityFrameworkInMemoryDatabase();
-            services.AddDbContext<BioContext>((p, options) =>
+            services.AddDbContext<TDbContext>((p, options) =>
             {
                 options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                     .UseInMemoryDatabase(Config.InMemoryDatabaseName).UseInternalServiceProvider(p);
