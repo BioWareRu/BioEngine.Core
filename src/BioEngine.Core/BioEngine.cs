@@ -40,7 +40,7 @@ namespace BioEngine.Core
             });
             return this;
         }
-
+        
         public BioEngine ConfigureServices(Action<IServiceCollection> conifgure)
         {
             _hostBuilder.ConfigureServices(conifgure);

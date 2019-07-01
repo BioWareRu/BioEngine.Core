@@ -5,7 +5,7 @@ namespace BioEngine.Core.Search
     public class SearchModel
     {
         public Guid Id { get; set; }
-        public int? AuthorId { get; set; }
+        public string AuthorId { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
         public Guid[] SiteIds { get; set; } = new Guid[0];

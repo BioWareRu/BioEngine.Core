@@ -17,7 +17,7 @@ namespace BioEngine.Core.Entities
         public Guid[] SectionIds { get; set; } = new Guid[0];
         public Guid[] TagIds { get; set; } = new Guid[0];
 
-        [Required] public virtual int AuthorId { get; set; }
+        [Required] public virtual string AuthorId { get; set; }
         [NotMapped] public IUser Author { get; set; }
         [NotMapped] public List<Section> Sections { get; set; }
         [NotMapped] public List<Tag> Tags { get; set; }

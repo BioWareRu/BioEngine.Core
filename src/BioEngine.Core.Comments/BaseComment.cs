@@ -11,7 +11,7 @@ namespace BioEngine.Core.Comments
     public abstract class BaseComment : BaseEntity, IRoutable
     {
         [Required] public Guid ContentId { get; set; }
-        [Required] public int AuthorId { get; set; }
+        [Required] public string AuthorId { get; set; }
         [Required] public Guid[] SiteIds { get; set; } = new Guid[0];
 
         [NotMapped] public IUser? Author { get; set; }

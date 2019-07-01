@@ -33,7 +33,7 @@ namespace BioEngine.Core.Posts.Api
             Post domainModel = null)
         {
             domainModel = await base.MapDomainModelAsync(restModel, domainModel);
-            if (domainModel.AuthorId == 0)
+            if (string.IsNullOrEmpty(domainModel.AuthorId))
             {
                 domainModel.AuthorId = CurrentUser.Id;
             }

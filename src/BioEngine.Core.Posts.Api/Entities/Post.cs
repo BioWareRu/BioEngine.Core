@@ -29,7 +29,7 @@ namespace BioEngine.Core.Posts.Api.Entities
     public class Post : PostRequestItem, IContentResponseRestModel<Core.Posts.Entities.Post>
     {
         public IUser Author { get; set; }
-        public int AuthorId { get; set; }
+        public string AuthorId { get; set; }
 
         protected override async Task ParseEntityAsync(Core.Posts.Entities.Post entity)
         {

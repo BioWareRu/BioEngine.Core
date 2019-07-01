@@ -5,6 +5,6 @@ namespace BioEngine.Core.Abstractions
 {
     public interface IUserDataProvider
     {
-        Task<List<IUser>> GetDataAsync(int[] userIds);
+        Task<List<IUser>> GetDataAsync(string[] userIds);
     }
 }

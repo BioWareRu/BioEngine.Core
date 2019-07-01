@@ -15,7 +15,7 @@ namespace BioEngine.Core.Entities
         public Guid ContentId { get; set; }
         [Column(TypeName = "jsonb")] public string Data { get; set; }
 
-        public int ChangeAuthorId { get; set; }
+        public string ChangeAuthorId { get; set; }
 
         public void SetContent(ContentItem contentItem)
         {
