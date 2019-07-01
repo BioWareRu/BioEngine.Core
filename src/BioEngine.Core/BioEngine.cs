@@ -9,7 +9,6 @@ using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core
@@ -20,24 +19,26 @@ namespace BioEngine.Core
         private readonly List<IBioEngineModule> _modules = new List<IBioEngineModule>();
         private IHost _appHost;
 
-        private bool _coreConfigured;
         private readonly IHostBuilder _hostBuilder;
+
+        private bool _registerEntities;
 
         public BioEngine(string[] args)
         {
             _hostBuilder = Host.CreateDefaultBuilder(args);
         }
 
-        private void ConfigureCore(IServiceCollection services)
+        public BioEngine AddEntities()
         {
-            if (!_coreConfigured)
+            _registerEntities = true;
+            _hostBuilder.ConfigureServices(services =>
             {
                 services.AddScoped<PropertiesProvider>();
                 services.AddScoped<BioRepositoryHooksManager>();
                 services.AddSingleton(_entitiesManager);
                 services.AddScoped(typeof(BioRepositoryContext<>));
-                _coreConfigured = true;
-            }
+            });
+            return this;
         }
 
         public BioEngine ConfigureServices(Action<IServiceCollection> conifgure)
@@ -135,7 +136,6 @@ namespace BioEngine.Core
         private void ConfigureModule(IBioEngineModule module, IServiceCollection collection,
             IHostEnvironment environment, IConfiguration configuration)
         {
-            ConfigureCore(collection);
             module.ConfigureServices(collection, configuration, environment);
             var validators = module.RegisterValidation();
             if (validators != null && validators.Any())
@@ -146,8 +146,10 @@ namespace BioEngine.Core
                 }
             }
 
-            module.ConfigureEntities(collection, _entitiesManager);
-            collection.TryAddSingleton(_entitiesManager);
+            if (_registerEntities)
+            {
+                module.ConfigureEntities(collection, _entitiesManager);
+            }
         }
 
         private void ConfigureModule(IBioEngineModule module)
