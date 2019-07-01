@@ -45,6 +45,7 @@ namespace BioEngine.Core.DB
             {
                 modelBuilder.RegisterSiteEntityConversions<Section>();
                 modelBuilder.RegisterSiteEntityConversions<ContentItem>();
+                modelBuilder.RegisterSectionEntityConversions<ContentItem>();
                 modelBuilder.RegisterSiteEntityConversions<Menu>();
             }
             else
