@@ -5,17 +5,17 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.7"/>
-    <PackageReference Include="cloudscribe.Web.SiteMap" Version="2.1.4"/>
-    <PackageReference Include="WilderMinds.RssSyndication" Version="1.5.0"/>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.8" />
+    <PackageReference Include="cloudscribe.Web.SiteMap" Version="2.1.4" />
+    <PackageReference Include="WilderMinds.RssSyndication" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj"/>
-    <ProjectReference Include="..\BioEngine.Core.Web\BioEngine.Core.Web.csproj"/>
-    <ProjectReference Include="..\BioEngine.Core.Seo\BioEngine.Core.Seo.csproj"/>
-    <ProjectReference Include="..\BioEngine.Core.Search\BioEngine.Core.Search.csproj"/>
+    <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj" />
+    <ProjectReference Include="..\BioEngine.Core.Web\BioEngine.Core.Web.csproj" />
+    <ProjectReference Include="..\BioEngine.Core.Seo\BioEngine.Core.Seo.csproj" />
+    <ProjectReference Include="..\BioEngine.Core.Search\BioEngine.Core.Search.csproj" />
   </ItemGroup>
 </Project>

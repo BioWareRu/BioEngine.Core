@@ -60,11 +60,21 @@ namespace BioEngine.Core
             await GetAppHost().RunAsync();
         }
 
-        public async Task ExecuteAsync(Func<IServiceProvider, Task> command)
+        public BioEngine Run<TStartup>(int port = 0) where TStartup : class
+        {
+            GetHostBuilder().ConfigureWebHostDefaults(builder =>
+                builder.UseStartup<TStartup>().UseUrls($"http://*:{port.ToString()}"));
+
+            GetAppHost().Start();
+            return this;
+        }
+
+        public async Task ExecuteAsync<TStartup>(Func<IServiceProvider, Task> command) where TStartup : class
         {
             await InitAsync();
 
-            var host = GetAppHost();
+            var host = UseStartup<TStartup>().GetAppHost();
+            await host.StartAsync();
 
             var serviceProvider = host.Services;
 
@@ -72,16 +82,22 @@ namespace BioEngine.Core
             {
                 await command(scope.ServiceProvider);
             }
+
+            await host.StopAsync();
         }
 
-        public async Task RunAsync<TStartup>() where TStartup : class
+        private BioEngine UseStartup<TStartup>() where TStartup : class
         {
             _hostBuilder.ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<TStartup>();
             });
+            return this;
+        }
 
-            await RunAsync();
+        public async Task RunAsync<TStartup>() where TStartup : class
+        {
+            await UseStartup<TStartup>().RunAsync();
         }
 
         public IServiceProvider GetServices()
