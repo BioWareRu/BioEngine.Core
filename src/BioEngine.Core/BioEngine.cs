@@ -71,9 +71,10 @@ namespace BioEngine.Core
 
         public async Task ExecuteAsync<TStartup>(Func<IServiceProvider, Task> command) where TStartup : class
         {
-            await InitAsync();
-
             var host = UseStartup<TStartup>().GetAppHost();
+            
+            await InitAsync();
+            
             await host.StartAsync();
 
             var serviceProvider = host.Services;
