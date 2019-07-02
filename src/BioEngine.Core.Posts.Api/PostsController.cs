@@ -29,18 +29,6 @@ namespace BioEngine.Core.Posts.Api
             _userDataProvider = userDataProvider;
         }
 
-        protected override async Task<Post> MapDomainModelAsync(Entities.PostRequestItem restModel,
-            Post domainModel = null)
-        {
-            domainModel = await base.MapDomainModelAsync(restModel, domainModel);
-            if (string.IsNullOrEmpty(domainModel.AuthorId))
-            {
-                domainModel.AuthorId = CurrentUser.Id;
-            }
-
-            return domainModel;
-        }
-
         public override async Task<ActionResult<StorageItem>> UploadAsync(string name)
         {
             var file = await GetBodyAsFileAsync();

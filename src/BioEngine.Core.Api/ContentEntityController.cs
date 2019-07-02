@@ -50,6 +50,11 @@ namespace BioEngine.Core.Api
         {
             domainModel = await base.MapDomainModelAsync(restModel, domainModel);
 
+            if (domainModel is ContentItem contentItemModel && string.IsNullOrEmpty(contentItemModel.AuthorId))
+            {
+                contentItemModel.AuthorId = CurrentUser.Id;
+            }
+            
             domainModel.Blocks = new List<ContentBlock>();
             var dbBlocks = await _blocksRepository.GetByIdsAsync(restModel.Blocks.Select(b => b.Id).ToArray());
             _blocksRepository.BeginBatch();
