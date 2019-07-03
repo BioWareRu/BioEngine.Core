@@ -183,10 +183,19 @@ namespace BioEngine.Core.Site.Model
 
             if (Entity is IContentEntity contEntity)
             {
-                if (contEntity.Blocks.FirstOrDefault(b => b is GalleryBlock) is GalleryBlock galleryBlock
-                    && galleryBlock.Data.Pictures.Length > 0)
+                foreach (var block in contEntity.Blocks.OrderBy(b => b.Position))
                 {
-                    meta.ImageUrl = galleryBlock.Data.Pictures[0].PublicUri;
+                    if (block is PictureBlock pictureBlock)
+                    {
+                        meta.ImageUrl = pictureBlock.Data.Picture.PublicUri;
+                        break;
+                    }
+
+                    if (block is GalleryBlock galleryBlock && galleryBlock.Data.Pictures.Length > 0)
+                    {
+                        meta.ImageUrl = galleryBlock.Data.Pictures[0].PublicUri;
+                        break;
+                    }
                 }
             }
 
