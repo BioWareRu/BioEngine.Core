@@ -31,12 +31,15 @@ namespace BioEngine.Core.Search.ElasticSearch
                 var settings = new ConnectionSettings(new Uri(_options.Url)).DisableDirectStreaming()
                     .OnRequestCompleted(details =>
                     {
-                        _logger.LogDebug("### ES REQEUST ###");
-                        if (details.RequestBodyInBytes != null)
-                            _logger.LogDebug(Encoding.UTF8.GetString(details.RequestBodyInBytes));
-                        _logger.LogDebug("### ES RESPONSE ###");
-                        if (details.ResponseBodyInBytes != null)
-                            _logger.LogDebug(Encoding.UTF8.GetString(details.ResponseBodyInBytes));
+                        if (_options.EnableClientLogging)
+                        {
+                            _logger.LogDebug("### ES REQEUST ###");
+                            if (details.RequestBodyInBytes != null)
+                                _logger.LogDebug(Encoding.UTF8.GetString(details.RequestBodyInBytes));
+                            _logger.LogDebug("### ES RESPONSE ###");
+                            if (details.ResponseBodyInBytes != null)
+                                _logger.LogDebug(Encoding.UTF8.GetString(details.ResponseBodyInBytes));
+                        }
                     })
                     .PrettyJson();
                 if (!string.IsNullOrEmpty(_options.Login))
@@ -85,7 +88,7 @@ namespace BioEngine.Core.Search.ElasticSearch
         {
             indexName = $"{_options.Prefix}_{indexName}";
             var result = await GetClient().IndexManyAsync(searchModels, indexName.ToLowerInvariant());
-            return !result.Errors;
+            return result.ApiCall.Success;
         }
 
         public async Task<bool> DeleteAsync(string indexName, IEnumerable<SearchModel> searchModels)
@@ -99,7 +102,7 @@ namespace BioEngine.Core.Search.ElasticSearch
         {
             indexName = $"{_options.Prefix}_{indexName}";
             var result = await GetClient()
-                .Indices.DeleteAsync(Indices.All, descriptor => descriptor.Index(indexName.ToLowerInvariant()));
+                .DeleteIndexAsync(Indices.All, descriptor => descriptor.Index(indexName.ToLowerInvariant()));
             return result.Acknowledged;
         }
 
@@ -143,23 +146,24 @@ namespace BioEngine.Core.Search.ElasticSearch
         public async Task InitAsync(string indexName)
         {
             indexName = $"{_options.Prefix}_{indexName}";
-            var indexExists = await GetClient().Indices.ExistsAsync(indexName);
+            var indexExists = await GetClient().IndexExistsAsync(indexName);
             if (indexExists.Exists)
             {
-                await GetClient().Indices.CloseAsync(indexName);
-                var result = await GetClient().Indices.UpdateSettingsAsync(indexName, c => c.IndexSettings(s =>
+                await GetClient().CloseIndexAsync(indexName);
+                var result = await GetClient().UpdateIndexSettingsAsync(indexName, c => c.IndexSettings(s =>
                     s.Analysis(BuildIndexDescriptor)));
                 if (!result.IsValid)
                 {
                     throw result.OriginalException;
                 }
 
-                await GetClient().Indices.OpenAsync(indexName);
+                await GetClient().OpenIndexAsync(indexName);
             }
             else
             {
                 var result = await GetClient()
-                    .Indices.CreateAsync(indexName, c => c.Settings(s => s.Analysis(BuildIndexDescriptor)));
+                    .CreateIndexAsync(indexName,
+                        c => c.Settings(s => s.Analysis(BuildIndexDescriptor)));
                 if (!result.IsValid)
                 {
                     throw result.OriginalException;
