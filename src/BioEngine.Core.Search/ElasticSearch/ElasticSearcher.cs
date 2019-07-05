@@ -62,7 +62,6 @@ namespace BioEngine.Core.Search.ElasticSearch
             Site site,
             int limit = 0)
         {
-            indexName = $"{_options.Prefix}_{indexName}";
             var names = GetSearchText(term);
 
             return descriptor.Query(q =>
