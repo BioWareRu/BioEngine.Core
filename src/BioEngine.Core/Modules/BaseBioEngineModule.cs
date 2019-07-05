@@ -46,7 +46,7 @@ namespace BioEngine.Core.Modules
             }
 
             serviceCollection.Scan(s =>
-                s.FromAssemblies(GetType().Assembly).AddClasses(classes => classes.AssignableTo<IBioRepository>())
+                s.FromAssemblies(assembly).AddClasses(classes => classes.AssignableTo<IBioRepository>())
                     .AsSelfWithInterfaces());
         }
 
