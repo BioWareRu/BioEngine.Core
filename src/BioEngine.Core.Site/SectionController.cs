@@ -24,7 +24,7 @@ namespace BioEngine.Core.Site
             var section = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
             if (section == null)
             {
-                return NotFound();
+                return PageNotFound();
             }
 
             var contentRepository = HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>();

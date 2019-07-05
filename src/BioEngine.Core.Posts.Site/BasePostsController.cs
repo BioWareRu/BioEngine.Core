@@ -36,7 +36,7 @@ namespace BioEngine.Core.Posts.Site
             var post = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
             if (post == null)
             {
-                return NotFound();
+                return PageNotFound();
             }
 
             var commentsData = await _commentsProvider.GetCommentsDataAsync(new ContentItem[] {post});
@@ -67,7 +67,7 @@ namespace BioEngine.Core.Posts.Site
             var tags = await TagsRepository.GetAllAsync(q => q.Where(t => titles.Contains(t.Title.ToLower())));
             if (!tags.items.Any())
             {
-                return NotFound();
+                return PageNotFound();
             }
 
             var (items, itemsCount) =

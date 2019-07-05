@@ -35,6 +35,11 @@ namespace BioEngine.Core.Site
 
             return context;
         }
+
+        protected virtual IActionResult PageNotFound()
+        {
+            return NotFound();
+        }
     }
 
     public abstract class SiteController<TEntity, TRepository> : BaseSiteController
@@ -74,7 +79,7 @@ namespace BioEngine.Core.Site
             var entity = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
             if (entity == null)
             {
-                return NotFound();
+                return PageNotFound();
             }
 
             return View(new EntityViewModel<TEntity>(GetPageContext(), entity, ContentEntityViewMode.Entity));
