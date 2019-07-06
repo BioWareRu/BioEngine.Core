@@ -6,6 +6,11 @@ namespace BioEngine.Core.Site.Helpers
     {
         public static string GetDescriptionFromHtml(string html)
         {
+            if (html == null)
+            {
+                return "";
+            }
+
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(html);
 
