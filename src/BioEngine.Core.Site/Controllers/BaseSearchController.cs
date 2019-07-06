@@ -6,7 +6,6 @@ using BioEngine.Core.Entities;
 using BioEngine.Core.Search;
 using BioEngine.Core.Site.Model;
 using BioEngine.Core.Web;
-using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioEngine.Core.Site.Controllers
@@ -22,29 +21,6 @@ namespace BioEngine.Core.Site.Controllers
         }
 
         public abstract Task<IActionResult> IndexAsync([FromQuery] string query, string block);
-
-        protected string GetDescriptionFromHtml(string html)
-        {
-            var description = "";
-            if (!string.IsNullOrEmpty(html))
-            {
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(html);
-
-
-                foreach (var childNode in htmlDoc.DocumentNode.ChildNodes.Where(x => x.Name == "p" || x.Name == "div"))
-                {
-                    var childText = HtmlEntity.DeEntitize(childNode.InnerText.Trim('\r', '\n')).Trim();
-                    if (!string.IsNullOrWhiteSpace(childText))
-                    {
-                        description = childText;
-                        break;
-                    }
-                }
-            }
-
-            return description;
-        }
 
         private ISearchProvider<T> GetSearchProvider<T>() where T : BaseEntity
         {

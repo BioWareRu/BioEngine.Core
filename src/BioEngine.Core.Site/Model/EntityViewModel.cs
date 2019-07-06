@@ -5,6 +5,7 @@ using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Routing;
 using BioEngine.Core.Seo;
+using BioEngine.Core.Site.Helpers;
 
 namespace BioEngine.Core.Site.Model
 {
@@ -41,7 +42,7 @@ namespace BioEngine.Core.Site.Model
                     if (contentEntity.Blocks.OrderBy(b => b.Position).FirstOrDefault(b => b is TextBlock) is TextBlock
                         textBlock)
                     {
-                        meta.Description = GetDescriptionFromHtml(textBlock.Data.Text);
+                        meta.Description = HtmlHelper.GetDescriptionFromHtml(textBlock.Data.Text);
                     }
                 }
             }

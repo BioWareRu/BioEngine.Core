@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Seo;
-using HtmlAgilityPack;
 using Microsoft.AspNetCore.Routing;
 
 namespace BioEngine.Core.Site.Model
@@ -55,14 +54,6 @@ namespace BioEngine.Core.Site.Model
             }
 
             return _meta;
-        }
-
-        protected string GetDescriptionFromHtml(string html)
-        {
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(html);
-
-            return HtmlEntity.DeEntitize(htmlDoc.DocumentNode.InnerText.Trim('\r', '\n')).Trim();
         }
     }
 }
