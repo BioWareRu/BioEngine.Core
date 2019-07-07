@@ -24,14 +24,12 @@ stages:
                     -   task: DotNetCoreCLI@2
                         displayName: 'Create package'
                         inputs:
-                            command: custom
-                            custom: 'pack'
+                            command: pack
                             configuration: Release
                             versioningScheme: byEnvVar
                             versionEnvVar: Version
                             verbosityPack: minimal
                             projects: src/**/*.csproj
-                            arguments: '--no-restore'
 
                     -   task: PublishPipelineArtifact@0
                         displayName: 'Publish package as artifact'
