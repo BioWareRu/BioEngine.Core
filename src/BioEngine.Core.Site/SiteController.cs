@@ -85,17 +85,29 @@ namespace BioEngine.Core.Site
             return View(new EntityViewModel<TEntity>(GetPageContext(), entity, ContentEntityViewMode.Entity));
         }
 
+        protected virtual void ApplyDefaultOrder(BioRepositoryQuery<TEntity> query)
+        {
+            query.OrderByDescending(e => e.DateAdded);
+        }
+
         [PublicAPI]
         protected BioRepositoryQuery<T> ConfigureQuery<T>(BioRepositoryQuery<T> query, int page = 0)
             where T : class, IEntity, ISiteEntity
         {
             if (ControllerContext.HttpContext.Request.Query.ContainsKey("order"))
             {
-                query = query.OrderByString(ControllerContext.HttpContext.Request.Query["order"]);
+                query.OrderByString(ControllerContext.HttpContext.Request.Query["order"]);
             }
             else
             {
-                query = query.OrderByDescending(e => e.DateUpdated);
+                if (query is BioRepositoryQuery<TEntity> entityQuery)
+                {
+                    ApplyDefaultOrder(entityQuery);
+                }
+                else
+                {
+                    query.OrderByDescending(e => e.DateAdded);
+                }
             }
 
             var offset = 0;

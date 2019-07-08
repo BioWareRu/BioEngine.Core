@@ -148,5 +148,10 @@ namespace BioEngine.Core.Posts.Site
 
             return description;
         }
+
+        protected override void ApplyDefaultOrder(BioRepositoryQuery<Post> query)
+        {
+            query.OrderByDescending(p => p.DatePublished);
+        }
     }
 }
