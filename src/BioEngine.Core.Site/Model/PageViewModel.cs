@@ -56,4 +56,23 @@ namespace BioEngine.Core.Site.Model
             return _meta;
         }
     }
+
+    public class PageViewModel<T> : PageViewModel
+    {
+        public T Data { get; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Keywords { get; set; }
+
+        public PageViewModel(PageViewModelContext context, T data) : base(context)
+        {
+            Data = data;
+        }
+
+        public override Task<PageMetaModel> GetMetaAsync()
+        {
+            var meta = new PageMetaModel {Title = Title, Description = Description, Keywords = Keywords};
+            return Task.FromResult(meta);
+        }
+    }
 }
