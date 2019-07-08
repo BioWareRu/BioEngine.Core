@@ -16,19 +16,25 @@ namespace BioEngine.Core.Social
         private readonly BioContext _dbContext;
         private readonly BioEntitiesManager _entitiesManager;
 
-        protected BaseContentPublisher(BioContext dbContext, ILogger<IContentPublisher<TConfig>> logger, BioEntitiesManager entitiesManager)
+        protected BaseContentPublisher(BioContext dbContext, ILogger<IContentPublisher<TConfig>> logger,
+            BioEntitiesManager entitiesManager)
         {
             Logger = logger;
             _dbContext = dbContext;
             _entitiesManager = entitiesManager;
         }
 
-        public virtual async Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config)
+        public virtual async Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config, bool needUpdate)
         {
             try
             {
                 var isNew = false;
                 var record = await GetRecordAsync(entity, site);
+                if (record != null && !needUpdate)
+                {
+                    return true;
+                }
+
                 if (record == null)
                 {
                     isNew = true;

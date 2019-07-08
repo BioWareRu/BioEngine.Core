@@ -5,7 +5,7 @@ namespace BioEngine.Core.Social
 {
     public interface IContentPublisher<TConfig> where TConfig : IContentPublisherConfig
     {
-        Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config);
+        Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config, bool needUpdate);
         Task<bool> DeleteAsync(ContentItem entity, TConfig config, Site? site = null);
     }
 }
