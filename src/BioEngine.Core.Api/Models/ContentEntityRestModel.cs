@@ -39,7 +39,7 @@ namespace BioEngine.Core.Api.Models
             }
 
             Blocks = entity.Blocks != null
-                ? entity.Blocks.Select(ContentBlock.Create).ToList()
+                ? entity.Blocks.OrderBy(b => b.Position).Select(ContentBlock.Create).ToList()
                 : new List<ContentBlock>();
         }
 
