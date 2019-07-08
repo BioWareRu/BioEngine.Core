@@ -33,7 +33,7 @@ namespace BioEngine.Core.Posts.Site
 
         public override async Task<IActionResult> ShowAsync(string url)
         {
-            var post = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
+            var post = await Repository.GetAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
             if (post == null)
             {
                 return PageNotFound();
