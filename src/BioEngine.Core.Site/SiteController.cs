@@ -61,14 +61,14 @@ namespace BioEngine.Core.Site
 
         public virtual async Task<IActionResult> ListAsync()
         {
-            var (items, itemsCount) = await GetAllAsync(entities => entities.Where(e => e.IsPublished));
+            var (items, itemsCount) = await GetAllAsync(ApplyPublishConditions);
             return View("List", new ListViewModel<TEntity>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage));
         }
 
         public virtual async Task<IActionResult> ListPageAsync(int page)
         {
-            var (items, itemsCount) = await GetAllAsync(entities => entities.Where(e => e.IsPublished), page);
+            var (items, itemsCount) = await GetAllAsync(ApplyPublishConditions, page);
             return View("List", new ListViewModel<TEntity>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage));
         }
@@ -76,13 +76,18 @@ namespace BioEngine.Core.Site
 
         public virtual async Task<IActionResult> ShowAsync(string url)
         {
-            var entity = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
+            var entity = await Repository.GetAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
             if (entity == null)
             {
                 return PageNotFound();
             }
 
             return View(new EntityViewModel<TEntity>(GetPageContext(), entity, ContentEntityViewMode.Entity));
+        }
+
+        protected virtual BioRepositoryQuery<TEntity> ApplyPublishConditions(BioRepositoryQuery<TEntity> query)
+        {
+            return query.Where(e => e.IsPublished);
         }
 
         protected virtual void ApplyDefaultOrder(BioRepositoryQuery<TEntity> query)
