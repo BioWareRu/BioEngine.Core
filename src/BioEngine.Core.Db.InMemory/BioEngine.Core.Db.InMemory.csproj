@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <IsPackable>true</IsPackable>
+    <NullableContextOptions>enable</NullableContextOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview5.19227.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj" />
+  </ItemGroup>
+</Project>

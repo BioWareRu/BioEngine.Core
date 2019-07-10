@@ -1,13 +1,15 @@
 using System;
+using BioEngine.Core.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace BioEngine.Core.DB
+namespace BioEngine.Core.Db.InMemory
 {
-    public class InMemoryDatabaseModule<TDbContext> : DatabaseModule<InMemoryDatabaseModuleConfig> where TDbContext: DbContext
+    public class InMemoryDatabaseModule<TDbContext> : DatabaseModule<InMemoryDatabaseModuleConfig>
+        where TDbContext : DbContext
     {
         protected override void CheckConfig()
         {
@@ -27,6 +29,12 @@ namespace BioEngine.Core.DB
                 options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                     .UseInMemoryDatabase(Config.InMemoryDatabaseName).UseInternalServiceProvider(p);
             });
+        }
+
+        public override void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
+        {
+            base.ConfigureEntities(serviceCollection, entitiesManager);
+            entitiesManager.RequireArrayConversions();
         }
     }
 

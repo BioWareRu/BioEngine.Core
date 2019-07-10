@@ -41,16 +41,14 @@ namespace BioEngine.Core.DB
             modelBuilder.RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(s => s.PictureInfo);
             modelBuilder.Entity<StorageItem>().Property(i => i.PublicUri)
                 .HasConversion(u => u.ToString(), s => new Uri(s));
-            if (Database.IsInMemory())
+            var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
+
+            if (entitiesManager.NeedArrayConversions)
             {
                 modelBuilder.RegisterSiteEntityConversions<Section>();
                 modelBuilder.RegisterSiteEntityConversions<ContentItem>();
                 modelBuilder.RegisterSectionEntityConversions<ContentItem>();
                 modelBuilder.RegisterSiteEntityConversions<Menu>();
-            }
-            else
-            {
-                modelBuilder.ForNpgsqlUseIdentityByDefaultColumns();
             }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);
@@ -76,7 +74,7 @@ namespace BioEngine.Core.DB
             var sectionEntityConversionsRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
                 nameof(ModelBuilderContextExtensions.RegisterSectionEntityConversions),
                 BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
-            var entitiesManager = this.GetInfrastructure().GetRequiredService<BioEntitiesManager>();
+
             var logger = this.GetInfrastructure().GetRequiredService<ILogger<BioContext>>();
             foreach (var entityMetadata in entitiesManager.GetBlocksMetadata())
             {
@@ -98,7 +96,7 @@ namespace BioEngine.Core.DB
                     entityMetadata.DataType);
                 modelBuilder.RegisterDiscriminator<Section>(entityMetadata.ObjectType,
                     entityMetadata.Key);
-                if (Database.IsInMemory())
+                if (entitiesManager.NeedArrayConversions)
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
                         .Invoke(modelBuilder, new object[] {modelBuilder});
@@ -117,7 +115,7 @@ namespace BioEngine.Core.DB
                     entityMetadata.DataType);
                 modelBuilder.RegisterDiscriminator<ContentItem>(entityMetadata.ObjectType,
                     entityMetadata.Key);
-                if (Database.IsInMemory())
+                if (entitiesManager.NeedArrayConversions)
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(entityMetadata.ObjectType)
                         .Invoke(modelBuilder, new object[] {modelBuilder});
@@ -136,7 +134,8 @@ namespace BioEngine.Core.DB
             foreach (var registration in entitiesTypes)
             {
                 modelBuilder.Entity(registration.ObjectType);
-                if (typeof(ISiteEntity).IsAssignableFrom(registration.ObjectType) && Database.IsInMemory())
+                if (typeof(ISiteEntity).IsAssignableFrom(registration.ObjectType) &&
+                    entitiesManager.NeedArrayConversions)
                 {
                     siteConversionsRegistrationMethod?.MakeGenericMethod(registration.ObjectType)
                         .Invoke(modelBuilder, new object[] {modelBuilder});

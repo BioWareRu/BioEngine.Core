@@ -14,6 +14,12 @@ namespace BioEngine.Core.DB
             new Dictionary<string, EntityMetadata>();
 
         private readonly List<Action<ModelBuilder>> _configureActions = new List<Action<ModelBuilder>>();
+        public bool NeedArrayConversions { get; private set; }
+
+        public void RequireArrayConversions()
+        {
+            NeedArrayConversions = true;
+        }
 
         public void RegisterEntity<TEntity>() where TEntity : IEntity
         {

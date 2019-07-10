@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
+using BioEngine.Core.Db.InMemory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace BioEngine.Core.Tests
+namespace BioEngine.Core.Tests.Xunit
 {
     public abstract class BaseTest
     {

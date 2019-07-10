@@ -26,6 +26,7 @@ namespace BioEngine.Core
         public BioEngine(string[] args)
         {
             _hostBuilder = Host.CreateDefaultBuilder(args);
+            AddModule<BioEngineCoreModule>();
         }
 
         public BioEngine AddEntities()

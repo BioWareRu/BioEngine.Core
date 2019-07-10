@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace BioEngine.Core.Tests
+namespace BioEngine.Core.Tests.Xunit
 {
     public class XunitLoggerProvider : ILoggerProvider
     {

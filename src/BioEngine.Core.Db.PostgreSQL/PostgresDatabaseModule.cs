@@ -2,13 +2,14 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 
-namespace BioEngine.Core.DB
+namespace BioEngine.Core.Db.PostgreSQL
 {
     public class PostgresDatabaseModule<TDbContext> : DatabaseModule<PostgresDatabaseModuleConfig>
         where TDbContext : DbContext

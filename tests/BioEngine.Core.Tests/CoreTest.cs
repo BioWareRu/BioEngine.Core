@@ -3,6 +3,7 @@ using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Modules;
 using BioEngine.Core.Tests.Fixtures;
+using BioEngine.Core.Tests.Xunit;
 using JetBrains.Annotations;
 using Xunit.Abstractions;
 
