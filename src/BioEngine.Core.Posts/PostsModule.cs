@@ -1,7 +1,5 @@
-using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
 using BioEngine.Core.Modules;
-using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
 using BioEngine.Core.Posts.Search;
 using BioEngine.Core.Search;
@@ -19,14 +17,12 @@ namespace BioEngine.Core.Posts
             base.ConfigureServices(services, configuration, environment);
             services.RegisterSearchRepositoryHook<Post>()
                 .RegisterSearchProvider<PostsSearchProvider, Post>();
-            services.AddScoped<IBioRepository<Post>, PostsRepository>();
-            services.AddScoped<PostsRepository, PostsRepository>();
         }
 
         public override void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
         {
             base.ConfigureEntities(serviceCollection, entitiesManager);
-            entitiesManager.RegisterEntity<Post>();
+            RegisterRepositories(typeof(Post).Assembly, serviceCollection, entitiesManager);
         }
     }
 }
