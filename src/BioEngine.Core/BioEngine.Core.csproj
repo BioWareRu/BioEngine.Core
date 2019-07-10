@@ -27,6 +27,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="3.0.0-preview5.19227.1" />
     <!---->
     <PackageReference Include="FluentValidation" Version="8.4.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.17" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.18" />
   </ItemGroup>
 </Project>
