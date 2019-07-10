@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
+using BioEngine.Core.Api.Auth;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BioEngine.Core.Api
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = BioPolicies.User)]
     [Route("v1/[controller]")]
     public abstract class ApiController : BaseController
     {

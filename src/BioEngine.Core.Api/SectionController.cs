@@ -1,15 +1,19 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.Api.Auth;
 using BioEngine.Core.Api.Models;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BioEngine.Core.Api
 {
+    [Authorize(Policy = BioPolicies.Sections)]
     public abstract class
         SectionController<TEntity, TData, TRepository, TResponse, TRequest> : ContentEntityController<
             TEntity, TRepository,
@@ -35,6 +39,42 @@ namespace BioEngine.Core.Api
         }
 
         protected abstract string GetUploadPath();
+
+        [Authorize(Policy = BioPolicies.SectionsAdd)]
+        public override Task<ActionResult<TResponse>> NewAsync()
+        {
+            return base.NewAsync();
+        }
+
+        [Authorize(Policy = BioPolicies.SectionsAdd)]
+        public override Task<ActionResult<TResponse>> AddAsync(TRequest item)
+        {
+            return base.AddAsync(item);
+        }
+
+        [Authorize(Policy = BioPolicies.SectionsEdit)]
+        public override Task<ActionResult<TResponse>> UpdateAsync(Guid id, TRequest item)
+        {
+            return base.UpdateAsync(id, item);
+        }
+
+        [Authorize(Policy = BioPolicies.SectionsDelete)]
+        public override Task<ActionResult<TResponse>> DeleteAsync(Guid id)
+        {
+            return base.DeleteAsync(id);
+        }
+
+        [Authorize(Policy = BioPolicies.SectionsPublish)]
+        public override Task<ActionResult<TResponse>> PublishAsync(Guid id)
+        {
+            return base.PublishAsync(id);
+        }
+
+        [Authorize(Policy = BioPolicies.SectionsPublish)]
+        public override Task<ActionResult<TResponse>> HideAsync(Guid id)
+        {
+            return base.HideAsync(id);
+        }
     }
 
     public abstract class
