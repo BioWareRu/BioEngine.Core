@@ -104,5 +104,40 @@ namespace BioEngine.Core.Comments
 
             return results;
         }
+
+        public abstract Task<BaseComment> AddCommentAsync(ContentItem entity, string text, string authorId,
+            Guid? replyTo = null);
+
+        public abstract Task<BaseComment> UpdateCommentAsync(ContentItem entity, Guid commentId, string text);
+
+        public async Task<BaseComment> DeleteCommentAsync(ContentItem entity, Guid commentId)
+        {
+            var comment = await GetCommentByIdAsync(entity, commentId);
+            if (comment == null)
+            {
+                throw new Exception($"Comment {commentId.ToString()} not found");
+            }
+
+            DbContext.Remove(comment);
+            await DbContext.SaveChangesAsync(); 
+            return comment;
+        }
+
+        public async Task<IEnumerable<BaseComment>> GetCommentsAsync(ContentItem entity)
+        {
+            var comments = await GetDbSet().Where(c => c.ContentId == entity.Id).OrderBy(c => c.DateAdded).ToListAsync();
+            var authors = await _userDataProvider.GetDataAsync(comments.Select(c => c.AuthorId).ToArray());
+            foreach (var comment in comments)
+            {
+                comment.Author = authors.FirstOrDefault(a => a.Id == comment.AuthorId);
+            }
+
+            return comments;
+        }
+
+        public async Task<BaseComment> GetCommentByIdAsync(ContentItem entity, Guid commentId)
+        {
+            return await GetDbSet().Where(c => c.ContentId == entity.Id && c.Id == commentId).FirstOrDefaultAsync();
+        }
     }
 }
