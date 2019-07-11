@@ -271,7 +271,7 @@ namespace BioEngine.Core.Repository
 
         protected virtual BioRepositoryQuery<TEntity> CreateRepositoryQuery()
         {
-            return new BioRepositoryQuery<TEntity>(GetBaseQuery());
+            return new BioRepositoryQuery<TEntity>(GetBaseQuery(), DbContext);
         }
         
         protected virtual Task<bool> BeforeValidateAsync(TEntity item,

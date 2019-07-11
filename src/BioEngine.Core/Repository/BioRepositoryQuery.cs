@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Extensions;
 using JetBrains.Annotations;
@@ -11,12 +12,14 @@ namespace BioEngine.Core.Repository
 {
     public class BioRepositoryQuery<TEntity> where TEntity : class, IEntity
     {
+        public BioContext DbContext { get; }
         private IQueryable<TEntity> _query;
         public int? Limit { get; private set; }
         public int? Offset { get; private set; }
 
-        internal BioRepositoryQuery(IQueryable<TEntity> query)
+        internal BioRepositoryQuery(IQueryable<TEntity> query, BioContext dbContext)
         {
+            DbContext = dbContext;
             _query = query;
         }
 
