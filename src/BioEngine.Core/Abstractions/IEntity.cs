@@ -6,9 +6,17 @@ namespace BioEngine.Core.Abstractions
 {
     public interface IEntity
     {
-        List<PropertiesEntry> Properties { get; set; }
+        string GetId();
+    }
 
-        Guid Id { get; set; }
+    public interface IEntity<TKey> : IEntity
+    {
+        TKey Id { get; set; }
+    }
+
+    public interface IBioEntity : IEntity<Guid>
+    {
+        List<PropertiesEntry> Properties { get; set; }
         string Title { get; set; }
         DateTimeOffset DateAdded { get; set; }
         DateTimeOffset DateUpdated { get; set; }

@@ -8,13 +8,18 @@ using BioEngine.Core.Properties;
 namespace BioEngine.Core.Entities
 {
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
-    public abstract class BaseEntity : IEntity
+    public abstract class BaseEntity : IBioEntity
     {
         [Key] public virtual Guid Id { get; set; } = Guid.Empty;
         [Required] public virtual string Title { get; set; }
         [Required] public virtual DateTimeOffset DateAdded { get; set; } = DateTimeOffset.UtcNow;
         [Required] public virtual DateTimeOffset DateUpdated { get; set; } = DateTimeOffset.UtcNow;
         [NotMapped] public virtual List<PropertiesEntry> Properties { get; set; } = new List<PropertiesEntry>();
+
+        public string GetId()
+        {
+            return Id.ToString();
+        }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.
 

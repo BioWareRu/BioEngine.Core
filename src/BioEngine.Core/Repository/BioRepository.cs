@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BioEngine.Core.Repository
 {
     [PublicAPI]
-    public abstract class BioRepository<TEntity> : IBioRepository<TEntity> where TEntity : class, IEntity
+    public abstract class BioRepository<TEntity> : IBioRepository<TEntity> where TEntity : class, IBioEntity
     {
         protected readonly BioContext DbContext;
         protected readonly List<IValidator<TEntity>> Validators;

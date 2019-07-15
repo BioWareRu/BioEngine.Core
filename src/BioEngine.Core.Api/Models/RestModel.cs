@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace BioEngine.Core.Api.Models
 {
-    public abstract class RestModel<TEntity> where TEntity : class, IEntity
+    public abstract class RestModel<TEntity> where TEntity : class, IBioEntity
     {
         public Guid Id { get; set; }
         public DateTimeOffset DateAdded { get; set; }

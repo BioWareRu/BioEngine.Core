@@ -15,7 +15,7 @@ namespace BioEngine.Core.Api
     public abstract class
         ContentEntityController<TEntity, TRepository, TResponse, TRequest> : RequestRestController<
             TEntity, TRepository, TResponse, TRequest>
-        where TEntity : class, IContentEntity, IEntity
+        where TEntity : class, IContentEntity, IBioEntity
         where TResponse : class, IContentResponseRestModel<TEntity>
         where TRequest : class, IContentRequestRestModel<TEntity>
         where TRepository : IContentEntityRepository<TEntity>

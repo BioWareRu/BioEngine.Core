@@ -127,7 +127,7 @@ namespace BioEngine.Core.Properties
         }
 
         [PublicAPI]
-        public async Task<TProperties> GetAsync<TProperties>(IEntity entity, Guid? siteId = null)
+        public async Task<TProperties> GetAsync<TProperties>(IBioEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
             var schema = Schema.FirstOrDefault(s => s.Value.Type == typeof(TProperties));
@@ -174,7 +174,7 @@ namespace BioEngine.Core.Properties
         }
 
         [PublicAPI]
-        public async Task<bool> SetAsync<TProperties>(TProperties properties, IEntity entity, Guid? siteId = null)
+        public async Task<bool> SetAsync<TProperties>(TProperties properties, IBioEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
             var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value).FirstOrDefault();
@@ -218,7 +218,7 @@ namespace BioEngine.Core.Properties
                     && s.EntityType == null && s.EntityId == null);
         }
 
-        private async Task<PropertiesRecord?> LoadFromDatabaseAsync(PropertiesSchema schema, IEntity entity,
+        private async Task<PropertiesRecord?> LoadFromDatabaseAsync(PropertiesSchema schema, IBioEntity entity,
             Guid? siteId = null)
         {
             return schema == null || !_checkIfExists
@@ -229,7 +229,7 @@ namespace BioEngine.Core.Properties
                     (siteId == null || s.SiteId == siteId.Value));
         }
 
-        public async Task LoadPropertiesAsync<T>(IEnumerable<T> entities) where T : class, IEntity
+        public async Task LoadPropertiesAsync<T>(IEnumerable<T> entities) where T : class, IBioEntity
         {
             var entitiesArray = entities as T[] ?? entities.ToArray();
             if (entitiesArray.Any())

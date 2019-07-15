@@ -9,7 +9,7 @@ using BioEngine.Core.Site.Helpers;
 
 namespace BioEngine.Core.Site.Model
 {
-    public class EntityViewModel<TEntity> : PageViewModel where TEntity : class, IEntity, IRoutable
+    public class EntityViewModel<TEntity> : PageViewModel where TEntity : class, IBioEntity, IRoutable
     {
         public TEntity Entity { get; }
         public ContentEntityViewMode Mode { get; }
