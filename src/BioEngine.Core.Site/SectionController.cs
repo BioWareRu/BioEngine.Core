@@ -29,13 +29,13 @@ namespace BioEngine.Core.Site
 
             var contentRepository = HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>();
             var provider = new ListProvider<TContent, IBioRepository<TContent>>(contentRepository);
-            provider.SetPage(Page).SetPageSize(ItemsPerPage).SetSite(Site);
+            provider.SetPage(page).SetPageSize(ItemsPerPage).SetSite(Site);
             var (items, itemsCount) = await provider.GetAllAsync(queryable =>
                 queryable.ForSection(section)
                     .Where(c => c.IsPublished));
             return View("Content", new SectionContentListViewModel<TSection, TContent>(GetPageContext(section), section,
                 items,
-                itemsCount, Page, ItemsPerPage));
+                itemsCount, page, ItemsPerPage));
         }
 
         protected virtual PageViewModelContext GetPageContext(TSection section)
