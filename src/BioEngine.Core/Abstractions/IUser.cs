@@ -1,8 +1,7 @@
 ﻿namespace BioEngine.Core.Abstractions
 {
-    public interface IUser
+    public interface IUser: IEntity<string>
     {
-        string Id { get; set; }
         string Name { get; set; }
         string PhotoUrl { get; set; }
         string ProfileUrl { get; set; }

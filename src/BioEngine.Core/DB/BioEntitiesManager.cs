@@ -41,19 +41,24 @@ namespace BioEngine.Core.DB
             }
 
 
-            if (typeof(Section).IsAssignableFrom(entityType))
+            if (typeof(IBioEntity).IsAssignableFrom(entityType))
             {
-                metaData.MarkAsSection();
-            }
+                metaData.MarkAsBioEntity();
 
-            else if (typeof(ContentItem).IsAssignableFrom(entityType))
-            {
-                metaData.MarkAsContentItem();
-            }
+                if (typeof(Section).IsAssignableFrom(entityType))
+                {
+                    metaData.MarkAsSection();
+                }
 
-            else if (typeof(ContentBlock).IsAssignableFrom(entityType))
-            {
-                metaData.MarkAsContentBlock();
+                else if (typeof(ContentItem).IsAssignableFrom(entityType))
+                {
+                    metaData.MarkAsContentItem();
+                }
+
+                else if (typeof(ContentBlock).IsAssignableFrom(entityType))
+                {
+                    metaData.MarkAsContentBlock();
+                }
             }
 
             _registrations.Add(metaData.Key, metaData);
@@ -81,9 +86,9 @@ namespace BioEngine.Core.DB
             return new EntityMetadata(type, typedAttribute.Key, dataType);
         }
 
-        public IEnumerable<EntityMetadata> GetTypes()
+        public IEnumerable<EntityMetadata> GetDbTypes()
         {
-            return _registrations.Values;
+            return _registrations.Values.Where(m => m.IsBioEntity);
         }
 
         public void ConfigureDbContext(Action<ModelBuilder> configureContext)

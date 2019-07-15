@@ -130,7 +130,7 @@ namespace BioEngine.Core.DB
             }
 
 
-            var entitiesTypes = entitiesManager.GetTypes();
+            var entitiesTypes = entitiesManager.GetDbTypes();
             foreach (var registration in entitiesTypes)
             {
                 modelBuilder.Entity(registration.ObjectType);
