@@ -37,7 +37,7 @@ namespace BioEngine.Core.DB
 
             if (_registrations.ContainsKey(metaData.Key))
             {
-                throw new Exception($"Entity with key {metaData.Key} already registerd");
+                throw new Exception($"Entity with key {metaData.Key} already registered");
             }
 
 
