@@ -39,8 +39,7 @@ namespace BioEngine.Core.DB
             {
                 throw new Exception($"Entity with key {metaData.Key} already registered");
             }
-
-
+            
             if (typeof(IBioEntity).IsAssignableFrom(entityType))
             {
                 metaData.MarkAsBioEntity();
