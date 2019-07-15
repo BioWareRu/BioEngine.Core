@@ -86,7 +86,7 @@ namespace BioEngine.Core.Posts.Site
                 Copyright = $"(c) {Site.Title}"
             };
 
-            var posts = await Repository.GetAllAsync(entities => ConfigureQuery(entities.Where(e => e.IsPublished)));
+            var posts = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished).ForSite(Site).OrderByDescending(p => p.DateAdded));
             var mostRecentPubDate = DateTime.MinValue;
             var commentsData =
                 await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());
@@ -149,9 +149,9 @@ namespace BioEngine.Core.Posts.Site
             return description;
         }
 
-        protected override void ApplyDefaultOrder(BioRepositoryQuery<Post> query)
+        protected override void ApplyDefaultOrder(ListProvider<Post, PostsRepository> provider)
         {
-            query.OrderByDescending(p => p.DatePublished);
+            provider.SetOrderByDescending(p => p.DatePublished);
         }
     }
 }

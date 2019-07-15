@@ -28,8 +28,10 @@ namespace BioEngine.Core.Site
             }
 
             var contentRepository = HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>();
-            var (items, itemsCount) = await contentRepository.GetAllAsync(queryable =>
-                ConfigureQuery(queryable, page).ForSection(section)
+            var provider = new ListProvider<TContent, IBioRepository<TContent>>(contentRepository);
+            provider.SetPage(Page).SetPageSize(ItemsPerPage).SetSite(Site);
+            var (items, itemsCount) = await provider.GetAllAsync(queryable =>
+                queryable.ForSection(section)
                     .Where(c => c.IsPublished));
             return View("Content", new SectionContentListViewModel<TSection, TContent>(GetPageContext(section), section,
                 items,

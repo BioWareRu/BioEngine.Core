@@ -56,7 +56,7 @@ namespace BioEngine.Core.Site
         protected int Page { get; private set; } = 1;
         protected virtual int ItemsPerPage { get; } = 20;
 
-        [PublicAPI] protected IBioRepository<TEntity> Repository;
+        [PublicAPI] protected TRepository Repository;
 
 
         public virtual async Task<IActionResult> ListAsync()
@@ -76,7 +76,8 @@ namespace BioEngine.Core.Site
 
         public virtual async Task<IActionResult> ShowAsync(string url)
         {
-            var entity = await Repository.GetAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
+            var entity =
+                await Repository.GetAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
             if (entity == null)
             {
                 return PageNotFound();
@@ -90,52 +91,37 @@ namespace BioEngine.Core.Site
             return query.Where(e => e.IsPublished);
         }
 
-        protected virtual void ApplyDefaultOrder(BioRepositoryQuery<TEntity> query)
+        protected virtual void ApplyDefaultOrder(ListProvider<TEntity, TRepository> provider)
         {
-            query.OrderByDescending(e => e.DateAdded);
-        }
-
-        [PublicAPI]
-        protected BioRepositoryQuery<T> ConfigureQuery<T>(BioRepositoryQuery<T> query, int page = 0)
-            where T : class, IEntity, ISiteEntity
-        {
-            if (ControllerContext.HttpContext.Request.Query.ContainsKey("order"))
-            {
-                query.OrderByString(ControllerContext.HttpContext.Request.Query["order"]);
-            }
-            else
-            {
-                if (query is BioRepositoryQuery<TEntity> entityQuery)
-                {
-                    ApplyDefaultOrder(entityQuery);
-                }
-                else
-                {
-                    query.OrderByDescending(e => e.DateAdded);
-                }
-            }
-
-            var offset = 0;
-            if (page > 0)
-            {
-                Page = page;
-                offset = (Page - 1) * ItemsPerPage;
-            }
-            else if (ControllerContext.HttpContext.Request.Query.ContainsKey("page"))
-            {
-                Page = int.Parse(ControllerContext.HttpContext.Request.Query["page"]);
-                if (Page < 1) Page = 1;
-                offset = (Page - 1) * ItemsPerPage;
-            }
-
-            return query.ForSite(Site).Skip(offset).Take(ItemsPerPage);
+            provider.SetOrderByDescending(e => e.DateAdded);
         }
 
         [PublicAPI]
         protected Task<(TEntity[] items, int itemsCount)> GetAllAsync(
             Func<BioRepositoryQuery<TEntity>, BioRepositoryQuery<TEntity>>? configureQuery, int page = 0)
         {
-            return Repository.GetAllAsync(entities => ConfigureQuery(configureQuery(entities), page));
+            var provider = new ListProvider<TEntity, TRepository>(Repository).SetSite(Site);
+            if (ControllerContext.HttpContext.Request.Query.ContainsKey("order"))
+            {
+                provider.SetOrderByString(ControllerContext.HttpContext.Request.Query["order"]);
+            }
+            else
+            {
+                ApplyDefaultOrder(provider);
+            }
+
+            if (page > 0)
+            {
+                Page = page;
+            }
+            else if (ControllerContext.HttpContext.Request.Query.ContainsKey("page"))
+            {
+                Page = int.Parse(ControllerContext.HttpContext.Request.Query["page"]);
+                if (Page < 1) Page = 1;
+            }
+            provider.SetPage(Page);
+
+            return provider.GetAllAsync(configureQuery);
         }
     }
 }
