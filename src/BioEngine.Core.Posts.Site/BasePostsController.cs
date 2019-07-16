@@ -21,6 +21,7 @@ namespace BioEngine.Core.Posts.Site
     {
         protected readonly TagsRepository TagsRepository;
         private readonly ICommentsProvider _commentsProvider;
+        public virtual int RssFeedSize { get; } = 20;
 
         protected BasePostsController(
             BaseControllerContext<Post, PostsRepository> context,
@@ -75,7 +76,7 @@ namespace BioEngine.Core.Posts.Site
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
         }
-
+       
         public virtual async Task<IActionResult> RssAsync()
         {
             var feed = new Feed
@@ -86,7 +87,7 @@ namespace BioEngine.Core.Posts.Site
                 Copyright = $"(c) {Site.Title}"
             };
 
-            var posts = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished).ForSite(Site).OrderByDescending(p => p.DateAdded));
+            var posts = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished).ForSite(Site).OrderByDescending(p => p.DateAdded).Take(RssFeedSize));
             var mostRecentPubDate = DateTime.MinValue;
             var commentsData =
                 await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());
