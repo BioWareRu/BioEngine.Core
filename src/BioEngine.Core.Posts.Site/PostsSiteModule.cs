@@ -1,4 +1,6 @@
+using BioEngine.Core.Posts.Site.Rss;
 using BioEngine.Core.Posts.Site.SiteMaps;
+using BioEngine.Core.Site.Rss;
 using cloudscribe.Web.SiteMap;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,7 @@ namespace BioEngine.Core.Posts.Site
         {
             base.ConfigureServices(services, configuration, environment);
             services.AddScoped<ISiteMapNodeService, PostsSiteMapNodeService>();
+            services.AddScoped<IRssItemsProvider, PostsRssItemsProvider>();
         }
     }
 }

@@ -1,19 +1,15 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
 using BioEngine.Core.Entities;
-using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
 using BioEngine.Core.Repository;
-using BioEngine.Core.Routing;
 using BioEngine.Core.Site;
 using BioEngine.Core.Site.Model;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Mvc;
-using WilderMinds.RssSyndication;
 
 namespace BioEngine.Core.Posts.Site
 {
@@ -21,7 +17,6 @@ namespace BioEngine.Core.Posts.Site
     {
         protected readonly TagsRepository TagsRepository;
         private readonly ICommentsProvider _commentsProvider;
-        public virtual int RssFeedSize { get; } = 20;
 
         protected BasePostsController(
             BaseControllerContext<Post, PostsRepository> context,
@@ -75,79 +70,6 @@ namespace BioEngine.Core.Posts.Site
                 await Repository.GetAllAsync(entities => entities.WithTags(tags.items).Where(e => e.IsPublished));
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
-        }
-       
-        public virtual async Task<IActionResult> RssAsync()
-        {
-            var feed = new Feed
-            {
-                Title = Site.Title,
-                Description = "Последние публикации",
-                Link = new Uri(Site.Url),
-                Copyright = $"(c) {Site.Title}"
-            };
-
-            var posts = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished).ForSite(Site).OrderByDescending(p => p.DatePublished).Take(RssFeedSize));
-            var mostRecentPubDate = DateTime.MinValue;
-            var commentsData =
-                await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());
-            foreach (var post in posts.items)
-            {
-                var postDate = post.DateAdded.DateTime;
-                if (postDate > mostRecentPubDate) mostRecentPubDate = postDate;
-                var postUrl = LinkGenerator.GeneratePublicUrl(post, Site);
-
-
-                var item = new Item
-                {
-                    Title = post.Title,
-                    Body = GetDescription(post),
-                    Link = postUrl,
-                    PublishDate = postDate,
-                    Author = new Author {Name = post.Author.Name},
-                };
-
-                if (commentsData.ContainsKey(post.Id))
-                {
-                    item.Comments = commentsData[post.Id].uri;
-                }
-
-                foreach (var section in post.Sections)
-                {
-                    item.Categories.Add(section.Title);
-                }
-
-                feed.Items.Add(item);
-            }
-
-
-            var rss = feed.Serialize();
-
-            return Content(rss, "text/xml; charset=utf-8");
-        }
-
-        private static string GetDescription(Post post)
-        {
-            var description = "";
-
-            foreach (var block in post.Blocks)
-            {
-                switch (block)
-                {
-                    case CutBlock _:
-                        return description;
-                    case TextBlock textBlock:
-                        description += textBlock.Data.Text;
-                        break;
-                    case PictureBlock pictureBlock:
-                        description += $"<p style=\"text-align:center;\">{pictureBlock.Data.Picture.PublicUri}</p>";
-                        break;
-                    default:
-                        continue;
-                }
-            }
-
-            return description;
         }
 
         protected override void ApplyDefaultOrder(ListProvider<Post, PostsRepository> provider)
