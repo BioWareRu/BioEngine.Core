@@ -15,7 +15,7 @@ namespace BioEngine.Core.Site
         private int _itemsPerPage = 20;
         private string _orderByString;
         private Expression<Func<TEntity, object>> _orderBy;
-        private bool _orderByDescending = false;
+        private bool _orderByDescending;
         private Core.Entities.Site _site;
 
         public ListProvider(TRepository repository)
@@ -67,7 +67,7 @@ namespace BioEngine.Core.Site
             return _repository.GetAllAsync(entities => ConfigureQuery(configureQuery(entities)));
         }
 
-        private BioRepositoryQuery<TEntity> ConfigureQuery(BioRepositoryQuery<TEntity> query)
+        private void ConfigureQuery(BioRepositoryQuery<TEntity> query)
         {
             if (!string.IsNullOrEmpty(_orderByString)) 
             {
@@ -99,7 +99,7 @@ namespace BioEngine.Core.Site
                 query.ForSite(_site);
             }
 
-            return query.Skip(offset).Take(_itemsPerPage);
+            query.Skip(offset).Take(_itemsPerPage);
         }
     }
 }
