@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BioEngine.Core.Comments;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
@@ -16,11 +17,14 @@ namespace BioEngine.Core.Posts.Site.Rss
     {
         private readonly PostsRepository _postsRepository;
         private readonly LinkGenerator _linkGenerator;
+        private readonly ICommentsProvider _commentsProvider;
 
-        public PostsRssItemsProvider(PostsRepository postsRepository, LinkGenerator linkGenerator)
+        public PostsRssItemsProvider(PostsRepository postsRepository, LinkGenerator linkGenerator,
+            ICommentsProvider commentsProvider)
         {
             _postsRepository = postsRepository;
             _linkGenerator = linkGenerator;
+            _commentsProvider = commentsProvider;
         }
 
         public async Task<IEnumerable<RssItem>> GetItemsAsync(Core.Entities.Site site, int count)
@@ -28,6 +32,7 @@ namespace BioEngine.Core.Posts.Site.Rss
             var posts = await _postsRepository.GetAllAsync(entities =>
                 entities.Where(e => e.IsPublished).ForSite(site).OrderByDescending(p => p.DatePublished).Take(count));
             DateTimeOffset? mostRecentPubDate = DateTimeOffset.MinValue;
+            var commentsData = await _commentsProvider.GetCommentsDataAsync(posts.items);
             var items = new List<RssItem>();
             foreach (var post in posts.items)
             {
@@ -46,7 +51,17 @@ namespace BioEngine.Core.Posts.Site.Rss
                         Guid = new RssGuid(postUrl.ToString(), true)
                     };
 
-                    
+                    if (commentsData.ContainsKey(post.Id))
+                    {
+                        item.Comments = commentsData[post.Id].uri;
+                    }
+
+                    foreach (var section in post.Sections)
+                    {
+                        item.Categories.Add(new RssCategory(section.Title,
+                            _linkGenerator.GeneratePublicUrl(section).ToString()));
+                    }
+
                     items.Add(item);
                 }
             }
