@@ -87,7 +87,7 @@ namespace BioEngine.Core.Posts.Site
                 Copyright = $"(c) {Site.Title}"
             };
 
-            var posts = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished).ForSite(Site).OrderByDescending(p => p.DateAdded).Take(RssFeedSize));
+            var posts = await Repository.GetAllAsync(entities => entities.Where(e => e.IsPublished).ForSite(Site).OrderByDescending(p => p.DatePublished).Take(RssFeedSize));
             var mostRecentPubDate = DateTime.MinValue;
             var commentsData =
                 await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());
