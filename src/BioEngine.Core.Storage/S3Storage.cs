@@ -42,7 +42,7 @@ namespace BioEngine.Core.Storage
         {
             try
             {
-                var bucketExists = await AmazonS3Util.DoesS3BucketExistAsync(_client, bucketName);
+                var bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(_client, bucketName);
                 if (!bucketExists)
                 {
                     var putBucketRequest = new PutBucketRequest {BucketName = bucketName, UseClientRegion = true};
