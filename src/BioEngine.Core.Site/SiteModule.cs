@@ -31,6 +31,7 @@ namespace BioEngine.Core.Site
         private readonly RequestDelegate _next;
         private readonly SiteModuleConfig _options;
         private readonly ILogger<CurrentSiteMiddleware> _logger;
+        private Entities.Site _site;
 
         public CurrentSiteMiddleware(RequestDelegate next, SiteModuleConfig options,
             ILogger<CurrentSiteMiddleware> logger)
@@ -44,23 +45,26 @@ namespace BioEngine.Core.Site
         [SuppressMessage("ReSharper", "VSTHRD200")]
         public async Task Invoke(HttpContext context)
         {
-            Entities.Site site = null;
-            try
+            if (_site == null)
             {
-                var repository = context.RequestServices.GetRequiredService<SitesRepository>();
-                site = await repository.GetByIdAsync(_options.SiteId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in site middleware: {errorText}", ex.ToString());
+                try
+                {
+                    var repository = context.RequestServices.GetRequiredService<SitesRepository>();
+                    _site = await repository.GetByIdAsync(_options.SiteId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error in site middleware: {errorText}", ex.ToString());
+                }
+
+                if (_site == null)
+                {
+                    throw new Exception("Site is not configured");
+                }
             }
 
-            if (site == null)
-            {
-                throw new Exception("Site is not configured");
-            }
 
-            context.Features.Set(new CurrentSiteFeature(site));
+            context.Features.Set(new CurrentSiteFeature(_site));
             await _next.Invoke(context);
         }
     }
