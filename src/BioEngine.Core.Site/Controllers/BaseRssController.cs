@@ -53,10 +53,10 @@ namespace BioEngine.Core.Site.Controllers
 
             channel.Items = items.OrderByDescending(i => i.PublicationDate);
 
-            var syncIOFeature = HttpContext.Features.Get<IHttpBodyControlFeature>();
-            if (syncIOFeature != null)
+            var syncIoFeature = HttpContext.Features.Get<IHttpBodyControlFeature>();
+            if (syncIoFeature != null)
             {
-                syncIOFeature.AllowSynchronousIO = true;
+                syncIoFeature.AllowSynchronousIO = true;
             }
 
             var xml = XmlFormatter.BuildXml(channel);

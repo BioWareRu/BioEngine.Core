@@ -20,10 +20,10 @@ namespace BioEngine.Core.Site.Controllers
         public override Task<IActionResult> Index()
         {
             // https://github.com/aspnet/AspNetCore/issues/7644 may be fixed in next cloudscribe release
-            var syncIOFeature = HttpContext.Features.Get<IHttpBodyControlFeature>();
-            if (syncIOFeature != null)
+            var syncIoFeature = HttpContext.Features.Get<IHttpBodyControlFeature>();
+            if (syncIoFeature != null)
             {
-                syncIOFeature.AllowSynchronousIO = true;
+                syncIoFeature.AllowSynchronousIO = true;
             }
 
             return base.Index();
