@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Routing;
 
@@ -27,7 +28,7 @@ namespace BioEngine.Core.Api.Models
             return entity;
         }
 
-        protected SectionEntityRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        protected SectionEntityRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository, PropertiesProvider propertiesProvider) : base(linkGenerator, sitesRepository, propertiesProvider)
         {
         }
     }

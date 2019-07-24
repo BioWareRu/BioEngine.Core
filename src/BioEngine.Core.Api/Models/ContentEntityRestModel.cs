@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Api.Entities;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Routing;
 using Microsoft.AspNetCore.Routing;
@@ -20,7 +21,7 @@ namespace BioEngine.Core.Api.Models
         public List<ContentBlock> Blocks { get; set; }
         public string Url { get; set; }
 
-        public ContentEntityRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository)
+        protected ContentEntityRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository, PropertiesProvider propertiesProvider) : base(propertiesProvider)
         {
             _linkGenerator = linkGenerator;
             _sitesRepository = sitesRepository;

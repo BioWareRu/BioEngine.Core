@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Api.Models;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Routing;
 
@@ -20,8 +21,9 @@ namespace BioEngine.Core.Posts.Api.Entities
             return entity;
         }
 
-        public PostRequestItem(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator,
-            sitesRepository)
+        public PostRequestItem(LinkGenerator linkGenerator, SitesRepository sitesRepository,
+            PropertiesProvider propertiesProvider) : base(linkGenerator,
+            sitesRepository, propertiesProvider)
         {
         }
     }
@@ -44,7 +46,8 @@ namespace BioEngine.Core.Posts.Api.Entities
             await ParseEntityAsync(entity);
         }
 
-        public Post(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        public Post(LinkGenerator linkGenerator, SitesRepository sitesRepository, PropertiesProvider propertiesProvider)
+            : base(linkGenerator, sitesRepository, propertiesProvider)
         {
         }
     }

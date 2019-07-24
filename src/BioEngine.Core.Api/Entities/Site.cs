@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BioEngine.Core.Api.Models;
+using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Api.Entities
 {
@@ -19,6 +20,10 @@ namespace BioEngine.Core.Api.Entities
         {
             await ParseEntityAsync(entity);
             Url = entity.Url;
+        }
+
+        public Site(PropertiesProvider propertiesProvider) : base(propertiesProvider)
+        {
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Api.Models
 {
@@ -20,6 +21,10 @@ namespace BioEngine.Core.Api.Models
             entity = await base.FillEntityAsync(entity);
             entity.SiteIds = SiteIds;
             return entity;
+        }
+
+        protected SiteEntityRestModel(PropertiesProvider propertiesProvider) : base(propertiesProvider)
+        {
         }
     }
 }

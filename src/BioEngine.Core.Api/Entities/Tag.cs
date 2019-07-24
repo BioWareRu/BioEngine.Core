@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BioEngine.Core.Api.Models;
+using BioEngine.Core.Properties;
 
 namespace BioEngine.Core.Api.Entities
 {
@@ -15,6 +16,10 @@ namespace BioEngine.Core.Api.Entities
         public async Task SetEntityAsync(Core.Entities.Tag entity)
         {
             await ParseEntityAsync(entity);
+        }
+
+        public Tag(PropertiesProvider propertiesProvider) : base(propertiesProvider)
+        {
         }
     }
 }

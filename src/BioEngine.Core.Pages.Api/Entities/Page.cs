@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BioEngine.Core.Api.Models;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Routing;
 
@@ -21,7 +22,8 @@ namespace BioEngine.Core.Pages.Api.Entities
             await ParseEntityAsync(entity);
         }
 
-        public Page(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator, sitesRepository)
+        public Page(LinkGenerator linkGenerator, SitesRepository sitesRepository, PropertiesProvider propertiesProvider)
+            : base(linkGenerator, sitesRepository, propertiesProvider)
         {
         }
     }

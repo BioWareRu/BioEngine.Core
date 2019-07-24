@@ -288,25 +288,11 @@ namespace BioEngine.Core.Repository
             return HooksManager.BeforeSaveAsync(item, validationResult, changes, operationContext);
         }
 
-        protected virtual async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null,
+        protected virtual Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null,
             TEntity? oldItem = null,
             IBioRepositoryOperationContext? operationContext = null)
         {
-            var result = await HooksManager.AfterSaveAsync(item, changes, operationContext);
-
-
-            if (item.Properties != null)
-            {
-                foreach (var propertiesEntry in item.Properties)
-                {
-                    foreach (var val in propertiesEntry.Properties)
-                    {
-                        await PropertiesProvider.SetAsync(val.Value, item, val.SiteId);
-                    }
-                }
-            }
-
-            return result;
+            return HooksManager.AfterSaveAsync(item, changes, operationContext);
         }
     }
 }

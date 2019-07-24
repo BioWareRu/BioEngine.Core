@@ -16,7 +16,7 @@ namespace BioEngine.Core.Api
         RequestRestController<TEntity, TRepository, TResponse, TRequest> : ResponseRestController<TEntity
             , TRepository,
             TResponse>
-        where TEntity : class, IEntity
+        where TEntity : class, IBioEntity
         where TResponse : class, IResponseRestModel<TEntity>
         where TRequest : class, IRequestRestModel<TEntity>
         where TRepository : IBioRepository<TEntity>
@@ -42,6 +42,21 @@ namespace BioEngine.Core.Api
             if (result.IsSuccess)
             {
                 await AfterSaveAsync(result.Entity, result.Changes, item);
+                if (item is RestModel<TEntity> restModel)
+                {
+                    var properties = restModel.PropertiesGroups?.Select(s => s.GetPropertiesEntry()).ToList();
+                    if (properties != null)
+                    {
+                        foreach (var propertiesEntry in properties)
+                        {
+                            foreach (var val in propertiesEntry.Properties)
+                            {
+                                await PropertiesProvider.SetAsync(val.Value, entity, val.SiteId);
+                            }
+                        }
+                    }
+                }
+
                 return Created(await MapRestModelAsync(result.Entity));
             }
 
@@ -132,7 +147,7 @@ namespace BioEngine.Core.Api
     public abstract class
         ResponseRequestRestController<TEntity, TRepository, TRequestResponse> :
             RequestRestController<TEntity, TRepository, TRequestResponse, TRequestResponse>
-        where TEntity : class, IEntity
+        where TEntity : class, IBioEntity
         where TRequestResponse : class, IResponseRestModel<TEntity>, IRequestRestModel<TEntity>
         where TRepository : IBioRepository<TEntity>
     {

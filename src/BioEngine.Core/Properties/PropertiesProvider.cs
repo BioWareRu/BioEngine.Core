@@ -20,6 +20,9 @@ namespace BioEngine.Core.Properties
         private bool _batchMode;
         private bool _checkIfExists = true;
 
+        private readonly Dictionary<Guid, List<PropertiesEntry>> _properties =
+            new Dictionary<Guid, List<PropertiesEntry>>();
+
         private static readonly ConcurrentDictionary<string, PropertiesSchema> Schema =
             new ConcurrentDictionary<string, PropertiesSchema>();
 
@@ -114,6 +117,17 @@ namespace BioEngine.Core.Properties
         }
 
         [PublicAPI]
+        public async Task<List<PropertiesEntry>> GetAsync(IBioEntity entity)
+        {
+            if (!_properties.ContainsKey(entity.Id))
+            {
+                await LoadPropertiesAsync(new[] {entity});
+            }
+
+            return _properties[entity.Id];
+        }
+
+        [PublicAPI]
         public async Task<TProperties> GetAsync<TProperties>() where TProperties : PropertiesSet, new()
         {
             var properties = new TProperties();
@@ -131,8 +145,8 @@ namespace BioEngine.Core.Properties
             where TProperties : PropertiesSet, new()
         {
             var schema = Schema.FirstOrDefault(s => s.Value.Type == typeof(TProperties));
-            if (!(entity.Properties.FirstOrDefault(x => x.Key == schema.Key)?.Properties
-                .FirstOrDefault(x => x.SiteId == siteId)?.Value is TProperties properties))
+            if (!(_properties.FirstOrDefault(r => r.Key == entity.Id).Value.Find(x => x.Key == schema.Key)?.Properties
+                .Find(x => x.SiteId == siteId)?.Value is TProperties properties))
             {
                 properties = new TProperties();
                 var propertiesRecord = await LoadFromDatabaseAsync(schema.Value, entity, siteId);
@@ -260,7 +274,11 @@ namespace BioEngine.Core.Properties
 
                     foreach (var entity in group)
                     {
-                        entity.Properties = new List<PropertiesEntry>();
+                        if (!_properties.ContainsKey(entity.Id))
+                        {
+                            _properties.Add(entity.Id, new List<PropertiesEntry>());
+                        }
+
                         foreach (var schema in schemas.Select(s => s.Value).OrderBy(s => s.Key))
                         {
                             var entry = new PropertiesEntry(schema.Key);
@@ -300,7 +318,7 @@ namespace BioEngine.Core.Properties
                                     throw new ArgumentOutOfRangeException();
                             }
 
-                            entity.Properties.Add(entry);
+                            _properties[entity.Id].Add(entry);
                         }
                     }
                 }

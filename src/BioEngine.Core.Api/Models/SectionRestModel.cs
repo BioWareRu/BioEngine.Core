@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
+using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Routing;
 
@@ -15,8 +16,9 @@ namespace BioEngine.Core.Api.Models
             return await FillEntityAsync(entity);
         }
 
-        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator,
-            sitesRepository)
+        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository,
+            PropertiesProvider propertiesProvider) : base(linkGenerator,
+            sitesRepository, propertiesProvider)
         {
         }
     }
@@ -34,8 +36,9 @@ namespace BioEngine.Core.Api.Models
             return entity;
         }
 
-        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(linkGenerator,
-            sitesRepository)
+        protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository,
+            PropertiesProvider propertiesProvider) : base(linkGenerator,
+            sitesRepository, propertiesProvider)
         {
         }
     }
@@ -62,8 +65,9 @@ namespace BioEngine.Core.Api.Models
             }
         }
 
-        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(
-            linkGenerator, sitesRepository)
+        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository,
+            PropertiesProvider propertiesProvider) : base(
+            linkGenerator, sitesRepository, propertiesProvider)
         {
         }
     }
@@ -91,8 +95,9 @@ namespace BioEngine.Core.Api.Models
             Data = entity.Data;
         }
 
-        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository) : base(
-            linkGenerator, sitesRepository)
+        protected ResponseSectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository,
+            PropertiesProvider propertiesProvider) : base(
+            linkGenerator, sitesRepository, propertiesProvider)
         {
         }
     }
