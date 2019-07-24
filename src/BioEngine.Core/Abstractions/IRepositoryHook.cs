@@ -12,12 +12,12 @@ namespace BioEngine.Core.Abstractions
 
         Task<bool> BeforeValidateAsync<T>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
-            where T : class, IEntity;
+            where T : class, IBioEntity;
 
         Task<bool> BeforeSaveAsync<T>(T item, (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)
-            where T : class, IEntity;
+            where T : class, IBioEntity;
 
-        Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null) where T : class, IEntity;
+        Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null) where T : class, IBioEntity;
     }
 }

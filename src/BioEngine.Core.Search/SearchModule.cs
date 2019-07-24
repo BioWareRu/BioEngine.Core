@@ -15,6 +15,7 @@ namespace BioEngine.Core.Search
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
+            services.AddScoped<IRepositoryHook, SearchRepositoryHook>();
             ConfigureSearch(services);
         }
 
@@ -43,12 +44,6 @@ namespace BioEngine.Core.Search
             serviceCollection.AddScoped<TSearchProvider>();
             serviceCollection.AddScoped<ISearchProvider<TEntity>, TSearchProvider>();
             return serviceCollection.AddScoped<ISearchProvider, TSearchProvider>();
-        }
-
-        public static IServiceCollection RegisterSearchRepositoryHook<TEntity>(
-            this IServiceCollection serviceCollection) where TEntity : BaseEntity
-        {
-            return serviceCollection.AddScoped<IRepositoryHook, SearchRepositoryHook<TEntity>>();
         }
     }
 

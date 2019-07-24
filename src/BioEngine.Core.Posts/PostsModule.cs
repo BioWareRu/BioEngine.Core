@@ -15,8 +15,7 @@ namespace BioEngine.Core.Posts
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            services.RegisterSearchRepositoryHook<Post>()
-                .RegisterSearchProvider<PostsSearchProvider, Post>();
+            services.RegisterSearchProvider<PostsSearchProvider, Post>();
         }
 
         public override void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)

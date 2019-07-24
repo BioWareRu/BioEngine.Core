@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Search
@@ -12,7 +13,7 @@ namespace BioEngine.Core.Search
         Task InitAsync();
     }
 
-    public interface ISearchProvider<T> : ISearchProvider where T : BaseEntity
+    public interface ISearchProvider<T> : ISearchProvider where T : IBioEntity
     {
         Task<T[]> SearchAsync(string term, int limit, Site site);
         Task AddOrUpdateEntityAsync(T entity);
