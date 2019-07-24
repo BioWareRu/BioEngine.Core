@@ -145,7 +145,10 @@ namespace BioEngine.Core.Properties
             where TProperties : PropertiesSet, new()
         {
             var schema = Schema.FirstOrDefault(s => s.Value.Type == typeof(TProperties));
-            if (!(_properties.FirstOrDefault(r => r.Key == entity.Id).Value.Find(x => x.Key == schema.Key)?.Properties
+            var entityProperties = _properties.ContainsKey(entity.Id)
+                ? _properties[entity.Id]
+                : new List<PropertiesEntry>();
+            if (!(entityProperties.Find(x => x.Key == schema.Key)?.Properties
                 .Find(x => x.SiteId == siteId)?.Value is TProperties properties))
             {
                 properties = new TProperties();

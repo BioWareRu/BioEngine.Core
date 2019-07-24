@@ -44,17 +44,7 @@ namespace BioEngine.Core.Api
                 await AfterSaveAsync(result.Entity, result.Changes, item);
                 if (item is RestModel<TEntity> restModel)
                 {
-                    var properties = restModel.PropertiesGroups?.Select(s => s.GetPropertiesEntry()).ToList();
-                    if (properties != null)
-                    {
-                        foreach (var propertiesEntry in properties)
-                        {
-                            foreach (var val in propertiesEntry.Properties)
-                            {
-                                await PropertiesProvider.SetAsync(val.Value, entity, val.SiteId);
-                            }
-                        }
-                    }
+                    await SavePropertiesAsync(restModel, entity);
                 }
 
                 return Created(await MapRestModelAsync(result.Entity));
@@ -62,6 +52,21 @@ namespace BioEngine.Core.Api
 
             return Errors(StatusCodes.Status422UnprocessableEntity,
                 result.Errors.Select(e => new ValidationErrorResponse(e.PropertyName, e.ErrorMessage)));
+        }
+
+        protected virtual async Task SavePropertiesAsync(RestModel<TEntity> restModel, TEntity entity)
+        {
+            var properties = restModel.PropertiesGroups?.Select(s => s.GetPropertiesEntry()).ToList();
+            if (properties != null)
+            {
+                foreach (var propertiesEntry in properties)
+                {
+                    foreach (var val in propertiesEntry.Properties)
+                    {
+                        await PropertiesProvider.SetAsync(val.Value, entity, val.SiteId);
+                    }
+                }
+            }
         }
 
         [HttpPut("{id}")]
@@ -79,6 +84,10 @@ namespace BioEngine.Core.Api
             if (result.IsSuccess)
             {
                 await AfterSaveAsync(result.Entity, result.Changes, item);
+                if (item is RestModel<TEntity> restModel)
+                {
+                    await SavePropertiesAsync(restModel, entity);
+                }
                 return Updated(await MapRestModelAsync(result.Entity));
             }
 
