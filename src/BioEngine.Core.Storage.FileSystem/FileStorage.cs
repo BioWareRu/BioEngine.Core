@@ -4,10 +4,9 @@ using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Repository;
 using JetBrains.Annotations;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace BioEngine.Core.Storage
+namespace BioEngine.Core.Storage.FileSystem
 {
     [UsedImplicitly]
     public class FileStorage : Storage
@@ -36,38 +35,6 @@ namespace BioEngine.Core.Storage
         {
             File.Delete(path);
             return Task.FromResult(true);
-        }
-    }
-
-    public class FileStorageModule : StorageModule<FileStorageModuleConfig>
-    {
-        protected override void CheckConfig()
-        {
-            if (string.IsNullOrEmpty(Config.StoragePath))
-            {
-                throw new ArgumentException("File storage path is empty");
-            }
-
-            if (Config.PublicUri == null)
-            {
-                throw new ArgumentException("Storage url is empty");
-            }
-        }
-
-        protected override void ConfigureStorage(IServiceCollection services)
-        {
-            services.AddSingleton(Config);
-            services.AddScoped<IStorage, FileStorage>();
-        }
-    }
-
-    public class FileStorageModuleConfig : StorageModuleConfig
-    {
-        public string StoragePath { get; }
-
-        public FileStorageModuleConfig(Uri publicUri, string storagePath) : base(publicUri)
-        {
-            StoragePath = storagePath;
         }
     }
 }
