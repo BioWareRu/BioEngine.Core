@@ -21,10 +21,11 @@
     <PackageReference Include="Scrutor" Version="3.0.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0-preview7.19362.9" />
     <!--Fix EF Core on preview5 until npgsql is fixed-->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview5.19227.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview5.19227.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.0.0-preview5.19227.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="3.0.0-preview5.19227.1" />
+<!--    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview5.19227.1" />-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview7.19362.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.0.0-preview7.19362.6" />
+<!--    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.0.0-preview5.19227.1" />-->
+<!--    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="3.0.0-preview5.19227.1" />-->
     <!---->
     <PackageReference Include="FluentValidation" Version="8.4.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.18" />
