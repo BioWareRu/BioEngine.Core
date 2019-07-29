@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.DB;
 
 namespace BioEngine.Core.Entities
@@ -7,5 +8,7 @@ namespace BioEngine.Core.Entities
     [Entity("tag")]
     public class Tag : BaseEntity
     {
+        [Required]
+        public string Title { get; set; }
     }
 }

@@ -8,7 +8,6 @@ namespace BioEngine.Core.Entities
     [Entity("propertiesrecord")]
     public class PropertiesRecord : BaseEntity
     {
-        [NotMapped] public override string Title { get; set; } = "";
         [Required] public string Key { get; set; } = "";
         public string EntityType { get; set; } = "";
         public Guid EntityId { get; set; }

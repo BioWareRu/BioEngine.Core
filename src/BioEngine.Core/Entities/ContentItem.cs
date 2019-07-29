@@ -9,6 +9,8 @@ namespace BioEngine.Core.Entities
     [Table("Content")]
     public abstract class ContentItem : BaseEntity, ITaggedContentEntity, ISectionEntity
     {
+        [Required] public string Title { get; set; }
+
         [Required] public virtual string Type { get; set; }
         public virtual bool IsPublished { get; set; }
         public virtual DateTimeOffset? DatePublished { get; set; }

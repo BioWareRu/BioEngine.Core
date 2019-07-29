@@ -14,7 +14,6 @@ namespace BioEngine.Core.Abstractions
 
     public interface IBioEntity : IEntity<Guid>
     {
-        string Title { get; set; }
         DateTimeOffset DateAdded { get; set; }
         DateTimeOffset DateUpdated { get; set; }
     }

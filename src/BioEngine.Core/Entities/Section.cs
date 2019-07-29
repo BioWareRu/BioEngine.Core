@@ -10,6 +10,7 @@ namespace BioEngine.Core.Entities
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public abstract class Section : BaseSiteEntity, IContentEntity
     {
+        [Required] public string Title { get; set; }
         [Required] public virtual string Type { get; set; }
         public virtual Guid? ParentId { get; set; }
 
@@ -18,7 +19,7 @@ namespace BioEngine.Core.Entities
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }
         [Required] public string Url { get; set; }
-        
+
         [NotMapped] public abstract string PublicRouteName { get; set; }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized.

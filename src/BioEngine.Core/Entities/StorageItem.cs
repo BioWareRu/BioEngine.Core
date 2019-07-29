@@ -9,7 +9,6 @@ namespace BioEngine.Core.Entities
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
     public class StorageItem : BaseEntity
     {
-        [NotMapped] public override string Title => FileName;
         public string FileName { get; set; }
         public long FileSize { get; set; }
         public Uri PublicUri { get; set; }

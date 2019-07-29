@@ -11,7 +11,6 @@ namespace BioEngine.Core.Entities
     [Entity("contentversion")]
     public class ContentVersion : BaseEntity
     {
-        [NotMapped] public override string Title { get; set; }
         public Guid ContentId { get; set; }
         [Column(TypeName = "jsonb")] public string Data { get; set; }
 
