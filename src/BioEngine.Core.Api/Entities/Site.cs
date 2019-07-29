@@ -8,11 +8,13 @@ namespace BioEngine.Core.Api.Entities
         IResponseRestModel<Core.Entities.Site>
     {
         public string Url { get; set; }
+        public string Title { get; set; }
 
         public async Task<Core.Entities.Site> GetEntityAsync(Core.Entities.Site entity)
         {
             entity = await FillEntityAsync(entity);
             entity.Url = Url;
+            entity.Title = Title;
             return entity;
         }
 
@@ -20,6 +22,7 @@ namespace BioEngine.Core.Api.Entities
         {
             await ParseEntityAsync(entity);
             Url = entity.Url;
+            Title = entity.Title;
         }
 
         public Site(PropertiesProvider propertiesProvider) : base(propertiesProvider)

@@ -16,7 +16,6 @@ namespace BioEngine.Core.Api.Models
         public DateTimeOffset DateAdded { get; set; }
         public DateTimeOffset DateUpdated { get; set; }
 
-        public string Title { get; set; }
 
         protected RestModel(PropertiesProvider propertiesProvider)
         {
@@ -31,9 +30,6 @@ namespace BioEngine.Core.Api.Models
             Id = entity.Id;
             DateAdded = entity.DateAdded;
             DateUpdated = entity.DateUpdated;
-
-            Title = entity.Title;
-
             PropertiesGroups = (await _propertiesProvider.GetAsync(entity))
                 .Select(p => PropertiesGroup.Create(p, PropertiesProvider.GetSchema(p.Key))).ToList();
         }
@@ -42,7 +38,6 @@ namespace BioEngine.Core.Api.Models
         {
             entity ??= CreateEntity();
             entity.Id = Id;
-            entity.Title = Title;
             return Task.FromResult(entity);
         }
 

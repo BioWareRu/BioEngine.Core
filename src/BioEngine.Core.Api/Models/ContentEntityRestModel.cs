@@ -20,6 +20,7 @@ namespace BioEngine.Core.Api.Models
         public List<PublicUrl> PublicUrls = new List<PublicUrl>();
         public List<ContentBlock> Blocks { get; set; }
         public string Url { get; set; }
+        public string Title { get; set; }
 
         protected ContentEntityRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository, PropertiesProvider propertiesProvider) : base(propertiesProvider)
         {
@@ -34,6 +35,7 @@ namespace BioEngine.Core.Api.Models
             DatePublished = entity.DatePublished;
             var sites = await _sitesRepository.GetByIdsAsync(entity.SiteIds);
             Url = entity.Url;
+            Title = entity.Title;
             foreach (var site in sites)
             {
                 PublicUrls.Add(new PublicUrl {Url = _linkGenerator.GeneratePublicUrl(entity, site), Site = site});
@@ -48,6 +50,7 @@ namespace BioEngine.Core.Api.Models
         {
             entity = await base.FillEntityAsync(entity);
             entity.Url = Url;
+            entity.Title = Title;
             return entity;
         }
     }

@@ -13,7 +13,9 @@ namespace BioEngine.Core.Api.Models
     {
         public async Task<TEntity> GetEntityAsync(TEntity entity)
         {
-            return await FillEntityAsync(entity);
+            await FillEntityAsync(entity);
+            entity.Title = Title;
+            return entity;
         }
 
         protected SectionRestModel(LinkGenerator linkGenerator, SitesRepository sitesRepository,
@@ -47,7 +49,7 @@ namespace BioEngine.Core.Api.Models
         IResponseRestModel<TEntity>
         where TEntity : Section, ISiteEntity, IEntity
     {
-        public virtual string Type { get; set; }
+        public string Type { get; set; }
         public string TypeTitle { get; set; }
 
         public async Task SetEntityAsync(TEntity entity)
@@ -59,6 +61,7 @@ namespace BioEngine.Core.Api.Models
         {
             await base.ParseEntityAsync(entity);
             Type = entity.Type;
+            Title = entity.Title;
             if (entity is ITypedEntity typedEntity)
             {
                 TypeTitle = typedEntity.TypeTitle;
@@ -77,7 +80,7 @@ namespace BioEngine.Core.Api.Models
         where TEntity : Section, ISiteEntity, IEntity, ITypedEntity<TData>
         where TData : ITypedData, new()
     {
-        public virtual string Type { get; set; }
+        public string Type { get; set; }
         public string TypeTitle { get; set; }
         public TData Data { get; set; }
 
@@ -89,6 +92,7 @@ namespace BioEngine.Core.Api.Models
         protected override async Task ParseEntityAsync(TEntity entity)
         {
             await base.ParseEntityAsync(entity);
+            Title = entity.Title;
             Type = entity.Type;
             TypeTitle = entity.TypeTitle;
 
