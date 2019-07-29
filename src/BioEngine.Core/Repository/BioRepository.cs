@@ -71,9 +71,9 @@ namespace BioEngine.Core.Repository
             return entity != null ? AfterLoadAsync(new[] {entity}) : Task.CompletedTask;
         }
 
-        protected virtual async Task AfterLoadAsync(TEntity[] entities)
+        protected virtual Task AfterLoadAsync(TEntity[] entities)
         {
-            await PropertiesProvider.LoadPropertiesAsync(entities);
+            return Task.CompletedTask;
         }
 
         public virtual Task<int> CountAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
