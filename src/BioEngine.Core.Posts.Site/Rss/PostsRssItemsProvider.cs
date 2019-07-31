@@ -83,9 +83,20 @@ namespace BioEngine.Core.Posts.Site.Rss
                     case TextBlock textBlock:
                         description += textBlock.Data.Text;
                         break;
+                    case QuoteBlock quoteBlock:
+                        description +=
+                            $"<blockquote><div>{quoteBlock.Data.Text}</div><cite>{quoteBlock.Data.Author}</cite></blockquote>";
+                        break;
                     case PictureBlock pictureBlock:
                         description +=
                             $"<p style=\"text-align:center;\"><img src=\"{pictureBlock.Data.Picture.PublicUri}\" alt=\"{pictureBlock.Data.Picture.FileName}\" /></p>";
+                        break;
+                    case GalleryBlock galleryBlock:
+                        foreach (var picture in galleryBlock.Data.Pictures)
+                        {
+                            description +=
+                                $"<p style=\"text-align:center;\"><img src=\"{picture.PublicUri}\" alt=\"{picture.FileName}\" /></p>";
+                        }
                         break;
                     default:
                         continue;
