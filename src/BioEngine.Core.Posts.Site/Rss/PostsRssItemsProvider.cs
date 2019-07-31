@@ -47,7 +47,7 @@ namespace BioEngine.Core.Posts.Site.Rss
                         Title = post.Title,
                         Description = GetDescription(post),
                         Link = postUrl,
-                        PublicationDate = newsDate.Value.Date,
+                        PublicationDate = newsDate.Value.DateTime,
                         Author = post.Author.Name,
                         Guid = new RssGuid(postUrl.ToString(), true)
                     };

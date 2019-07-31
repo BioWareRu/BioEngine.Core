@@ -38,7 +38,8 @@ namespace BioEngine.Core.Site.Controllers
                 Language = CultureInfo.CurrentCulture,
                 TimeToLive = 60,
                 LastBuildDate = DateTime.Now,
-                Copyright = $"(c) {Site.Title}"
+                Copyright = $"(c) {Site.Title}",
+                PublicationDate = DateTime.Now
             };
 
             var items = new List<RssItem>();
