@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Comments;
 using BioEngine.Core.Entities.Blocks;
@@ -73,7 +74,7 @@ namespace BioEngine.Core.Posts.Site.Rss
         {
             var description = "";
 
-            foreach (var block in post.Blocks)
+            foreach (var block in post.Blocks.OrderBy(b => b.Position))
             {
                 switch (block)
                 {
