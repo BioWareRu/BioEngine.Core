@@ -59,7 +59,7 @@ namespace BioEngine.Core.Repository
                 needCount = true;
             }
 
-            var items = await dbQuery.ToArrayAsync();
+            var items = await AddIncludes(dbQuery).ToArrayAsync();
             var itemsCount = needCount && items.Length == query.Limit ? await CountAsync(configureQuery) : items.Length;
             await AfterLoadAsync(items);
 
@@ -86,7 +86,7 @@ namespace BioEngine.Core.Repository
         {
             var query = CreateRepositoryQuery().Where(i => i.Id.Equals(id)).Configure(configureQuery).BuildQuery();
 
-            var item = await query.FirstOrDefaultAsync();
+            var item = await AddIncludes(query).FirstOrDefaultAsync();
             await AfterLoadAsync(item);
             return item;
         }
@@ -94,7 +94,7 @@ namespace BioEngine.Core.Repository
         public virtual async Task<TEntity> GetAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Configure(configureQuery).BuildQuery();
-            var item = await query.FirstOrDefaultAsync();
+            var item = await AddIncludes(query).FirstOrDefaultAsync();
             await AfterLoadAsync(item);
             return item;
         }
@@ -111,7 +111,7 @@ namespace BioEngine.Core.Repository
             Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Where(i => ids.Contains(i.Id)).Configure(configureQuery).BuildQuery();
-            var items = await query.ToArrayAsync();
+            var items = await AddIncludes(query).ToArrayAsync();
             await AfterLoadAsync(items);
 
             return items;
@@ -264,16 +264,21 @@ namespace BioEngine.Core.Repository
             return (!failures.Any(), failures);
         }
 
-        protected virtual IQueryable<TEntity> GetBaseQuery()
+        private IQueryable<TEntity> GetBaseQuery()
         {
             return DbContext.Set<TEntity>().AsQueryable();
+        }
+
+        protected virtual IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query)
+        {
+            return query;
         }
 
         protected virtual BioRepositoryQuery<TEntity> CreateRepositoryQuery()
         {
             return new BioRepositoryQuery<TEntity>(GetBaseQuery(), DbContext);
         }
-        
+
         protected virtual Task<bool> BeforeValidateAsync(TEntity item,
             (bool isValid, IList<ValidationFailure> errors) validationResult,
             PropertyChange[]? changes = null, IBioRepositoryOperationContext? operationContext = null)

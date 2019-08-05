@@ -63,7 +63,7 @@ namespace BioEngine.Core.DB
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.IsPublished);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url).IsUnique();
             modelBuilder.Entity<ContentItem>().HasMany(contentItem => contentItem.Blocks).WithOne()
-                .HasForeignKey(c => c.ContentId);
+                .HasForeignKey(c => c.ContentId).IsRequired(false);
 
             var dataConversionRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
                 nameof(ModelBuilderContextExtensions.RegisterDataConversion),

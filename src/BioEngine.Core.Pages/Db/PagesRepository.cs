@@ -7,9 +7,9 @@ namespace BioEngine.Core.Pages.Db
 {
     public class PagesRepository : ContentEntityRepository<Page>
     {
-        protected override IQueryable<Page> GetBaseQuery()
+        protected override IQueryable<Page> AddIncludes(IQueryable<Page> query)
         {
-            return DbContext.Set<Page>().Include(p => p.Blocks);
+            return base.AddIncludes(query).Include(p => p.Blocks);
         }
 
         public PagesRepository(BioRepositoryContext<Page> repositoryContext) : base(repositoryContext)

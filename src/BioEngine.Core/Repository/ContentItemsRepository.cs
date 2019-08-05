@@ -11,10 +11,9 @@ namespace BioEngine.Core.Repository
         {
         }
         
-        protected override IQueryable<ContentItem> GetBaseQuery()
+        protected override IQueryable<ContentItem> AddIncludes(IQueryable<ContentItem> query)
         {
-            return DbContext.Set<ContentItem>().Include(p => p.Blocks);
+            return base.AddIncludes(query).Include(p=>p.Blocks);
         }
-
     }
 }

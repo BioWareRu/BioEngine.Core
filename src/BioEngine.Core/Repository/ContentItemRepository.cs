@@ -19,9 +19,9 @@ namespace BioEngine.Core.Repository
             _userDataProvider = userDataProvider;
         }
 
-        protected override IQueryable<TEntity> GetBaseQuery()
+        protected override IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query)
         {
-            return DbContext.Set<TEntity>().Include(p => p.Blocks);
+            return base.AddIncludes(query).Include(p => p.Blocks);
         }
 
         protected override void RegisterValidators()
