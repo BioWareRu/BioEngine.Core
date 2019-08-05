@@ -60,7 +60,7 @@ namespace BioEngine.Core.Repository
             }
 
             var items = await AddIncludes(dbQuery).ToArrayAsync();
-            var itemsCount = needCount && items.Length == query.Limit ? await CountAsync(configureQuery) : items.Length;
+            var itemsCount = needCount && (query.Offset>0 || items.Length == query.Limit) ? await CountAsync(configureQuery) : items.Length;
             await AfterLoadAsync(items);
 
             return (items, itemsCount);
