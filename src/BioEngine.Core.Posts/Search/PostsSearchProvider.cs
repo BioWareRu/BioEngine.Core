@@ -16,10 +16,9 @@ namespace BioEngine.Core.Posts.Search
         private readonly TagsRepository _tagsRepository;
         private readonly PostsRepository _postsRepository;
 
-        public PostsSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<Post>> logger,
-            TagsRepository tagsRepository, PostsRepository postsRepository, BioEntitiesManager entitiesManager) : base(
-            searcher,
-            logger, entitiesManager)
+        public PostsSearchProvider(ILogger<BaseSearchProvider<Post>> logger,
+            TagsRepository tagsRepository, PostsRepository postsRepository, BioEntitiesManager entitiesManager,
+            ISearcher searcher = null) : base(logger, entitiesManager, searcher)
         {
             _tagsRepository = tagsRepository;
             _postsRepository = postsRepository;

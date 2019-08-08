@@ -11,8 +11,8 @@ namespace BioEngine.Core.Search
     public abstract class SectionsSearchProvider<T> : BaseSearchProvider<T>
         where T : Section
     {
-        public SectionsSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<T>> logger, BioEntitiesManager entitiesManager) : base(searcher,
-            logger, entitiesManager)
+        public SectionsSearchProvider(ILogger<BaseSearchProvider<T>> logger,
+            BioEntitiesManager entitiesManager, ISearcher searcher = null) : base(logger, entitiesManager, searcher)
         {
         }
 

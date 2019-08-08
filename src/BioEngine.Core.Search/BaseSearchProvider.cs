@@ -12,9 +12,10 @@ namespace BioEngine.Core.Search
         protected readonly ILogger<BaseSearchProvider<T>> Logger;
         private readonly BioEntitiesManager _entitiesManager;
 
-        protected BaseSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<T>> logger, BioEntitiesManager entitiesManager)
+        protected BaseSearchProvider(ILogger<BaseSearchProvider<T>> logger,
+            BioEntitiesManager entitiesManager, ISearcher searcher = null)
         {
-            _searcher = searcher;
+            _searcher = searcher ?? throw new Exception($"No searcher for provider {this}");
             Logger = logger;
             _entitiesManager = entitiesManager;
         }
