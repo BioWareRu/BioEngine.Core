@@ -18,7 +18,7 @@
     <PackageReference Include="Roslynator.Analyzers" Version="2.1.0" />
     <PackageReference Include="Roslynator.CodeFixes" Version="2.0.0" />
     <PackageReference Include="ReflectionAnalyzers" Version="0.1.20-dev" />
-    <PackageReference Include="Scrutor" Version="3.0.2" />
+    <PackageReference Include="Scrutor" Version="3.1.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0-preview7.19362.9" />
     <!--Fix EF Core on preview5 until npgsql is fixed-->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview5.19227.1" />
