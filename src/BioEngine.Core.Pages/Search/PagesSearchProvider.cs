@@ -14,9 +14,9 @@ namespace BioEngine.Core.Pages.Search
     {
         private readonly PagesRepository _pagesRepository;
 
-        public PagesSearchProvider(ISearcher searcher, ILogger<BaseSearchProvider<Page>> logger,
-            PagesRepository pagesRepository, BioEntitiesManager entitiesManager) : base(searcher,
-            logger, entitiesManager)
+        public PagesSearchProvider(ILogger<BaseSearchProvider<Page>> logger,
+            PagesRepository pagesRepository, BioEntitiesManager entitiesManager, ISearcher searcher = null) : base(logger, entitiesManager,
+            searcher)
         {
             _pagesRepository = pagesRepository;
         }
@@ -25,13 +25,9 @@ namespace BioEngine.Core.Pages.Search
         {
             return Task.FromResult(entities.Select(page =>
             {
-                return new SearchModel(page.Id, page.Title, page.Url, 
-                    string.Join(" ", page.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s))), 
-                    page.DateAdded)
-                {
-                    SiteIds = page.SiteIds
-                };
-
+                return new SearchModel(page.Id, page.Title, page.Url,
+                    string.Join(" ", page.Blocks.Select(b => b.ToString()).Where(s => !string.IsNullOrEmpty(s))),
+                    page.DateAdded) {SiteIds = page.SiteIds};
             }).ToArray());
         }
 
