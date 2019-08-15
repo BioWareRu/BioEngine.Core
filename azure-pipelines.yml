@@ -1,10 +1,3 @@
-variables:
-    Version: 3.0.$(Build.BuildId)
-    BE_POSTGRES_HOST: postgres
-    BE_POSTGRES_USERNAME: brc
-    BE_POSTGRES_PASSWORD: 123
-    BE_POSTGRES_PORT: 5432
-
 resources:
     containers:
         -   container: postgres
@@ -13,14 +6,21 @@ resources:
                 POSTGRES_USER: brc
                 POSTGRES_PASSWORD: 123
 
+variables:
+    Version: 3.0.$(Build.BuildId)
+    BE_POSTGRES_HOST: postgres
+    BE_POSTGRES_USERNAME: brc
+    BE_POSTGRES_PASSWORD: 123
+    BE_POSTGRES_PORT: 5432
+
 stages:
     -   stage: Build
-        services:
-            postgres: postgres
         jobs:
             -   job: Build
                 pool:
                     vmImage: Ubuntu 16.04
+                services:
+                    postgres: postgres
                 steps:
                     -   task: UseDotNet@2
                         displayName: 'Install .Net Core 3.0'
