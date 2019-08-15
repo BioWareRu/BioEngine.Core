@@ -5,10 +5,12 @@ resources:
             env:
                 POSTGRES_USER: brc
                 POSTGRES_PASSWORD: 123
+            ports:
+                5432:5432
 
 variables:
     Version: 3.0.$(Build.BuildId)
-    BE_POSTGRES_HOST: postgres
+    BE_POSTGRES_HOST: localhost
     BE_POSTGRES_USERNAME: brc
     BE_POSTGRES_PASSWORD: 123
     BE_POSTGRES_PORT: 5432
