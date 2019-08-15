@@ -6,7 +6,7 @@ resources:
                 POSTGRES_USER: brc
                 POSTGRES_PASSWORD: 123
             ports:
-                5432:5432
+                - 5432:5432
 
 variables:
     Version: 3.0.$(Build.BuildId)
