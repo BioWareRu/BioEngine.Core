@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BioEngine.Core.DB;
 using BioEngine.Core.Db.InMemory;
+using BioEngine.Core.Db.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,13 +22,13 @@ namespace BioEngine.Core.Tests.Xunit
         }
     }
 
-    public abstract class BaseTest<T> : BaseTest, IDisposable where T : BaseTestScope
+    public abstract class BaseTest<T> : BaseTest, IDisposable where T : BaseTestScope<T>
     {
         protected BaseTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 
-        private readonly Dictionary<string, BaseTestScope> _scopes = new Dictionary<string, BaseTestScope>();
+        private readonly Dictionary<string, BaseTestScope<T>> _scopes = new Dictionary<string, BaseTestScope<T>>();
 
         protected T GetScope([CallerMemberName] string name = "")
         {
@@ -71,19 +72,44 @@ namespace BioEngine.Core.Tests.Xunit
         }
     }
 
-    public abstract class BaseTestScope : IDisposable
+    public abstract class BaseTestScope<TScope> : IDisposable where TScope : class
     {
         public void Configure(string dbName, ITestOutputHelper testOutputHelper)
         {
             var bioEngine = new BioEngine(new string[0]);
+
             bioEngine.ConfigureServices(collection =>
                 {
                     collection.AddLogging(o => o.AddProvider(new XunitLoggerProvider(testOutputHelper)));
                     ConfigureServices(collection, dbName);
                 })
-                .AddEntities()
-                .AddModule<InMemoryDatabaseModule<BioContext>, InMemoryDatabaseModuleConfig>(
+                .AddEntities();
+
+            var config = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TScope>()
+                .Build();
+            
+            var testInMemory =
+                !string.IsNullOrEmpty(config["BIOENGINE_TEST_IN_MEMORY"])
+                && bool.TryParse(config["BIOENGINE_TEST_IN_MEMORY"], out _);
+            if (testInMemory)
+            {
+                bioEngine.AddModule<InMemoryDatabaseModule<BioContext>, InMemoryDatabaseModuleConfig>(
                     (configuration, environment) => new InMemoryDatabaseModuleConfig(dbName));
+            }
+            else
+            {
+                bioEngine.AddModule<PostgresDatabaseModule<BioContext>, PostgresDatabaseModuleConfig>((configuration,
+                    environment) =>
+                {
+                    return new PostgresDatabaseModuleConfig(config["BE_POSTGRES_HOST"],
+                        config["BE_POSTGRES_USERNAME"], dbName,
+                        config["BE_POSTGRES_PASSWORD"],
+                        int.Parse(config["BE_POSTGRES_PORT"]));
+                });
+            }
+
             bioEngine = ConfigureBioEngine(bioEngine);
             ServiceProvider = bioEngine.GetServices();
         }
@@ -123,8 +149,7 @@ namespace BioEngine.Core.Tests.Xunit
 
             return _bioContext;
         }
-
-        protected IConfiguration? Configuration;
+        
         protected IServiceProvider? ServiceProvider;
 
         protected virtual void InitDbContext(BioContext dbContext)
