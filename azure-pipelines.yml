@@ -19,8 +19,6 @@ stages:
             -   job: Build
                 pool:
                     vmImage: Ubuntu 16.04
-                services:
-                    postgres: postgres
                 steps:
                     -   task: UseDotNet@2
                         displayName: 'Install .Net Core 3.0'
@@ -50,6 +48,8 @@ stages:
                         inputs:
                             artifactName: 'packages'
                             targetPath: '$(Build.ArtifactStagingDirectory)'
+                services:
+                    postgres: postgres
 
     -   stage: Deploy
         dependsOn: Build
