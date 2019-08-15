@@ -7,13 +7,12 @@ variables:
     BE_POSTGRES_PASSWORD: 123
     BE_POSTGRES_PORT: 5432
 
-resources:
-    containers:
-        -   container: postgres
-            image: postgres
-
 stages:
     -   stage: Build
+        resources:
+            containers:
+                -   container: postgres
+                    image: postgres
         jobs:
             -   job: Build
                 pool:
