@@ -13,11 +13,10 @@ resources:
                 POSTGRES_USER: brc
                 POSTGRES_PASSWORD: 123
 
-services:
-    postgres: postgres
-
 stages:
     -   stage: Build
+        services:
+            postgres: postgres
         jobs:
             -   job: Build
                 pool:
