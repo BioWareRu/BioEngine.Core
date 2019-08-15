@@ -1,18 +1,23 @@
 variables:
     Version: 3.0.$(Build.BuildId)
-    POSTGRES_USER: brc
-    POSTGRES_PASSWORD: 123
     BE_POSTGRES_HOST: postgres
     BE_POSTGRES_USERNAME: brc
     BE_POSTGRES_PASSWORD: 123
     BE_POSTGRES_PORT: 5432
 
+resources:
+    containers:
+        -   container: postgres
+            image: postgres
+            env:
+                POSTGRES_USER: brc
+                POSTGRES_PASSWORD: 123
+
+services:
+    postgres: postgres
+
 stages:
     -   stage: Build
-        resources:
-            containers:
-                -   container: postgres
-                    image: postgres
         jobs:
             -   job: Build
                 pool:
