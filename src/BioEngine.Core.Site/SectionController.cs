@@ -21,7 +21,8 @@ namespace BioEngine.Core.Site
         protected virtual async Task<IActionResult> ShowContentAsync<TContent>(string url, int page = 0)
             where TContent : ContentItem
         {
-            var section = await Repository.GetAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
+            var section =
+                await Repository.GetWithBlocksAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
             if (section == null)
             {
                 return PageNotFound();
