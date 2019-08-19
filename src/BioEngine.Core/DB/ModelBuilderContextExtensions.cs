@@ -5,7 +5,6 @@ using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Newtonsoft.Json;
 
 namespace BioEngine.Core.DB
 {
@@ -17,17 +16,11 @@ namespace BioEngine.Core.DB
             modelBuilder
                 .Entity<TEntity>()
                 .Property(s => s.SectionIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Guid[]>(v));
+                .HasColumnType("jsonb");
             modelBuilder
                 .Entity<TEntity>()
                 .Property(s => s.TagIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Guid[]>(v));
+                .HasColumnType("jsonb");
         }
 
         public static void RegisterSiteEntityConversions<TEntity>(this ModelBuilder modelBuilder)
@@ -36,10 +29,7 @@ namespace BioEngine.Core.DB
             modelBuilder
                 .Entity<TEntity>()
                 .Property(s => s.SiteIds)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Guid[]>(v));
+                .HasColumnType("jsonb");
         }
 
         public static void RegisterJsonConversion<TEntity, TProperty>(this ModelBuilder modelBuilder,
@@ -49,10 +39,7 @@ namespace BioEngine.Core.DB
             modelBuilder
                 .Entity<TEntity>()
                 .Property(propertySelector)
-                .HasColumnType("jsonb")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<TProperty>(v));
+                .HasColumnType("jsonb");
         }
 
         public static void RegisterDataConversion<TEntity, TData>(this ModelBuilder modelBuilder)
@@ -62,10 +49,7 @@ namespace BioEngine.Core.DB
                 .Entity<TEntity>()
                 .Property(e => e.Data)
                 .HasColumnType("jsonb")
-                .HasColumnName(nameof(ITypedEntity<TData>.Data))
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<TData>(v));
+                .HasColumnName(nameof(ITypedEntity<TData>.Data));
         }
 
         public static void RegisterDiscriminator<TBase>(this ModelBuilder modelBuilder, Type objectType,
