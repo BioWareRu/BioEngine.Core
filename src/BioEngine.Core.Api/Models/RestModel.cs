@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Api.Entities;
 using BioEngine.Core.Properties;
-using Newtonsoft.Json;
 
 namespace BioEngine.Core.Api.Models
 {
@@ -15,15 +14,13 @@ namespace BioEngine.Core.Api.Models
         public Guid Id { get; set; }
         public DateTimeOffset DateAdded { get; set; }
         public DateTimeOffset DateUpdated { get; set; }
+        public List<PropertiesGroup> PropertiesGroups { get; set; }
 
 
         protected RestModel(PropertiesProvider propertiesProvider)
         {
             _propertiesProvider = propertiesProvider;
         }
-
-        [JsonIgnore] public List<PropertiesEntry> Properties { get; set; }
-        public List<PropertiesGroup> PropertiesGroups { get; set; }
 
         protected virtual async Task ParseEntityAsync(TEntity entity)
         {
