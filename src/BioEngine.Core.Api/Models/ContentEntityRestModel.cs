@@ -18,7 +18,7 @@ namespace BioEngine.Core.Api.Models
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }
         public List<PublicUrl> PublicUrls = new List<PublicUrl>();
-        public List<ContentBlock> Blocks { get; set; }
+        public List<ContentBlock> Blocks { get; set; } = new List<ContentBlock>();
         public string Url { get; set; }
         public string Title { get; set; }
 

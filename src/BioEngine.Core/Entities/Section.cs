@@ -13,7 +13,7 @@ namespace BioEngine.Core.Entities
         [Required] public string Title { get; set; }
         [Required] public virtual string Type { get; set; }
         public virtual Guid? ParentId { get; set; }
-        [NotMapped] public List<ContentBlock> Blocks { get; set; }
+        [NotMapped] public List<ContentBlock> Blocks { get; set; } = new List<ContentBlock>();
 
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }
