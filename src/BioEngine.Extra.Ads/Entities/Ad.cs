@@ -16,6 +16,7 @@ namespace BioEngine.Extra.Ads.Entities
         [NotMapped] public string PublicRouteName { get; set; } = "";
         [Required] public string Url { get; set; }
         public string Title { get; set; }
+        [NotMapped]
         public List<ContentBlock> Blocks { get; set; }
         public bool IsPublished { get; set; }
         public DateTimeOffset? DatePublished { get; set; }

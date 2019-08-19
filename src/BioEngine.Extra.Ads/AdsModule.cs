@@ -11,11 +11,6 @@ namespace BioEngine.Extra.Ads
         {
             base.ConfigureEntities(serviceCollection, entitiesManager);
             RegisterRepositories(typeof(Ad).Assembly, serviceCollection, entitiesManager);
-            entitiesManager.ConfigureDbContext(modelBuilder =>
-            {
-                modelBuilder.Entity<Ad>().HasMany(contentItem => contentItem.Blocks).WithOne()
-                    .HasForeignKey(c => c.ContentId);
-            });
         }
     }
 }
