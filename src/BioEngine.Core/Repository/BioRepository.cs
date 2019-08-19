@@ -19,7 +19,8 @@ namespace BioEngine.Core.Repository
         protected readonly BioContext DbContext;
         protected readonly List<IValidator<TEntity>> Validators;
         protected readonly PropertiesProvider PropertiesProvider;
-        public BioRepositoryHooksManager HooksManager { get; set; }
+        protected readonly BioRepositoryHooksManager HooksManager;
+        protected readonly BioEntitiesManager EntitiesManager;
 
         protected BioRepository(BioRepositoryContext<TEntity> repositoryContext)
         {
@@ -27,6 +28,7 @@ namespace BioEngine.Core.Repository
             Validators = repositoryContext.Validators ?? new List<IValidator<TEntity>>();
             PropertiesProvider = repositoryContext.PropertiesProvider;
             HooksManager = repositoryContext.HooksManager;
+            EntitiesManager = repositoryContext.EntitiesManager;
             Init();
         }
 
@@ -60,7 +62,9 @@ namespace BioEngine.Core.Repository
             }
 
             var items = await AddIncludes(dbQuery).ToArrayAsync();
-            var itemsCount = needCount && (query.Offset>0 || items.Length == query.Limit) ? await CountAsync(configureQuery) : items.Length;
+            var itemsCount = needCount && (query.Offset > 0 || items.Length == query.Limit)
+                ? await CountAsync(configureQuery)
+                : items.Length;
             await AfterLoadAsync(items);
 
             return (items, itemsCount);
@@ -120,6 +124,26 @@ namespace BioEngine.Core.Repository
         public virtual async Task<AddOrUpdateOperationResult<TEntity>> AddAsync(TEntity item,
             IBioRepositoryOperationContext? operationContext = null)
         {
+            var validationResult = await DoAddAsync(item, operationContext);
+            if (validationResult.isValid)
+            {
+                await DoSaveAsync(item, null, null, operationContext);
+            }
+
+            return new AddOrUpdateOperationResult<TEntity>(item, validationResult.errors, new PropertyChange[0]);
+        }
+
+        protected async Task DoSaveAsync(TEntity item, PropertyChange[]? changes = null,
+            TEntity? oldItem = null,
+            IBioRepositoryOperationContext? operationContext = null)
+        {
+            await SaveChangesAsync();
+            await AfterSaveAsync(item, null, null, operationContext);
+        }
+
+        protected async Task<(bool isValid, IList<ValidationFailure> errors)> DoAddAsync(TEntity item,
+            IBioRepositoryOperationContext? operationContext = null)
+        {
             if (item.Id == Guid.Empty)
             {
                 item.Id = Guid.NewGuid();
@@ -134,14 +158,13 @@ namespace BioEngine.Core.Repository
                     if (await BeforeSaveAsync(item, validationResult, null, operationContext))
                     {
                         DbContext.Add(item);
-                        await SaveChangesAsync();
-                        await AfterSaveAsync(item, null, null, operationContext);
                     }
                 }
             }
 
-            return new AddOrUpdateOperationResult<TEntity>(item, validationResult.errors, new PropertyChange[0]);
+            return validationResult;
         }
+
 
         public PropertyChange[] GetChanges(TEntity item, TEntity oldEntity)
         {
@@ -178,6 +201,20 @@ namespace BioEngine.Core.Repository
         public virtual async Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item,
             IBioRepositoryOperationContext? operationContext = null)
         {
+            var (validationResult, changes, oldItem) = await DoUpdateAsync(item, operationContext);
+            if (validationResult.isValid)
+            {
+                await DoSaveAsync(item, changes, oldItem, operationContext);
+            }
+
+            return new AddOrUpdateOperationResult<TEntity>(item, validationResult.errors, changes);
+        }
+
+        protected async
+            Task<((bool isValid, IList<ValidationFailure> errors) validationResult, PropertyChange[] changes, TEntity
+                oldItem)> DoUpdateAsync(TEntity item,
+                IBioRepositoryOperationContext? operationContext = null)
+        {
             var oldItem = GetBaseQuery().Where(e => e.Id == item.Id).AsNoTracking().First();
             var changes = GetChanges(item, oldItem);
             item.DateUpdated = DateTimeOffset.UtcNow;
@@ -190,13 +227,11 @@ namespace BioEngine.Core.Repository
                     if (await BeforeSaveAsync(item, validationResult, changes, operationContext))
                     {
                         DbContext.Update(item);
-                        await SaveChangesAsync();
-                        await AfterSaveAsync(item, changes, oldItem, operationContext);
                     }
                 }
             }
 
-            return new AddOrUpdateOperationResult<TEntity>(item, validationResult.errors, changes);
+            return (validationResult, changes, oldItem);
         }
 
         public Task FinishBatchAsync()

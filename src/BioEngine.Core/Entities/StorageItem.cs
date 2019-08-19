@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.DB;
+using JetBrains.Annotations;
 
 namespace BioEngine.Core.Entities
 {
@@ -66,6 +67,11 @@ namespace BioEngine.Core.Entities
 
         public int Width { get; set; }
         public int Height { get; set; }
+
+        [UsedImplicitly]
+        public StorageItemPictureThumbnail()
+        {
+        }
 
         public StorageItemPictureThumbnail(Uri publicUri, string filePath, int width, int height)
         {

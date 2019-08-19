@@ -15,6 +15,7 @@ namespace BioEngine.Core.Entities
         public virtual bool IsPublished { get; set; }
         public virtual DateTimeOffset? DatePublished { get; set; }
         public Guid[] SiteIds { get; set; } = new Guid[0];
+        [NotMapped]
         public List<ContentBlock> Blocks { get; set; } = new List<ContentBlock>();
         public Guid[] SectionIds { get; set; } = new Guid[0];
         public Guid[] TagIds { get; set; } = new Guid[0];

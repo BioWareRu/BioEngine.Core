@@ -12,11 +12,6 @@ namespace BioEngine.Core.Repository
         {
         }
 
-        protected override IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query)
-        {
-            return base.AddIncludes(query).Include(p=>p.Blocks);
-        }
-
         protected override async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null,
             TEntity? oldItem = null,
             IBioRepositoryOperationContext? operationContext = null)

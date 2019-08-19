@@ -13,14 +13,19 @@ namespace BioEngine.Core.Repository
         public List<IValidator<T>>? Validators { get; }
         public PropertiesProvider PropertiesProvider { get; }
         public BioRepositoryHooksManager HooksManager { get; }
+        public BioEntitiesManager EntitiesManager { get; }
 
-        public BioRepositoryContext(BioContext dbContext, PropertiesProvider propertiesProvider,
+        public BioRepositoryContext(
+            BioContext dbContext,
+            PropertiesProvider propertiesProvider,
             BioRepositoryHooksManager hooksManager,
+            BioEntitiesManager entitiesManager,
             IEnumerable<IValidator<T>>? validators = default)
         {
             DbContext = dbContext;
             PropertiesProvider = propertiesProvider;
             HooksManager = hooksManager;
+            EntitiesManager = entitiesManager;
             Validators = validators?.ToList();
         }
     }

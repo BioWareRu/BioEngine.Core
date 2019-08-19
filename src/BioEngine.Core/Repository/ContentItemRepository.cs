@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Validation;
-using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Repository
 {
@@ -17,11 +16,6 @@ namespace BioEngine.Core.Repository
             sectionsRepository)
         {
             _userDataProvider = userDataProvider;
-        }
-
-        protected override IQueryable<TEntity> AddIncludes(IQueryable<TEntity> query)
-        {
-            return base.AddIncludes(query).Include(p => p.Blocks);
         }
 
         protected override void RegisterValidators()

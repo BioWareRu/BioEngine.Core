@@ -55,14 +55,12 @@ namespace BioEngine.Core.DB
             modelBuilder.Entity<Section>().HasIndex(s => s.IsPublished);
             modelBuilder.Entity<Section>().HasIndex(s => s.Type);
             modelBuilder.Entity<Section>().HasIndex(s => s.Url);
-            modelBuilder.Entity<Section>().HasMany(section => section.Blocks).WithOne().IsRequired(false);
 
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.SiteIds);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.TagIds);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.SectionIds);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.IsPublished);
             modelBuilder.Entity<ContentItem>().HasIndex(i => i.Url).IsUnique();
-            modelBuilder.Entity<ContentItem>().HasMany(contentItem => contentItem.Blocks).WithOne().IsRequired(false);
 
             var dataConversionRegistrationMethod = typeof(ModelBuilderContextExtensions).GetMethod(
                 nameof(ModelBuilderContextExtensions.RegisterDataConversion),
