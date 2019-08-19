@@ -89,7 +89,7 @@ namespace BioEngine.Core.Tests.Xunit
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TScope>()
                 .Build();
-            
+
             var testInMemory =
                 !string.IsNullOrEmpty(config["BIOENGINE_TEST_IN_MEMORY"])
                 && bool.TryParse(config["BIOENGINE_TEST_IN_MEMORY"], out _);
@@ -106,7 +106,7 @@ namespace BioEngine.Core.Tests.Xunit
                     return new PostgresDatabaseModuleConfig(config["BE_POSTGRES_HOST"],
                         config["BE_POSTGRES_USERNAME"], dbName,
                         config["BE_POSTGRES_PASSWORD"],
-                        int.Parse(config["BE_POSTGRES_PORT"]));
+                        int.Parse(config["BE_POSTGRES_PORT"])) {EnableSensitiveLogging = true};
                 });
             }
 
@@ -149,7 +149,7 @@ namespace BioEngine.Core.Tests.Xunit
 
             return _bioContext;
         }
-        
+
         protected IServiceProvider? ServiceProvider;
 
         protected virtual void InitDbContext(BioContext dbContext)
