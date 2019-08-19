@@ -29,7 +29,7 @@ namespace BioEngine.Core.Posts.Site
 
         public override async Task<IActionResult> ShowAsync(string url)
         {
-            var post = await Repository.GetAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
+            var post = await Repository.GetWithBlocksAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
             if (post == null)
             {
                 return PageNotFound();
@@ -67,7 +67,7 @@ namespace BioEngine.Core.Posts.Site
             }
 
             var (items, itemsCount) =
-                await Repository.GetAllAsync(entities => entities.WithTags(tags.items).Where(e => e.IsPublished));
+                await Repository.GetAllWithBlocksAsync(entities => entities.WithTags(tags.items).Where(e => e.IsPublished));
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
         }

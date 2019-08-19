@@ -32,13 +32,31 @@ namespace BioEngine.Core.Api
             return await restModel.GetEntityAsync(domainModel);
         }
 
+        protected virtual Task<AddOrUpdateOperationResult<TEntity>> DoAddAsync(TEntity entity,
+            BioRepositoryOperationContext operationContext)
+        {
+            return Repository.AddAsync(entity, operationContext);
+        }
+
+        protected virtual Task<AddOrUpdateOperationResult<TEntity>> DoUpdateAsync(TEntity entity,
+            BioRepositoryOperationContext operationContext)
+        {
+            return Repository.UpdateAsync(entity, operationContext);
+        }
+
+        protected virtual Task<TEntity> DoDeleteAsync(Guid id,
+            BioRepositoryOperationContext operationContext)
+        {
+            return Repository.DeleteAsync(id, operationContext);
+        }
+
 
         [HttpPost]
         public virtual async Task<ActionResult<TResponse>> AddAsync(TRequest item)
         {
             var entity = await MapDomainModelAsync(item, Activator.CreateInstance<TEntity>());
 
-            var result = await Repository.AddAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+            var result = await DoAddAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
             if (result.IsSuccess)
             {
                 await AfterSaveAsync(result.Entity, result.Changes, item);
@@ -80,7 +98,7 @@ namespace BioEngine.Core.Api
 
             entity = await MapDomainModelAsync(item, entity);
 
-            var result = await Repository.UpdateAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+            var result = await DoUpdateAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
             if (result.IsSuccess)
             {
                 await AfterSaveAsync(result.Entity, result.Changes, item);
@@ -88,6 +106,7 @@ namespace BioEngine.Core.Api
                 {
                     await SavePropertiesAsync(restModel, entity);
                 }
+
                 return Updated(await MapRestModelAsync(result.Entity));
             }
 
@@ -101,12 +120,10 @@ namespace BioEngine.Core.Api
             throw new NotImplementedException();
         }
 
-        //protected abstract TRest MapEntity(TRest entity, TRest newData);
-
         [HttpDelete("{id}")]
         public virtual async Task<ActionResult<TResponse>> DeleteAsync(Guid id)
         {
-            var result = await Repository.DeleteAsync(id, new BioRepositoryOperationContext {User = CurrentUser});
+            var result = await DoDeleteAsync(id, new BioRepositoryOperationContext {User = CurrentUser});
             if (result != null)
             {
                 await AfterDeleteAsync(result);

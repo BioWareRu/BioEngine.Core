@@ -31,6 +31,23 @@ namespace BioEngine.Core.Api
             EntitiesManager = entitiesManager;
         }
 
+        protected override Task<AddOrUpdateOperationResult<TEntity>> DoAddAsync(TEntity entity,
+            BioRepositoryOperationContext operationContext)
+        {
+            return Repository.AddWithBlocksAsync(entity, operationContext);
+        }
+
+        protected override Task<AddOrUpdateOperationResult<TEntity>> DoUpdateAsync(TEntity entity,
+            BioRepositoryOperationContext operationContext)
+        {
+            return Repository.UpdateWithBlocksAsync(entity, operationContext);
+        }
+
+        protected override Task<TEntity> DoGetByIdAsync(Guid id)
+        {
+            return Repository.GetByIdWithBlocksAsync(id);
+        }
+
         private ContentBlock CreateBlock(string type)
         {
             var blockType = EntitiesManager.GetBlocksMetadata().Where(entityMetadata =>
@@ -54,17 +71,15 @@ namespace BioEngine.Core.Api
             {
                 contentItemModel.AuthorId = CurrentUser.Id;
             }
-            
+
             domainModel.Blocks = new List<ContentBlock>();
             var dbBlocks = await _blocksRepository.GetByIdsAsync(restModel.Blocks.Select(b => b.Id).ToArray());
-            _blocksRepository.BeginBatch();
             foreach (var contentBlock in restModel.Blocks)
             {
                 var block = dbBlocks.FirstOrDefault(b => b.Id == contentBlock.Id && b.ContentId == domainModel.Id);
                 if (block == null)
                 {
                     block = CreateBlock(contentBlock.Type);
-                    await _blocksRepository.AddAsync(block);
                 }
 
                 if (block != null)

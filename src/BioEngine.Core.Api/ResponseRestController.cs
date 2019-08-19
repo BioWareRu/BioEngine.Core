@@ -42,10 +42,15 @@ namespace BioEngine.Core.Api
             return await ListAsync(result);
         }
 
+        protected virtual Task<TEntity> DoGetByIdAsync(Guid id)
+        {
+            return Repository.GetByIdAsync(id);
+        }
+
         [HttpGet("{id}")]
         public virtual async Task<ActionResult<TResponse>> GetAsync(Guid id)
         {
-            var entity = await Repository.GetByIdAsync(id);
+            var entity = await DoGetByIdAsync(id);
             if (entity == null)
             {
                 return NotFound();
