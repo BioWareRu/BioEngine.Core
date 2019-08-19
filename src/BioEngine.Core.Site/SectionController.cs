@@ -18,6 +18,19 @@ namespace BioEngine.Core.Site
         {
         }
 
+        public override async Task<IActionResult> ShowAsync(string url)
+        {
+            var entity =
+                await Repository.GetWithBlocksAsync(entities =>
+                    ApplyPublishConditions(entities).Where(e => e.Url == url));
+            if (entity == null)
+            {
+                return PageNotFound();
+            }
+
+            return View(new EntityViewModel<TSection>(GetPageContext(), entity, ContentEntityViewMode.Entity));
+        }
+
         protected virtual async Task<IActionResult> ShowContentAsync<TContent>(string url, int page = 0)
             where TContent : ContentItem
         {
