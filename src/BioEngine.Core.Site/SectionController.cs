@@ -27,8 +27,10 @@ namespace BioEngine.Core.Site
                 return PageNotFound();
             }
 
-            var contentRepository = HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>();
-            var provider = new ListProvider<TContent, IBioRepository<TContent>>(contentRepository);
+            var contentRepository =
+                HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>() as
+                    ContentEntityRepository<TContent>;
+            var provider = new ListProvider<TContent, ContentEntityRepository<TContent>>(contentRepository);
             provider.SetPage(page).SetPageSize(ItemsPerPage).SetSite(Site);
             var (items, itemsCount) = await provider.GetAllAsync(queryable =>
                 queryable.ForSection(section)
