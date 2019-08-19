@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -5,6 +6,7 @@ using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -57,6 +59,34 @@ namespace BioEngine.Core.Tests
             Assert.NotNull(content.SiteIds);
             Assert.NotEmpty(content.SiteIds);
             Assert.Equal(section.SiteIds, content.SiteIds);
+        }
+
+        [Fact]
+        public async Task JsonSearch()
+        {
+            var scope = GetScope();
+            var dbContext = scope.GetDbContext();
+            var count = await dbContext.Sections.CountAsync();
+            var section = new TestSection
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test section 4",
+                Url = "test4",
+                DatePublished = DateTimeOffset.Now,
+                IsPublished = true,
+                SiteIds = new[] {Guid.NewGuid()},
+                Data = new TestSectionData {SomeNumber = 5}
+            };
+            await dbContext.AddAsync(section);
+            await dbContext.SaveChangesAsync();
+
+            var newCount = await dbContext.Sections.CountAsync();
+
+            Assert.Equal(count + 1, newCount);
+
+            var search = await dbContext.Set<TestSection>().Where(s => s.Data.SomeNumber == 5).FirstOrDefaultAsync();
+            Assert.NotNull(search);
+            Assert.Equal(section.Id, search.Id);
         }
     }
 }

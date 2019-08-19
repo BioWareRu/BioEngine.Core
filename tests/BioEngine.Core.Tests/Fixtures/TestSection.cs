@@ -13,5 +13,6 @@ namespace BioEngine.Core.Tests.Fixtures
 
     public class TestSectionData : ITypedData
     {
+        public int SomeNumber { get; set; }
     }
 }
