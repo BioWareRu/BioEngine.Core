@@ -77,7 +77,7 @@ namespace BioEngine.Core.Db.PostgreSQL
                     builder => builder.MigrationsAssembly(Config.MigrationsAssembly != null
                         ? Config.MigrationsAssembly.FullName
                         : typeof(DbContext).Assembly.FullName)).UseInternalServiceProvider(p);
-                if (environment.IsDevelopment())
+                if (Config.EnableSensitiveLogging)
                 {
                     options.EnableSensitiveDataLogging();
                 }
@@ -93,6 +93,7 @@ namespace BioEngine.Core.Db.PostgreSQL
         public string Password { get; set; }
         public string Database { get; set; }
         public bool EnablePooling { get; set; }
+        public bool EnableSensitiveLogging { get; set; }
 
         public Assembly? MigrationsAssembly
         {
