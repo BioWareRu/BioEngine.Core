@@ -8,7 +8,7 @@ namespace BioEngine.Core.Site
 {
     public class ListProvider<TEntity, TRepository>
         where TEntity : class, IEntity, IRoutable, IContentEntity
-        where TRepository : IBioRepository<TEntity>
+        where TRepository : ContentEntityRepository<TEntity>
     {
         private readonly TRepository _repository;
         private int _page;
@@ -61,10 +61,10 @@ namespace BioEngine.Core.Site
         }
 
 
-        public Task<(TEntity[] items, int itemsCount)> GetAllAsync(
+        public virtual Task<(TEntity[] items, int itemsCount)> GetAllAsync(
             Func<BioRepositoryQuery<TEntity>, BioRepositoryQuery<TEntity>>? configureQuery)
         {
-            return _repository.GetAllAsync(entities => ConfigureQuery(configureQuery(entities)));
+            return _repository.GetAllWithBlocksAsync(entities => ConfigureQuery(configureQuery(entities)));
         }
 
         private void ConfigureQuery(BioRepositoryQuery<TEntity> query)
