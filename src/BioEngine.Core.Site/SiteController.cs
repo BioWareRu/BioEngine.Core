@@ -96,11 +96,16 @@ namespace BioEngine.Core.Site
             provider.SetOrderByDescending(e => e.DateAdded);
         }
 
+        protected virtual ListProvider<TEntity, TRepository> CreateListProvider()
+        {
+            return new ListProvider<TEntity, TRepository>(Repository).SetSite(Site);
+        }
+
         [PublicAPI]
         protected Task<(TEntity[] items, int itemsCount)> GetAllAsync(
             Func<BioRepositoryQuery<TEntity>, BioRepositoryQuery<TEntity>>? configureQuery, int page = 0)
         {
-            var provider = new ListProvider<TEntity, TRepository>(Repository).SetSite(Site);
+            var provider = CreateListProvider();
             if (ControllerContext.HttpContext.Request.Query.ContainsKey("order"))
             {
                 provider.SetOrderByString(ControllerContext.HttpContext.Request.Query["order"]);
@@ -119,6 +124,7 @@ namespace BioEngine.Core.Site
                 Page = int.Parse(ControllerContext.HttpContext.Request.Query["page"]);
                 if (Page < 1) Page = 1;
             }
+
             provider.SetPage(Page);
 
             return provider.GetAllAsync(configureQuery);
