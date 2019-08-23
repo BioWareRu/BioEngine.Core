@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Comments;
+using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
@@ -30,10 +31,11 @@ namespace BioEngine.Core.Posts.Site.Rss
 
         public async Task<IEnumerable<RssItem>> GetItemsAsync(Core.Entities.Site site, int count)
         {
-            var posts = await _postsRepository.GetAllAsync(entities =>
+            var posts = await _postsRepository.GetAllWithBlocksAsync(entities =>
                 entities.Where(e => e.IsPublished).ForSite(site).OrderByDescending(p => p.DatePublished).Take(count));
             DateTimeOffset? mostRecentPubDate = DateTimeOffset.MinValue;
-            var commentsData = await _commentsProvider.GetCommentsDataAsync(posts.items);
+            var commentsData =
+                await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());
             var items = new List<RssItem>();
             foreach (var post in posts.items)
             {
@@ -97,6 +99,7 @@ namespace BioEngine.Core.Posts.Site.Rss
                             description +=
                                 $"<p style=\"text-align:center;\"><img src=\"{picture.PublicUri}\" alt=\"{picture.FileName}\" /></p>";
                         }
+
                         break;
                     default:
                         continue;
