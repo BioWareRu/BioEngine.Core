@@ -12,11 +12,12 @@ namespace BioEngine.Core.Social
     public abstract class BaseContentPublisher<TConfig, TPublishRecord> : IContentPublisher<TConfig>
         where TConfig : IContentPublisherConfig where TPublishRecord : BasePublishRecord, new()
     {
-        protected ILogger<IContentPublisher<TConfig>> Logger { get; }
+        protected ILogger<BaseContentPublisher<TConfig, TPublishRecord>> Logger { get; }
         private readonly BioContext _dbContext;
         private readonly BioEntitiesManager _entitiesManager;
 
-        protected BaseContentPublisher(BioContext dbContext, ILogger<IContentPublisher<TConfig>> logger,
+        protected BaseContentPublisher(BioContext dbContext,
+            ILogger<BaseContentPublisher<TConfig, TPublishRecord>> logger,
             BioEntitiesManager entitiesManager)
         {
             Logger = logger;

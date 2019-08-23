@@ -14,7 +14,7 @@ namespace BioEngine.Core.Pages.Search
     {
         private readonly PagesRepository _pagesRepository;
 
-        public PagesSearchProvider(ILogger<BaseSearchProvider<Page>> logger,
+        public PagesSearchProvider(ILogger<PagesSearchProvider> logger,
             PagesRepository pagesRepository, BioEntitiesManager entitiesManager, ISearcher searcher = null) : base(logger, entitiesManager,
             searcher)
         {

@@ -14,11 +14,11 @@ namespace BioEngine.Core.Comments
     {
         protected readonly BioContext DbContext;
         private readonly IUserDataProvider _userDataProvider;
-        protected readonly ILogger<ICommentsProvider> Logger;
+        protected readonly ILogger<BaseCommentsProvider> Logger;
 
         protected BaseCommentsProvider(BioContext dbContext,
             IUserDataProvider userDataProvider,
-            ILogger<ICommentsProvider> logger)
+            ILogger<BaseCommentsProvider> logger)
         {
             DbContext = dbContext;
             _userDataProvider = userDataProvider;

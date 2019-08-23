@@ -11,7 +11,7 @@ namespace BioEngine.Core.Site.Controllers
 {
     public abstract class BaseSiteMapController : SiteMapController
     {
-        protected BaseSiteMapController(ILogger<SiteMapController> logger,
+        protected BaseSiteMapController(ILogger<BaseSiteMapController> logger,
             IEnumerable<ISiteMapNodeService> nodeProviders = null) : base(logger, nodeProviders)
         {
         }
