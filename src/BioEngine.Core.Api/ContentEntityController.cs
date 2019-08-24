@@ -99,7 +99,7 @@ namespace BioEngine.Core.Api
         [HttpPost("publish/{id}")]
         public virtual async Task<ActionResult<TResponse>> PublishAsync(Guid id)
         {
-            var entity = await Repository.GetByIdAsync(id);
+            var entity = await Repository.GetByIdWithBlocksAsync(id);
             if (entity != null)
             {
                 if (entity.IsPublished)
