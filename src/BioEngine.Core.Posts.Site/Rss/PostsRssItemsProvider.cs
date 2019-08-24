@@ -72,7 +72,7 @@ namespace BioEngine.Core.Posts.Site.Rss
             return items;
         }
 
-        private static string GetDescription(Post post)
+        private string GetDescription(Post post)
         {
             var description = "";
 
@@ -102,7 +102,9 @@ namespace BioEngine.Core.Posts.Site.Rss
 
                         break;
                     default:
-                        continue;
+                        description +=
+                            $"<p style=\"text-align:center;\"><a href=\"{_linkGenerator.GeneratePublicUrl(post)}\">Посмотреть на сайте</a></p>";
+                        break;
                 }
             }
 
