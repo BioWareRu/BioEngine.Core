@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +48,7 @@ namespace BioEngine.Core.Db.PostgreSQL
             if (environment.IsProduction())
             {
                 var dbContext = serviceProvider.GetRequiredService<TDbContext>();
-                if (dbContext.Database.GetPendingMigrations().Any())
+                if ((await dbContext.Database.GetPendingMigrationsAsync()).Any())
                 {
                     await dbContext.Database.MigrateAsync();
                 }
@@ -66,22 +67,32 @@ namespace BioEngine.Core.Db.PostgreSQL
                 Username = Config.Username,
                 Password = Config.Password,
                 Database = Config.Database,
-                Pooling = Config.EnablePooling
+                Pooling = Config.EnableNpgsqlPooling
             };
 
             Config.DbConfigure?.Invoke(connBuilder, configuration);
             services.AddEntityFrameworkNpgsql();
-            services.AddDbContextPool<TDbContext>((p, options) =>
+            if (Config.EnableContextPooling)
             {
-                options.UseNpgsql(connBuilder.ConnectionString,
-                    builder => builder.MigrationsAssembly(Config.MigrationsAssembly != null
-                        ? Config.MigrationsAssembly.FullName
-                        : typeof(DbContext).Assembly.FullName)).UseInternalServiceProvider(p);
-                if (Config.EnableSensitiveLogging)
-                {
-                    options.EnableSensitiveDataLogging();
-                }
-            });
+                services.AddDbContextPool<TDbContext>((p, options) => ConfigureNpgsql(options, connBuilder, p));
+            }
+            else
+            {
+                services.AddDbContext<TDbContext>((p, options) => ConfigureNpgsql(options, connBuilder, p));
+            }
+        }
+
+        private void ConfigureNpgsql(DbContextOptionsBuilder options, NpgsqlConnectionStringBuilder connBuilder,
+            IServiceProvider p)
+        {
+            options.UseNpgsql(connBuilder.ConnectionString,
+                builder => builder.MigrationsAssembly(Config.MigrationsAssembly != null
+                    ? Config.MigrationsAssembly.FullName
+                    : typeof(DbContext).Assembly.FullName)).UseInternalServiceProvider(p);
+            if (Config.EnableSensitiveLogging)
+            {
+                options.EnableSensitiveDataLogging();
+            }
         }
     }
 
@@ -92,7 +103,8 @@ namespace BioEngine.Core.Db.PostgreSQL
         public string Username { get; set; }
         public string Password { get; set; }
         public string Database { get; set; }
-        public bool EnablePooling { get; set; }
+        public bool EnableNpgsqlPooling { get; set; } = true;
+        public bool EnableContextPooling { get; set; } = true;
         public bool EnableSensitiveLogging { get; set; }
 
         public Assembly? MigrationsAssembly
@@ -104,13 +116,12 @@ namespace BioEngine.Core.Db.PostgreSQL
 
         public PostgresDatabaseModuleConfig(string host, string username, string database,
             string password = "",
-            int port = 5432, bool enablePooling = true, Assembly migrationsAssembly = null)
+            int port = 5432, Assembly migrationsAssembly = null)
         {
             Host = host;
             Username = username;
             Database = database;
             MigrationsAssembly = migrationsAssembly;
-            EnablePooling = enablePooling;
             Password = password;
             Port = port;
         }
