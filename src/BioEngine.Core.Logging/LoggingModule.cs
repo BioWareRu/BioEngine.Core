@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.AspNetCore;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Extensions.Logging;
 
 namespace BioEngine.Core.Logging
 {
