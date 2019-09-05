@@ -19,8 +19,11 @@
     <PackageReference Include="Roslynator.CodeFixes" Version="2.0.0" />
     <PackageReference Include="ReflectionAnalyzers" Version="0.1.20-dev" />
     <PackageReference Include="Scrutor" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview9.19423.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview9.19423.6" />
+    <!--Fix ef core on preview8 until https://github.com/aspnet/EntityFrameworkCore/issues/17374 is fixed-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0-preview8.19405.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0-preview8.19405.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.0.0-preview8.19405.11" />
+    <!---->
     <PackageReference Include="FluentValidation" Version="8.4.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
   </ItemGroup>

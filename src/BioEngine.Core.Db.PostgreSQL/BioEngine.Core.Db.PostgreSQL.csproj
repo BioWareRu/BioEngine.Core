@@ -8,7 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview9" />
+    <!--Fix ef core on preview8 until https://github.com/aspnet/EntityFrameworkCore/issues/17374 is fixed-->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.0-preview8" />
+    <!---->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj" />
