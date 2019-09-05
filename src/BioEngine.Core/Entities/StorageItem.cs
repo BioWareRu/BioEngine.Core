@@ -16,8 +16,8 @@ namespace BioEngine.Core.Entities
         public string FilePath { get; set; }
         public string Path { get; set; }
         public StorageItemType Type { get; set; } = StorageItemType.Other;
-        public StorageItemPictureInfo PictureInfo { get; set; }
-        public string Hash { get; set; }
+        public StorageItemPictureInfo? PictureInfo { get; set; }
+        public string? Hash { get; set; }
 
         public string StorageFileName => FilePath.Substring(FilePath.LastIndexOf('/') + 1);
         private readonly string[] _units = {"bytes", "KB", "MB", "GB", "TB", "PB"};

@@ -14,7 +14,7 @@ namespace BioEngine.Core.Comments
         [Required] public string AuthorId { get; set; }
         [Required] public Guid[] SiteIds { get; set; } = new Guid[0];
         public Guid? ReplyTo { get; set; }
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [NotMapped] public IUser? Author { get; set; }
 
