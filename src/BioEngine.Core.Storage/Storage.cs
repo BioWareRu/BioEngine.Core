@@ -42,6 +42,7 @@ namespace BioEngine.Core.Storage
             {
                 return new List<StorageNode>();
             }
+
             var items = await GetNodesByPathAsync(nodes, $"{root}/{path}".Trim('/').Replace("//", "/"));
             return items.Select(i => new StorageNode(i, root)).OrderByDescending(i => i.IsDirectory)
                 .ThenBy(i => i.Name);
@@ -241,16 +242,18 @@ namespace BioEngine.Core.Storage
         {
             try
             {
-                using (var image = Image.Load(filePath))
+                using (var image = Image.Load<Rgba32>(filePath))
                 {
                     storageItem.Type = StorageItemType.Picture;
                     storageItem.PictureInfo = new StorageItemPictureInfo
                     {
                         VerticalResolution = image.Height,
                         HorizontalResolution = image.Width,
-                        MediumThumbnail = await CreateThumbnailAsync(image, _options.MediumThumbnailWidth,
+                        MediumThumbnail = await CreateThumbnailAsync(image,
+                            _options.MediumThumbnailWidth,
                             _options.MediumThumbnailHeight, destinationPath, storageItem.StorageFileName),
-                        SmallThumbnail = await CreateThumbnailAsync(image, _options.SmallThumbnailWidth,
+                        SmallThumbnail = await CreateThumbnailAsync(image,
+                            _options.SmallThumbnailWidth,
                             _options.SmallThumbnailHeight, destinationPath, storageItem.StorageFileName)
                     };
                 }
