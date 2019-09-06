@@ -214,7 +214,7 @@ namespace BioEngine.Core.Storage
         public async Task<bool> DeleteAsync(string path, string root = "/")
         {
             var fullPath = GetFullPath(path, root);
-            var item = await _dbContext.StorageItems.Where(i => i.Path == fullPath).FirstOrDefaultAsync();
+            var item = await _dbContext.StorageItems.Where(i => i.FilePath == fullPath).FirstOrDefaultAsync();
             if (item == null)
             {
                 _logger.LogError("Can't find item with path {path}", fullPath);
