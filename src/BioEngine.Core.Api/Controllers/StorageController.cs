@@ -26,5 +26,12 @@ namespace BioEngine.Core.Api.Controllers
             var item = await Storage.SaveFileAsync(file, name, path, "storage");
             return new StorageNode(item);
         }
+        
+        [HttpDelete]
+        public async Task<bool> DeleteAsync([FromQuery] string path)
+        {
+            var result = await Storage.DeleteAsync(path, "storage");
+            return result;
+        }
     }
 }
