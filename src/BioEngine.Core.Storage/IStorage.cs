@@ -12,6 +12,7 @@ namespace BioEngine.Core.Storage
         Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/");
 
         Task<bool> DeleteAsync(StorageItem item);
+        Task<bool> DeleteAsync(string path, string root = "/");
         Task<bool> DeleteAsync(IEnumerable<StorageItem> items);
         
         void BeginBatch();

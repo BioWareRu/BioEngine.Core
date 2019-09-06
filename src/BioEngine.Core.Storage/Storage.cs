@@ -43,7 +43,8 @@ namespace BioEngine.Core.Storage
                 return new List<StorageNode>();
             }
 
-            var items = await GetNodesByPathAsync(nodes, $"{root}/{path}".Trim('/').Replace("//", "/"));
+            var fullPath = $"{root}/{path}".Trim('/').Replace("//", "/");
+            var items = await GetNodesByPathAsync(nodes, fullPath);
             return items.Select(i => new StorageNode(i, root)).OrderByDescending(i => i.IsDirectory)
                 .ThenBy(i => i.Name);
         }
@@ -122,6 +123,27 @@ namespace BioEngine.Core.Storage
             return bytes.Aggregate("", (current, b) => current + b.ToString("x2"));
         }
 
+        private string GetFullPath(string path, string root)
+        {
+            if (path.StartsWith("/")) path = path.Substring(1);
+            var basePath = path;
+            if (root != "/")
+            {
+                basePath = path != "/" ? Path.Combine(root, path) : root;
+            }
+
+            return basePath;
+        }
+
+        private string GetFilePath(string basePath, string fileName = null)
+        {
+            fileName ??= basePath;
+            var destinationName = GetStorageFileName(fileName);
+            var destinationPath = Path.Combine(basePath, destinationName).Replace("\\", "/");
+            if (destinationPath.StartsWith("/")) destinationPath = destinationPath.Substring(1);
+            return destinationPath;
+        }
+
         [SuppressMessage("ReSharper", "RCS1198")]
         public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
         {
@@ -132,16 +154,9 @@ namespace BioEngine.Core.Storage
                 return storageItem;
             }
 
-            var destinationName = GetStorageFileName(fileName);
-            if (path.StartsWith("/")) path = path.Substring(1);
-            var basePath = path;
-            if (root != "/")
-            {
-                basePath = path != "/" ? Path.Combine(root, path) : root;
-            }
+            var basePath = GetFullPath(path, root);
+            var destinationPath = GetFilePath(basePath, fileName);
 
-            var destinationPath = Path.Combine(basePath, destinationName).Replace("\\", "/");
-            if (destinationPath.StartsWith("/")) destinationPath = destinationPath.Substring(1);
             var tmpPath = Path.Combine(Path.GetTempPath(), fileName.ToLowerInvariant());
 
             using (var sourceStream = new FileStream(tmpPath,
@@ -194,6 +209,19 @@ namespace BioEngine.Core.Storage
             await _repository.DeleteAsync(item);
 
             return true;
+        }
+
+        public async Task<bool> DeleteAsync(string path, string root = "/")
+        {
+            var fullPath = GetFullPath(path, root);
+            var item = await _dbContext.StorageItems.Where(i => i.Path == fullPath).FirstOrDefaultAsync();
+            if (item == null)
+            {
+                _logger.LogError("Can't find item with path {path}", fullPath);
+                return false;
+            }
+
+            return await DeleteAsync(item);
         }
 
         public async Task<bool> DeleteAsync(IEnumerable<StorageItem> items)
