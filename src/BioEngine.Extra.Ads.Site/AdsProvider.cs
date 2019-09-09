@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BioEngine.Core.Repository;
+using BioEngine.Core.DB;
 using BioEngine.Extra.Ads.Entities;
 
 namespace BioEngine.Extra.Ads.Site
