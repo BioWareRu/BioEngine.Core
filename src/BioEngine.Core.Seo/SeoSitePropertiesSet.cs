@@ -3,7 +3,7 @@ using BioEngine.Core.Properties;
 namespace BioEngine.Core.Seo
 {
     [PropertiesSet("Seo", IsEditable = true)]
-    public class SeoPropertiesSet : PropertiesSet
+    public class SeoSitePropertiesSet : PropertiesSet
     {
         [PropertiesElement("Описание", PropertyElementType.LongString)]
         public string Description { get; set; } = "";

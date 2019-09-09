@@ -35,21 +35,25 @@ namespace BioEngine.Core.Site.Model
             if (_meta == null)
             {
                 _meta = new PageMetaModel {Title = Site.Title, CurrentUrl = new Uri(Site.Url)};
-                SeoPropertiesSet seoPropertiesSet = null;
+                SeoContentPropertiesSet seoPropertiesSet = null;
                 if (Section != null)
                 {
-                    seoPropertiesSet = await PropertiesProvider.GetAsync<SeoPropertiesSet>(Section);
-                }
-
-                if (seoPropertiesSet == null)
-                {
-                    seoPropertiesSet = await PropertiesProvider.GetAsync<SeoPropertiesSet>(Site);
+                    seoPropertiesSet = await PropertiesProvider.GetAsync<SeoContentPropertiesSet>(Section);
                 }
 
                 if (seoPropertiesSet != null)
                 {
                     _meta.Description = seoPropertiesSet.Description;
                     _meta.Keywords = seoPropertiesSet.Keywords;
+                }
+                else
+                {
+                    var sitePropertiesSet = await PropertiesProvider.GetAsync<SeoSitePropertiesSet>(Site);
+                    if (sitePropertiesSet != null)
+                    {
+                        _meta.Description = sitePropertiesSet.Description;
+                        _meta.Keywords = sitePropertiesSet.Keywords;
+                    }
                 }
             }
 

@@ -30,7 +30,7 @@ namespace BioEngine.Core.Site.Model
                 Title = $"{Entity.Title} / {Site.Title}", CurrentUrl = new Uri($"{Site.Url}{path}")
             };
 
-            var seoPropertiesSet = await PropertiesProvider.GetAsync<SeoPropertiesSet>(Entity);
+            var seoPropertiesSet = await PropertiesProvider.GetAsync<SeoContentPropertiesSet>(Entity);
             if (seoPropertiesSet != null && !string.IsNullOrEmpty(seoPropertiesSet.Description))
             {
                 meta.Description = seoPropertiesSet.Description;

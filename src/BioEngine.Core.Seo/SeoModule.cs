@@ -13,9 +13,9 @@ namespace BioEngine.Core.Seo
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            PropertiesProvider.RegisterBioEngineSectionProperties<SeoPropertiesSet>("seo");
-            PropertiesProvider.RegisterBioEngineContentProperties<SeoPropertiesSet>("seo");
-            PropertiesProvider.RegisterBioEngineProperties<SeoPropertiesSet, Site>("seo");
+            PropertiesProvider.RegisterBioEngineSectionProperties<SeoContentPropertiesSet>("seo");
+            PropertiesProvider.RegisterBioEngineContentProperties<SeoContentPropertiesSet>("seo");
+            PropertiesProvider.RegisterBioEngineProperties<SeoSitePropertiesSet, Site>("seosite");
         }
     }
 }
