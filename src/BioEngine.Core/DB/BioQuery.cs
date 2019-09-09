@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
@@ -280,7 +281,7 @@ namespace BioEngine.Core.DB
         }
     }
 
-    public static class BioRepositoryQueryExtensions
+    public static class BioQueryExtensions
     {
         public static BioQuery<T> ForSite<T>(this BioQuery<T> query, [NotNull] Site site)
             where T : class, IEntity, ISiteEntity
@@ -309,6 +310,30 @@ namespace BioEngine.Core.DB
             }
 
             return query;
+        }
+
+        public static async Task<(T[] items, int itemsCount)> GetAllAsync<T>(this BioQuery<T> query) where T : class
+        {
+            var dbQuery = query.BuildQuery();
+            var needCount = false;
+            if (query.Offset != null)
+            {
+                dbQuery = dbQuery.Skip(query.Offset.Value);
+                needCount = true;
+            }
+
+            if (query.Limit != null)
+            {
+                dbQuery = dbQuery.Take(query.Limit.Value);
+                needCount = true;
+            }
+
+            var items = await dbQuery.ToArrayAsync();
+            var itemsCount = needCount && (query.Offset > 0 || items.Length == query.Limit)
+                ? await query.BuildQuery().CountAsync()
+                : items.Length;
+
+            return (items, itemsCount);
         }
     }
 }
