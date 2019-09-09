@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Site.Model;
@@ -41,17 +43,19 @@ namespace BioEngine.Core.Site
                 return PageNotFound();
             }
 
-            var contentRepository =
-                HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>() as
-                    ContentEntityRepository<TContent>;
-            var provider = new ListProvider<TContent, ContentEntityRepository<TContent>>(contentRepository);
-            provider.SetPage(page).SetPageSize(ItemsPerPage).SetSite(Site);
-            var (items, itemsCount) = await provider.GetAllAsync(queryable =>
-                queryable.ForSection(section)
-                    .Where(c => c.IsPublished));
-            return View("Content", new SectionContentListViewModel<TSection, TContent>(GetPageContext(section), section,
-                items,
-                itemsCount, page, ItemsPerPage));
+            if (HttpContext.RequestServices.GetRequiredService<IBioRepository<TContent>>() is
+                ContentEntityRepository<TContent> contentRepository)
+            {
+                var (items, itemsCount) = await contentRepository.GetAllWithBlocksAsync(queryable =>
+                    queryable.ForSite(Site).ForSection(section).Take(ItemsPerPage)
+                        .Where(c => c.IsPublished).Paginate(page, ItemsPerPage));
+                return View("Content", new SectionContentListViewModel<TSection, TContent>(GetPageContext(section),
+                    section,
+                    items,
+                    itemsCount, page, ItemsPerPage));
+            }
+
+            throw new Exception("Can't inject ContentEntityRepository");
         }
 
         protected virtual PageViewModelContext GetPageContext(TSection section)

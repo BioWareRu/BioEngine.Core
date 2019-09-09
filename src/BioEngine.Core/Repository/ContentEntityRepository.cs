@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB;
 using BioEngine.Core.Helpers;
 
 namespace BioEngine.Core.Repository
@@ -28,7 +29,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<(TEntity[] items, int itemsCount)> GetAllWithBlocksAsync(
-            Action<BioRepositoryQuery<TEntity>> configureQuery = null)
+            Action<BioQuery<TEntity>> configureQuery = null)
         {
             var result = await base.GetAllAsync(configureQuery);
             var blocks = await BlocksHelper.GetBlocksAsync(result.items, DbContext);
@@ -40,7 +41,7 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        public async Task<TEntity> GetWithBlocksAsync(Action<BioRepositoryQuery<TEntity>> configureQuery = null)
+        public async Task<TEntity> GetWithBlocksAsync(Action<BioQuery<TEntity>> configureQuery = null)
         {
             var entity = await base.GetAsync(configureQuery);
             entity.Blocks = await BlocksHelper.GetBlocksAsync(entity, DbContext);
@@ -48,7 +49,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<TEntity> GetByIdWithBlocksAsync(Guid id,
-            Action<BioRepositoryQuery<TEntity>> configureQuery = null)
+            Action<BioQuery<TEntity>> configureQuery = null)
         {
             var entity = await base.GetByIdAsync(id, configureQuery);
             entity.Blocks = await BlocksHelper.GetBlocksAsync(entity, DbContext);
@@ -56,7 +57,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<TEntity[]> GetByIdsWithBlocksAsync(Guid[] ids,
-            Action<BioRepositoryQuery<TEntity>> configureQuery = null)
+            Action<BioQuery<TEntity>> configureQuery = null)
         {
             var items = await base.GetByIdsAsync(ids, configureQuery);
             var blocks = await BlocksHelper.GetBlocksAsync(items, DbContext);

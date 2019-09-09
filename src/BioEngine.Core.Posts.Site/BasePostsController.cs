@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
@@ -29,7 +30,8 @@ namespace BioEngine.Core.Posts.Site
 
         public override async Task<IActionResult> ShowAsync(string url)
         {
-            var post = await Repository.GetWithBlocksAsync(entities => ApplyPublishConditions(entities).Where(e => e.Url == url));
+            var post = await Repository.GetWithBlocksAsync(entities =>
+                ApplyPublishConditions(entities).Where(e => e.Url == url));
             if (post == null)
             {
                 return PageNotFound();
@@ -67,14 +69,15 @@ namespace BioEngine.Core.Posts.Site
             }
 
             var (items, itemsCount) =
-                await Repository.GetAllWithBlocksAsync(entities => entities.WithTags(tags.items).Where(e => e.IsPublished));
+                await Repository.GetAllWithBlocksAsync(entities =>
+                    entities.WithTags(tags.items).Where(e => e.IsPublished));
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
         }
 
-        protected override void ApplyDefaultOrder(ListProvider<Post, PostsRepository> provider)
+        protected override void ApplyDefaultOrder(BioQuery<Post> query)
         {
-            provider.SetOrderByDescending(p => p.DatePublished);
+            query.OrderByDescending(p => p.DatePublished);
         }
     }
 }

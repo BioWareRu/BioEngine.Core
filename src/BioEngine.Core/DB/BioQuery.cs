@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using BioEngine.Core.Abstractions;
-using BioEngine.Core.DB;
 using BioEngine.Core.DB.Queries;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Extensions;
@@ -14,12 +13,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace BioEngine.Core.Repository
+namespace BioEngine.Core.DB
 {
-    public class BioRepositoryQuery<TEntity> where TEntity : class, IEntity
+    public class BioQuery<TEntity> where TEntity : class
     {
-        public BioContext DbContext { get; }
-
         private IQueryable<TEntity> _query;
 
         private readonly List<Func<IQueryable<TEntity>, IQueryable<TEntity>>> _where =
@@ -31,13 +28,12 @@ namespace BioEngine.Core.Repository
         public int? Limit { get; private set; }
         public int? Offset { get; private set; }
 
-        internal BioRepositoryQuery(IQueryable<TEntity> query, BioContext dbContext)
+        public BioQuery(IQueryable<TEntity> query)
         {
-            DbContext = dbContext;
             _query = query;
         }
 
-        internal IQueryable<TEntity> BuildQuery()
+        public IQueryable<TEntity> BuildQuery()
         {
             foreach (var func in _where)
             {
@@ -54,55 +50,55 @@ namespace BioEngine.Core.Repository
             return _query;
         }
 
-        public BioRepositoryQuery<TEntity> Take(int take)
+        public BioQuery<TEntity> Take(int take)
         {
             Limit = take;
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> Skip(int skip)
+        public BioQuery<TEntity> Skip(int skip)
         {
             Offset = skip;
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> Where(Expression<Func<TEntity, bool>> where)
+        public BioQuery<TEntity> Where(Expression<Func<TEntity, bool>> where)
         {
             _where.Add(query => query.Where(where));
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> Where(string whereStr, object[] values)
+        public BioQuery<TEntity> Where(string whereStr, object[] values)
         {
             _where.Add(query => query.Where(whereStr, values));
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
+        public BioQuery<TEntity> OrderByDescending(Expression<Func<TEntity, object>> orderBy)
         {
             _orderBy.Add((orderBy, true));
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
+        public BioQuery<TEntity> OrderBy(Expression<Func<TEntity, object>> orderBy)
         {
             _orderBy.Add((orderBy, false));
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> Configure(Func<IQueryable<TEntity>, IQueryable<TEntity>> configureQuery)
+        public BioQuery<TEntity> Configure(Func<IQueryable<TEntity>, IQueryable<TEntity>> configureQuery)
         {
             _query = configureQuery(_query);
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> Configure(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
+        public BioQuery<TEntity> Configure(Action<BioQuery<TEntity>>? configureQuery = null)
         {
             configureQuery?.Invoke(this);
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> OrderByString(string orderBy)
+        public BioQuery<TEntity> OrderByString(string orderBy)
         {
             var sortQueries = GetSortParameters<TEntity>(orderBy);
             if (sortQueries.Any())
@@ -123,7 +119,7 @@ namespace BioEngine.Core.Repository
             return this;
         }
 
-        public BioRepositoryQuery<TEntity> WhereByString(string whereJson)
+        public BioQuery<TEntity> WhereByString(string whereJson)
         {
             var where = JsonConvert.DeserializeObject<List<QueryContextConditionsGroup>>(whereJson);
             if (where != null)
@@ -269,23 +265,36 @@ namespace BioEngine.Core.Repository
 
             return sortParameters;
         }
+
+        public BioQuery<TEntity> Paginate(int page, int itemsPerPage)
+        {
+            var offset = 0;
+            if (page > 0)
+            {
+                offset = (page - 1) * itemsPerPage;
+            }
+
+            Offset = offset;
+            Limit = itemsPerPage;
+            return this;
+        }
     }
 
     public static class BioRepositoryQueryExtensions
     {
-        public static BioRepositoryQuery<T> ForSite<T>(this BioRepositoryQuery<T> query, [NotNull] Site site)
+        public static BioQuery<T> ForSite<T>(this BioQuery<T> query, [NotNull] Site site)
             where T : class, IEntity, ISiteEntity
         {
             return query.Where(e => e.SiteIds.Contains(site.Id));
         }
 
-        public static BioRepositoryQuery<T> ForSection<T>(this BioRepositoryQuery<T> query, Section section)
+        public static BioQuery<T> ForSection<T>(this BioQuery<T> query, Section section)
             where T : class, IEntity, ISectionEntity
         {
             return query.Where(e => e.SectionIds.Contains(section.Id));
         }
 
-        public static BioRepositoryQuery<T> WithTags<T>(this BioRepositoryQuery<T> query, Tag[] tags)
+        public static BioQuery<T> WithTags<T>(this BioQuery<T> query, Tag[] tags)
             where T : class, IEntity, ITaggedContentEntity
         {
             Expression<Func<T, bool>> ex = null;

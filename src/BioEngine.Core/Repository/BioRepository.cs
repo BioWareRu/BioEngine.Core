@@ -44,7 +44,7 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<(TEntity[] items, int itemsCount)> GetAllAsync(
-            Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
+            Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Configure(configureQuery);
             var dbQuery = query.BuildQuery();
@@ -80,13 +80,13 @@ namespace BioEngine.Core.Repository
             return Task.CompletedTask;
         }
 
-        public virtual Task<int> CountAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
+        public virtual Task<int> CountAsync(Action<BioQuery<TEntity>>? configureQuery = null)
         {
             return CreateRepositoryQuery().Configure(configureQuery).BuildQuery().CountAsync();
         }
 
         public virtual async Task<TEntity> GetByIdAsync(Guid id,
-            Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
+            Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Where(i => i.Id.Equals(id)).Configure(configureQuery).BuildQuery();
 
@@ -95,7 +95,7 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
-        public virtual async Task<TEntity> GetAsync(Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
+        public virtual async Task<TEntity> GetAsync(Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Configure(configureQuery).BuildQuery();
             var item = await AddIncludes(query).FirstOrDefaultAsync();
@@ -112,7 +112,7 @@ namespace BioEngine.Core.Repository
         }
 
         public virtual async Task<TEntity[]> GetByIdsAsync(Guid[] ids,
-            Action<BioRepositoryQuery<TEntity>>? configureQuery = null)
+            Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Where(i => ids.Contains(i.Id)).Configure(configureQuery).BuildQuery();
             var items = await AddIncludes(query).ToArrayAsync();
@@ -299,7 +299,7 @@ namespace BioEngine.Core.Repository
             return (!failures.Any(), failures);
         }
 
-        private IQueryable<TEntity> GetBaseQuery()
+        public IQueryable<TEntity> GetBaseQuery()
         {
             return DbContext.Set<TEntity>().AsQueryable();
         }
@@ -309,9 +309,9 @@ namespace BioEngine.Core.Repository
             return query;
         }
 
-        protected virtual BioRepositoryQuery<TEntity> CreateRepositoryQuery()
+        public virtual BioQuery<TEntity> CreateRepositoryQuery()
         {
-            return new BioRepositoryQuery<TEntity>(GetBaseQuery(), DbContext);
+            return new BioQuery<TEntity>(GetBaseQuery());
         }
 
         protected virtual Task<bool> BeforeValidateAsync(TEntity item,

@@ -7,7 +7,7 @@ using BioEngine.Core.Abstractions;
 using BioEngine.Core.Api.Interfaces;
 using BioEngine.Core.Api.Models;
 using BioEngine.Core.Api.Response;
-using BioEngine.Core.Repository;
+using BioEngine.Core.DB;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -74,7 +74,7 @@ namespace BioEngine.Core.Api
             return Ok(result);
         }
 
-        protected BioRepositoryQuery<TEntity> ConfigureQuery(BioRepositoryQuery<TEntity> query, int limit, int offset, string order,
+        protected BioQuery<TEntity> ConfigureQuery(BioQuery<TEntity> query, int limit, int offset, string order,
             string filter)
         {
             if (!string.IsNullOrEmpty(filter) &&

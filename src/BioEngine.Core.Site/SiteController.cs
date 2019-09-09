@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
+using BioEngine.Core.DB;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Site.Model;
 using BioEngine.Core.Web;
@@ -86,33 +87,37 @@ namespace BioEngine.Core.Site
             return View(new EntityViewModel<TEntity>(GetPageContext(), entity, ContentEntityViewMode.Entity));
         }
 
-        protected virtual BioRepositoryQuery<TEntity> ApplyPublishConditions(BioRepositoryQuery<TEntity> query)
+        protected virtual BioQuery<TEntity> ApplyPublishConditions(BioQuery<TEntity> query)
         {
             return query.Where(e => e.IsPublished);
         }
 
-        protected virtual void ApplyDefaultOrder(ListProvider<TEntity, TRepository> provider)
+        protected virtual void ApplyDefaultOrder(BioQuery<TEntity> provider)
         {
-            provider.SetOrderByDescending(e => e.DateAdded);
+            provider.OrderByDescending(e => e.DateAdded);
         }
 
-        protected virtual ListProvider<TEntity, TRepository> CreateListProvider()
+        protected virtual BioQuery<TEntity> CreateListQuery()
         {
-            return new ListProvider<TEntity, TRepository>(Repository).SetSite(Site);
+            return new BioQuery<TEntity>(Repository.GetBaseQuery()).ForSite(Site);
         }
 
         [PublicAPI]
-        protected Task<(TEntity[] items, int itemsCount)> GetAllAsync(
-            Func<BioRepositoryQuery<TEntity>, BioRepositoryQuery<TEntity>>? configureQuery, int page = 0)
+        protected virtual Task<(TEntity[] items, int itemsCount)> GetAllAsync(
+            Func<BioQuery<TEntity>, BioQuery<TEntity>>? configureQuery, int page = 0)
         {
-            var provider = CreateListProvider();
+            return Repository.GetAllWithBlocksAsync(bioQuery => ConfigureQuery(bioQuery, page));
+        }
+
+        protected BioQuery<TEntity> ConfigureQuery(BioQuery<TEntity> query, int page)
+        {
             if (ControllerContext.HttpContext.Request.Query.ContainsKey("order"))
             {
-                provider.SetOrderByString(ControllerContext.HttpContext.Request.Query["order"]);
+                query.OrderByString(ControllerContext.HttpContext.Request.Query["order"]);
             }
             else
             {
-                ApplyDefaultOrder(provider);
+                ApplyDefaultOrder(query);
             }
 
             if (page > 0)
@@ -125,9 +130,8 @@ namespace BioEngine.Core.Site
                 if (Page < 1) Page = 1;
             }
 
-            provider.SetPage(Page);
-
-            return provider.GetAllAsync(configureQuery);
+            query.Paginate(page, ItemsPerPage);
+            return query;
         }
     }
 }
