@@ -85,7 +85,7 @@ namespace BioEngine.Core.Repository
             return CreateRepositoryQuery().Configure(configureQuery).BuildQuery().CountAsync();
         }
 
-        public virtual async Task<TEntity> GetByIdAsync(Guid id,
+        public virtual async Task<TEntity?> GetByIdAsync(Guid id,
             Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Where(i => i.Id.Equals(id)).Configure(configureQuery).BuildQuery();

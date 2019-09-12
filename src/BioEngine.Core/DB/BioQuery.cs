@@ -181,10 +181,13 @@ namespace BioEngine.Core.DB
             return this;
         }
 
-        private static object? ParsePropertyValue(Type propertyType, object value)
+        private static object? ParsePropertyValue(Type propertyType, object? value)
         {
             if (value == null)
+            {
                 return null;
+            }
+
             if (value is JArray arr)
             {
                 var values = Activator.CreateInstance(typeof(List<>).MakeGenericType(propertyType)) as IList;
@@ -211,17 +214,21 @@ namespace BioEngine.Core.DB
                 var enumType = propertyType;
                 var parsed = int.TryParse(value.ToString(), out var intValue);
 
-                if (Enum.IsDefined(enumType, value.ToString()) || (parsed && Enum.IsDefined(enumType, intValue)))
+                if (Enum.IsDefined(enumType, value.ToString()) || parsed && Enum.IsDefined(enumType, intValue))
                     parsedValue = Enum.Parse(enumType, value.ToString());
             }
 
             else if (propertyType == typeof(bool))
+            {
                 parsedValue = value.ToString() == "1" ||
-                              value.ToString() == "true" ||
-                              value.ToString() == "on" ||
-                              value.ToString() == "checked";
+                             value.ToString() == "true" ||
+                             value.ToString() == "on" ||
+                             value.ToString() == "checked";
+            }
             else if (propertyType == typeof(Uri))
+            {
                 parsedValue = new Uri(Convert.ToString(value));
+            }
             else if (propertyType == typeof(DateTimeOffset) || propertyType == typeof(DateTimeOffset?))
             {
                 if (DateTimeOffset.TryParse(value.ToString(), out var dto))
@@ -237,7 +244,9 @@ namespace BioEngine.Core.DB
                 }
             }
             else
+            {
                 parsedValue = Convert.ChangeType(value.ToString(), propertyType);
+            }
 
             return parsedValue;
         }
@@ -298,7 +307,7 @@ namespace BioEngine.Core.DB
         public static BioQuery<T> WithTags<T>(this BioQuery<T> query, Tag[] tags)
             where T : class, IEntity, ITaggedContentEntity
         {
-            Expression<Func<T, bool>> ex = null;
+            Expression<Func<T, bool>>? ex = null;
             foreach (var tag in tags)
             {
                 ex = ex == null ? post => post.TagIds.Contains(tag.Id) : ex.And(post => post.TagIds.Contains(tag.Id));

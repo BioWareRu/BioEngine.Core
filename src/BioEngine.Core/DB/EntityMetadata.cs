@@ -4,7 +4,7 @@ namespace BioEngine.Core.DB
 {
     public struct EntityMetadata
     {
-        public EntityMetadata(Type objectType, string entityKey, Type dataType = null)
+        public EntityMetadata(Type objectType, string entityKey, Type? dataType = null)
         {
             ObjectType = objectType;
             Key = entityKey;

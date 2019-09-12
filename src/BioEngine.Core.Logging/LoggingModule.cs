@@ -37,7 +37,7 @@ namespace BioEngine.Core.Logging
             }
 
             loggerConfiguration.MinimumLevel.ControlledBy(_controller.Switch);
-            Config.Configure?.Invoke(loggerConfiguration);
+            Config.Configure?.Invoke(loggerConfiguration, environment);
             Log.Logger = loggerConfiguration.CreateLogger();
 
             services.AddSingleton(_controller);
@@ -58,7 +58,7 @@ namespace BioEngine.Core.Logging
         public LogEventLevel DevLevel { get; set; } = LogEventLevel.Debug;
         public LogEventLevel ProdLevel { get; set; } = LogEventLevel.Information;
 
-        public Action<LoggerConfiguration> Configure { get; set; }
+        public Action<LoggerConfiguration, IHostEnvironment> Configure { get; set; }
     }
 
     public class LogLevelController

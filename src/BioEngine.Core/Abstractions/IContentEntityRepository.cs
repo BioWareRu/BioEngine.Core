@@ -13,16 +13,16 @@ namespace BioEngine.Core.Abstractions
         Task UnPublishAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
 
         Task<(TEntity[] items, int itemsCount)> GetAllWithBlocksAsync(
-            Action<BioQuery<TEntity>> configureQuery = null);
+            Action<BioQuery<TEntity>>? configureQuery = null);
 
-        Task<TEntity> GetWithBlocksAsync(Action<BioQuery<TEntity>> configureQuery = null);
-        Task<TEntity> GetByIdWithBlocksAsync(Guid id, Action<BioQuery<TEntity>> configureQuery = null);
-        Task<TEntity[]> GetByIdsWithBlocksAsync(Guid[] ids, Action<BioQuery<TEntity>> configureQuery = null);
+        Task<TEntity> GetWithBlocksAsync(Action<BioQuery<TEntity>>? configureQuery = null);
+        Task<TEntity> GetByIdWithBlocksAsync(Guid id, Action<BioQuery<TEntity>>? configureQuery = null);
+        Task<TEntity[]> GetByIdsWithBlocksAsync(Guid[] ids, Action<BioQuery<TEntity>>? configureQuery = null);
 
         Task<AddOrUpdateOperationResult<TEntity>> AddWithBlocksAsync(TEntity item,
-            IBioRepositoryOperationContext operationContext = null);
+            IBioRepositoryOperationContext? operationContext = null);
 
         Task<AddOrUpdateOperationResult<TEntity>> UpdateWithBlocksAsync(TEntity item,
-            IBioRepositoryOperationContext operationContext = null);
+            IBioRepositoryOperationContext? operationContext = null);
     }
 }

@@ -30,7 +30,7 @@ namespace BioEngine.Core.Abstractions
         Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item,
             IBioRepositoryOperationContext? operationContext = null);
 
-        Task<TEntity> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null);
+        Task<TEntity?> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null);
         Task<TEntity> DeleteAsync(TEntity item, IBioRepositoryOperationContext? operationContext = null);
 
         void BeginBatch();

@@ -29,7 +29,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<(TEntity[] items, int itemsCount)> GetAllWithBlocksAsync(
-            Action<BioQuery<TEntity>> configureQuery = null)
+            Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var result = await base.GetAllAsync(configureQuery);
             var blocks = await BlocksHelper.GetBlocksAsync(result.items, DbContext);
@@ -41,7 +41,7 @@ namespace BioEngine.Core.Repository
             return result;
         }
 
-        public async Task<TEntity> GetWithBlocksAsync(Action<BioQuery<TEntity>> configureQuery = null)
+        public async Task<TEntity?> GetWithBlocksAsync(Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var entity = await base.GetAsync(configureQuery);
             if (entity != null)
@@ -52,8 +52,8 @@ namespace BioEngine.Core.Repository
             return entity;
         }
 
-        public async Task<TEntity> GetByIdWithBlocksAsync(Guid id,
-            Action<BioQuery<TEntity>> configureQuery = null)
+        public async Task<TEntity?> GetByIdWithBlocksAsync(Guid id,
+            Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var entity = await base.GetByIdAsync(id, configureQuery);
             if (entity != null)
@@ -65,7 +65,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<TEntity[]> GetByIdsWithBlocksAsync(Guid[] ids,
-            Action<BioQuery<TEntity>> configureQuery = null)
+            Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var items = await base.GetByIdsAsync(ids, configureQuery);
             var blocks = await BlocksHelper.GetBlocksAsync(items, DbContext);
@@ -78,7 +78,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<AddOrUpdateOperationResult<TEntity>> AddWithBlocksAsync(TEntity item,
-            IBioRepositoryOperationContext operationContext = null)
+            IBioRepositoryOperationContext? operationContext = null)
         {
             var result = await DoAddAsync(item, operationContext);
             if (result.isValid)
@@ -91,7 +91,7 @@ namespace BioEngine.Core.Repository
         }
 
         public async Task<AddOrUpdateOperationResult<TEntity>> UpdateWithBlocksAsync(TEntity item,
-            IBioRepositoryOperationContext operationContext = null)
+            IBioRepositoryOperationContext? operationContext = null)
         {
             var (validationResult, changes, oldItem) = await DoUpdateAsync(item, operationContext);
             if (validationResult.isValid)
@@ -103,7 +103,7 @@ namespace BioEngine.Core.Repository
             return new AddOrUpdateOperationResult<TEntity>(item, validationResult.errors, changes);
         }
 
-        public override async Task<TEntity> DeleteAsync(Guid id, IBioRepositoryOperationContext operationContext = null)
+        public override async Task<TEntity?> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null)
         {
             var entity = await base.DeleteAsync(id, operationContext);
             if (entity != null)

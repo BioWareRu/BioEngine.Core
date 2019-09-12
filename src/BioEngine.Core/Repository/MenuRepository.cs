@@ -10,7 +10,7 @@ namespace BioEngine.Core.Repository
         {
         }
 
-        public async Task<Menu> GetSiteMenuAsync(Site site)
+        public async Task<Menu?> GetSiteMenuAsync(Site site)
         {
             return await GetAsync(q => q.Where(m => m.SiteIds.Contains(site.Id)));
         }

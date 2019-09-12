@@ -40,7 +40,13 @@ namespace BioEngine.Core.Modules
         {
             var method = entitiesManager.GetType().GetMethod(nameof(BioEntitiesManager.RegisterEntity),
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            foreach (var definedType in assembly.DefinedTypes.Where(type => !type.IsAbstract && typeof(IEntity).IsAssignableFrom(type)))
+            if (method == null)
+            {
+                throw new Exception("Method BioEntitiesManager.RegisterEntity not found");
+            }
+
+            foreach (var definedType in assembly.DefinedTypes.Where(type =>
+                !type.IsAbstract && typeof(IEntity).IsAssignableFrom(type)))
             {
                 method.MakeGenericMethod(definedType).Invoke(entitiesManager, null);
             }

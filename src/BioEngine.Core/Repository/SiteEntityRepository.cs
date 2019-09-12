@@ -16,8 +16,8 @@ namespace BioEngine.Core.Repository
         }
 
         protected override async Task<bool> BeforeValidateAsync(TEntity item,
-            (bool isValid, IList<ValidationFailure> errors) validationResult, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null)
+            (bool isValid, IList<ValidationFailure> errors) validationResult, PropertyChange[]? changes = null,
+            IBioRepositoryOperationContext? operationContext = null)
         {
             if (item.SiteIds.Length == 0)
             {

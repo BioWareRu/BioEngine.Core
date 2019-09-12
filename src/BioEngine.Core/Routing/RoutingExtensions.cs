@@ -8,7 +8,7 @@ namespace BioEngine.Core.Routing
 {
     public static class RoutingExtensions
     {
-        public static Uri GeneratePublicUrl(this LinkGenerator linkGenerator, IRoutable routable, Site? site = null)
+        public static Uri? GeneratePublicUrl(this LinkGenerator linkGenerator, IRoutable routable, Site? site = null)
         {
             if (string.IsNullOrEmpty(routable.PublicRouteName))
             {

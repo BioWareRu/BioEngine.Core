@@ -75,15 +75,18 @@ namespace BioEngine.Core.DB
             var logger = this.GetInfrastructure().GetRequiredService<ILogger<BioContext>>();
             foreach (var entityMetadata in entitiesManager.GetBlocksMetadata())
             {
-                logger.LogInformation(
-                    "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Key,
-                    entityMetadata.ObjectType,
-                    entityMetadata.DataType);
-                modelBuilder.RegisterDiscriminator<ContentBlock>(entityMetadata.ObjectType,
-                    entityMetadata.Key);
-                dataConversionRegistrationMethod
-                    ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
-                    .Invoke(modelBuilder, new object[] {modelBuilder});
+                if (entityMetadata.DataType != null)
+                {
+                    logger.LogInformation(
+                        "Register content block type {type} - {entityType} ({dataType})", entityMetadata.Key,
+                        entityMetadata.ObjectType,
+                        entityMetadata.DataType);
+                    modelBuilder.RegisterDiscriminator<ContentBlock>(entityMetadata.ObjectType,
+                        entityMetadata.Key);
+                    dataConversionRegistrationMethod
+                        ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
+                }
             }
 
             foreach (var entityMetadata in entitiesManager.GetSectionsMetadata())
@@ -99,9 +102,12 @@ namespace BioEngine.Core.DB
                         .Invoke(modelBuilder, new object[] {modelBuilder});
                 }
 
-                dataConversionRegistrationMethod
-                    ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
-                    .Invoke(modelBuilder, new object[] {modelBuilder});
+                if (entityMetadata.DataType != null)
+                {
+                    dataConversionRegistrationMethod
+                        ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
+                }
             }
 
             foreach (var entityMetadata in entitiesManager.GetContentItemsMetadata())
@@ -121,9 +127,12 @@ namespace BioEngine.Core.DB
                         .Invoke(modelBuilder, new object[] {modelBuilder});
                 }
 
-                dataConversionRegistrationMethod
-                    ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
-                    .Invoke(modelBuilder, new object[] {modelBuilder});
+                if (entityMetadata.DataType != null)
+                {
+                    dataConversionRegistrationMethod
+                        ?.MakeGenericMethod(entityMetadata.ObjectType, entityMetadata.DataType)
+                        .Invoke(modelBuilder, new object[] {modelBuilder});
+                }
             }
 
 

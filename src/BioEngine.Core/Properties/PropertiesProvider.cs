@@ -100,7 +100,10 @@ namespace BioEngine.Core.Properties
             var type = Schema.ContainsKey(key) ? Schema[key] : null;
             if (type != null)
             {
-                return (PropertiesSet)Activator.CreateInstance(type.Type);
+                if (Activator.CreateInstance(type.Type) is PropertiesSet set)
+                {
+                    return set;
+                }
             }
 
             throw new ArgumentException($"Class {key} is not registered in properties provider");
@@ -116,7 +119,8 @@ namespace BioEngine.Core.Properties
             return Schema[key];
         }
 
-        [PublicAPI]
+        [
+            PublicAPI]
         public async Task<List<PropertiesEntry>> GetAsync(IBioEntity entity)
         {
             if (!_properties.ContainsKey(entity.Id))
@@ -127,7 +131,8 @@ namespace BioEngine.Core.Properties
             return _properties[entity.Id];
         }
 
-        [PublicAPI]
+        [
+            PublicAPI]
         public async Task<TProperties> GetAsync<TProperties>() where TProperties : PropertiesSet, new()
         {
             var properties = new TProperties();
@@ -140,7 +145,8 @@ namespace BioEngine.Core.Properties
             return properties;
         }
 
-        [PublicAPI]
+        [
+            PublicAPI]
         public async Task<TProperties> GetAsync<TProperties>(IBioEntity entity, Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
@@ -162,11 +168,13 @@ namespace BioEngine.Core.Properties
             return properties;
         }
 
-        [PublicAPI]
+        [
+            PublicAPI]
         public async Task<bool> SetAsync<TProperties>(TProperties properties)
             where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value).FirstOrDefault();
+            var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value)
+                .FirstOrDefault();
             if (schema == null)
             {
                 throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
@@ -190,11 +198,14 @@ namespace BioEngine.Core.Properties
             return true;
         }
 
-        [PublicAPI]
-        public async Task<bool> SetAsync<TProperties>(TProperties properties, IBioEntity entity, Guid? siteId = null)
+        [
+            PublicAPI]
+        public async Task<bool> SetAsync<TProperties>(TProperties properties, IBioEntity entity,
+            Guid? siteId = null)
             where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value).FirstOrDefault();
+            var schema = Schema.Where(s => s.Value.Type == properties.GetType()).Select(s => s.Value)
+                .FirstOrDefault();
             if (schema == null)
             {
                 throw new ArgumentException($"Schema for type {typeof(TProperties)} is not registered");
@@ -227,7 +238,8 @@ namespace BioEngine.Core.Properties
         private async Task<PropertiesRecord?> LoadFromDatabaseAsync<TProperties>()
             where TProperties : PropertiesSet, new()
         {
-            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value).FirstOrDefault();
+            var schema = Schema.Where(s => s.Value.Type == typeof(TProperties)).Select(s => s.Value)
+                .FirstOrDefault();
             return schema == null || !_checkIfExists
                 ? null
                 : await _dbContext.Properties.FirstOrDefaultAsync(s =>
