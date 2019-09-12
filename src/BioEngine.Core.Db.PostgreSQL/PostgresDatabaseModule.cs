@@ -115,7 +115,7 @@ namespace BioEngine.Core.Db.PostgreSQL
 
         public PostgresDatabaseModuleConfig(string host, string username, string database,
             string password = "",
-            int port = 5432, Assembly migrationsAssembly = null)
+            int port = 5432, Assembly? migrationsAssembly = null)
         {
             Host = host;
             Username = username;
