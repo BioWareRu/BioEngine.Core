@@ -106,10 +106,11 @@ namespace BioEngine.Core.Site
         protected virtual Task<(TEntity[] items, int itemsCount)> GetAllAsync(
             Func<BioQuery<TEntity>, BioQuery<TEntity>>? configureQuery, int page = 0)
         {
-            return Repository.GetAllWithBlocksAsync(bioQuery => ConfigureQuery(bioQuery, page));
+            return Repository.GetAllWithBlocksAsync(bioQuery => ConfigureQuery(bioQuery, page, configureQuery));
         }
 
-        protected BioQuery<TEntity> ConfigureQuery(BioQuery<TEntity> query, int page)
+        protected BioQuery<TEntity> ConfigureQuery(BioQuery<TEntity> query, int page,
+            Func<BioQuery<TEntity>, BioQuery<TEntity>>? configureQuery = null)
         {
             if (ControllerContext.HttpContext.Request.Query.ContainsKey("order"))
             {
@@ -131,6 +132,7 @@ namespace BioEngine.Core.Site
             }
 
             query.Paginate(page, ItemsPerPage);
+            configureQuery?.Invoke(query);
             return query;
         }
 
@@ -138,7 +140,7 @@ namespace BioEngine.Core.Site
         {
             return ApplyPublishConditions(query);
         }
-        
+
         protected virtual BioQuery<TEntity> ApplyShowConditions(BioQuery<TEntity> query)
         {
             return ApplyPublishConditions(query);
