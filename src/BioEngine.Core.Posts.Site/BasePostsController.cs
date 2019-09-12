@@ -70,7 +70,7 @@ namespace BioEngine.Core.Posts.Site
 
             var (items, itemsCount) =
                 await Repository.GetAllWithBlocksAsync(entities =>
-                    entities.WithTags(tags.items).Where(e => e.IsPublished));
+                    ConfigureQuery(entities, page).WithTags(tags.items).Where(e => e.IsPublished));
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
         }
