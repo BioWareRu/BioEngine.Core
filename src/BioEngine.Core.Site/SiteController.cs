@@ -97,11 +97,6 @@ namespace BioEngine.Core.Site
             provider.OrderByDescending(e => e.DateAdded);
         }
 
-        protected virtual BioQuery<TEntity> CreateListQuery()
-        {
-            return new BioQuery<TEntity>(Repository.GetBaseQuery()).ForSite(Site);
-        }
-
         [PublicAPI]
         protected virtual Task<(TEntity[] items, int itemsCount)> GetAllAsync(
             Func<BioQuery<TEntity>, BioQuery<TEntity>>? configureQuery, int page = 0)
