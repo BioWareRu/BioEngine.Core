@@ -95,11 +95,15 @@ namespace BioEngine.Core.Repository
             return item;
         }
 
-        public virtual async Task<TEntity> GetAsync(Action<BioQuery<TEntity>>? configureQuery = null)
+        public virtual async Task<TEntity?> GetAsync(Action<BioQuery<TEntity>>? configureQuery = null)
         {
             var query = CreateRepositoryQuery().Configure(configureQuery).BuildQuery();
             var item = await AddIncludes(query).FirstOrDefaultAsync();
-            await AfterLoadAsync(item);
+            if (item != null)
+            {
+                await AfterLoadAsync(item);
+            }
+
             return item;
         }
 

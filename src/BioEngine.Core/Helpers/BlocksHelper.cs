@@ -15,6 +15,11 @@ namespace BioEngine.Core.Helpers
             BioContext dbContext)
             where TEntity : IContentEntity
         {
+            if (entities.Length == 0)
+            {
+                return new Dictionary<Guid, List<ContentBlock>>();
+            }
+
             var ids = entities.Select(e => e.Id).ToArray();
             var blocks = await dbContext.Blocks
                 .Where(b => ids.Contains(b.ContentId)).ToListAsync();

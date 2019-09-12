@@ -15,9 +15,9 @@ namespace BioEngine.Core.Abstractions
 
         Task<int> CountAsync(Action<BioQuery<TEntity>>? configureQuery = null);
 
-        Task<TEntity> GetByIdAsync(Guid id, Action<BioQuery<TEntity>>? configureQuery = null);
+        Task<TEntity?> GetByIdAsync(Guid id, Action<BioQuery<TEntity>>? configureQuery = null);
 
-        Task<TEntity> GetAsync(Action<BioQuery<TEntity>>? configureQuery = null);
+        Task<TEntity?> GetAsync(Action<BioQuery<TEntity>>? configureQuery = null);
 
         Task<TEntity> NewAsync();
 

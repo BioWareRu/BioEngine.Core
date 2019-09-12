@@ -44,7 +44,11 @@ namespace BioEngine.Core.Repository
         public async Task<TEntity> GetWithBlocksAsync(Action<BioQuery<TEntity>> configureQuery = null)
         {
             var entity = await base.GetAsync(configureQuery);
-            entity.Blocks = await BlocksHelper.GetBlocksAsync(entity, DbContext);
+            if (entity != null)
+            {
+                entity.Blocks = await BlocksHelper.GetBlocksAsync(entity, DbContext);
+            }
+
             return entity;
         }
 
@@ -52,7 +56,11 @@ namespace BioEngine.Core.Repository
             Action<BioQuery<TEntity>> configureQuery = null)
         {
             var entity = await base.GetByIdAsync(id, configureQuery);
-            entity.Blocks = await BlocksHelper.GetBlocksAsync(entity, DbContext);
+            if (entity != null)
+            {
+                entity.Blocks = await BlocksHelper.GetBlocksAsync(entity, DbContext);
+            }
+
             return entity;
         }
 
