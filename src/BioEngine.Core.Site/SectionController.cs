@@ -24,7 +24,7 @@ namespace BioEngine.Core.Site
         {
             var entity =
                 await Repository.GetWithBlocksAsync(entities =>
-                    ApplyPublishConditions(entities).Where(e => e.Url == url));
+                    ApplyShowConditions(entities).Where(e => e.Url == url));
             if (entity == null)
             {
                 return PageNotFound();
@@ -37,7 +37,7 @@ namespace BioEngine.Core.Site
             where TContent : ContentItem
         {
             var section =
-                await Repository.GetWithBlocksAsync(entities => entities.Where(e => e.Url == url && e.IsPublished));
+                await Repository.GetWithBlocksAsync(entities => ApplyShowConditions(entities).Where(e => e.Url == url));
             if (section == null)
             {
                 return PageNotFound();
