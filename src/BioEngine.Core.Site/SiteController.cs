@@ -131,7 +131,7 @@ namespace BioEngine.Core.Site
                 if (Page < 1) Page = 1;
             }
 
-            query.Paginate(page, ItemsPerPage);
+            query.ForSite(Site).Paginate(page, ItemsPerPage);
             configureQuery?.Invoke(query);
             return query;
         }
