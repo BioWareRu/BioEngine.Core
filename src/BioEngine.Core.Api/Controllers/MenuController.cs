@@ -1,6 +1,6 @@
-using BioEngine.Core.Api.Auth;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
+using BioEngine.Core.Users;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Authorization;
 

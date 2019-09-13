@@ -1,4 +1,4 @@
-namespace BioEngine.Core.Api.Auth
+namespace BioEngine.Core.Users
 {
     public static class BioPolicies
     {

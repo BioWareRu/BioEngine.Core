@@ -1,4 +1,4 @@
-namespace BioEngine.Core.Pages.Api
+namespace BioEngine.Core.Pages
 {
     public static class PagesPolicies
     {

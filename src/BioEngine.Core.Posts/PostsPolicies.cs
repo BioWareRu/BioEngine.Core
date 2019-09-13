@@ -1,4 +1,4 @@
-namespace BioEngine.Core.Posts.Api
+namespace BioEngine.Core.Posts
 {
     public static class PostsPolicies
     {

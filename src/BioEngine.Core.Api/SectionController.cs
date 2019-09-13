@@ -2,11 +2,11 @@
 using System.IO;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
-using BioEngine.Core.Api.Auth;
 using BioEngine.Core.Api.Models;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
+using BioEngine.Core.Users;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,6 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
-using BioEngine.Core.Api.Auth;
+using BioEngine.Core.Users;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
