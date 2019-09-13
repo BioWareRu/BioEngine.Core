@@ -30,8 +30,8 @@ namespace BioEngine.Core.Posts.Site
 
         public override async Task<IActionResult> ShowAsync(string url)
         {
-            var post = await Repository.GetWithBlocksAsync(entities =>
-                ApplyPublishConditions(entities).Where(e => e.Url == url));
+            var post = await Repository.GetWithBlocksAsync(async entities =>
+                (await ApplyPublishConditionsAsync(entities)).Where(e => e.Url == url));
             if (post == null)
             {
                 return PageNotFound();
@@ -69,8 +69,8 @@ namespace BioEngine.Core.Posts.Site
             }
 
             var (items, itemsCount) =
-                await Repository.GetAllWithBlocksAsync(entities =>
-                    ConfigureQuery(entities, page).WithTags(tags.items).Where(e => e.IsPublished));
+                await Repository.GetAllWithBlocksAsync(async entities =>
+                    (await ConfigureQueryAsync(entities, page)).WithTags(tags.items).Where(e => e.IsPublished));
             return View("List", new ListViewModel<Post>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
         }

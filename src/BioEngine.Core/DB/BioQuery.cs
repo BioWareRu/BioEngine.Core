@@ -96,6 +96,17 @@ namespace BioEngine.Core.DB
         public BioQuery<TEntity> Configure(Action<BioQuery<TEntity>>? configureQuery = null)
         {
             configureQuery?.Invoke(this);
+
+            return this;
+        }
+
+        public async Task<BioQuery<TEntity>> ConfigureAsync(Func<BioQuery<TEntity>, Task>? configureQuery = null)
+        {
+            if (configureQuery != null)
+            {
+                await configureQuery(this);
+            }
+
             return this;
         }
 
@@ -221,9 +232,9 @@ namespace BioEngine.Core.DB
             else if (propertyType == typeof(bool))
             {
                 parsedValue = value.ToString() == "1" ||
-                             value.ToString() == "true" ||
-                             value.ToString() == "on" ||
-                             value.ToString() == "checked";
+                              value.ToString() == "true" ||
+                              value.ToString() == "on" ||
+                              value.ToString() == "checked";
             }
             else if (propertyType == typeof(Uri))
             {

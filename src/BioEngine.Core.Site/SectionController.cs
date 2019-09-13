@@ -23,8 +23,8 @@ namespace BioEngine.Core.Site
         public override async Task<IActionResult> ShowAsync(string url)
         {
             var entity =
-                await Repository.GetWithBlocksAsync(entities =>
-                    ApplyShowConditions(entities).Where(e => e.Url == url));
+                await Repository.GetWithBlocksAsync(async entities =>
+                    (await ApplyShowConditionsAsync(entities)).Where(e => e.Url == url));
             if (entity == null)
             {
                 return PageNotFound();
@@ -37,7 +37,8 @@ namespace BioEngine.Core.Site
             where TContent : ContentItem
         {
             var section =
-                await Repository.GetWithBlocksAsync(entities => ApplyShowConditions(entities).Where(e => e.Url == url));
+                await Repository.GetWithBlocksAsync(async entities =>
+                    (await ApplyShowConditionsAsync(entities)).Where(e => e.Url == url));
             if (section == null)
             {
                 return PageNotFound();
