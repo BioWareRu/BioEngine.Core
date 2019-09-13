@@ -1,4 +1,4 @@
-namespace BioEngine.Extra.Ads.Api
+namespace BioEngine.Extra.Ads
 {
     public static class AdsPolicies
     {
