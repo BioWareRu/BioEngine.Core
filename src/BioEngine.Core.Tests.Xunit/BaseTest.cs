@@ -92,7 +92,7 @@ namespace BioEngine.Core.Tests.Xunit
 
             var testInMemory =
                 !string.IsNullOrEmpty(config["BIOENGINE_TEST_IN_MEMORY"])
-                && bool.TryParse(config["BIOENGINE_TEST_IN_MEMORY"], out _);
+                && bool.TryParse(config["BIOENGINE_TEST_IN_MEMORY"], out var outBool) && outBool;
             if (testInMemory)
             {
                 bioEngine.AddModule<InMemoryDatabaseModule<BioContext>, InMemoryDatabaseModuleConfig>(
