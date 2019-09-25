@@ -100,7 +100,7 @@ namespace BioEngine.Core.Social
             return true;
         }
 
-        protected async Task<TPublishRecord> GetRecordAsync(ContentItem entity, Site? site = null)
+        protected virtual async Task<TPublishRecord> GetRecordAsync(ContentItem entity, Site? site = null)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
