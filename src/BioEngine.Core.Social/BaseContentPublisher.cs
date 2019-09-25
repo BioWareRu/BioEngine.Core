@@ -25,7 +25,8 @@ namespace BioEngine.Core.Social
             _entitiesManager = entitiesManager;
         }
 
-        public virtual async Task<bool> PublishAsync(ContentItem entity, Site site, TConfig config, bool needUpdate)
+        public virtual async Task<bool> PublishAsync(ContentItem entity, TConfig config, bool needUpdate,
+            Site site = null)
         {
             try
             {
@@ -44,7 +45,7 @@ namespace BioEngine.Core.Social
                         Id = Guid.NewGuid(),
                         ContentId = entity.Id,
                         Type = _entitiesManager.GetKey(entity),
-                        SiteIds = new[] {site.Id}
+                        SiteIds = site != null ? new[] {site.Id} : entity.SiteIds
                     };
                 }
 
@@ -103,8 +104,8 @@ namespace BioEngine.Core.Social
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
-                    r.Type == _entitiesManager.GetKey(entity) && r.ContentId == entity.Id &&
-                    (site == null || r.SiteIds.Contains(site.Id)));
+                    r.Type == _entitiesManager.GetKey(entity) && r.ContentId == entity.Id
+                                                              && (site == null || r.SiteIds.Contains(site.Id)));
         }
 
         protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(ContentItem entity)
