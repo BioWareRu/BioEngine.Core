@@ -37,7 +37,7 @@ namespace BioEngine.Core.Posts.Site
                 return PageNotFound();
             }
 
-            var commentsData = await _commentsProvider.GetCommentsDataAsync(new ContentItem[] {post});
+            var commentsData = await _commentsProvider.GetCommentsDataAsync(new ContentItem[] {post}, Site);
 
             return View(new ContentItemViewModel(GetPageContext(), post, commentsData[post.Id].count,
                 commentsData[post.Id].uri, ContentEntityViewMode.Entity));

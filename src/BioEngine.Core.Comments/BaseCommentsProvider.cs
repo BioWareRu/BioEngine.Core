@@ -33,14 +33,14 @@ namespace BioEngine.Core.Comments
         protected abstract IQueryable<BaseComment> GetDbSet();
 
         public virtual async Task<Dictionary<Guid, (int count, Uri? uri)>> GetCommentsDataAsync(
-            ContentItem[] entities)
+            ContentItem[] entities, Site site)
         {
             var result = new Dictionary<Guid, (int count, Uri? uri)>();
             var ids = entities.Select(e => e.Id).ToArray();
             var counts = await GetDbSet().Where(c => ids.Contains(c.ContentId))
                 .GroupBy(c => c.ContentId).Select(g => new {g.Key, count = g.Count()})
                 .ToListAsync();
-            var urls = await GetCommentsUrlAsync(entities);
+            var urls = await GetCommentsUrlAsync(entities, site);
             foreach (var entity in entities)
             {
                 var entityData = counts.FirstOrDefault(c => c.Key == entity.Id);
@@ -63,7 +63,7 @@ namespace BioEngine.Core.Comments
             return result;
         }
 
-        public abstract Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities);
+        public abstract Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities, Site site);
 
         public virtual async Task<IEnumerable<BaseComment>> GetLastCommentsAsync(Site site, int count)
         {
@@ -119,13 +119,14 @@ namespace BioEngine.Core.Comments
             }
 
             DbContext.Remove(comment);
-            await DbContext.SaveChangesAsync(); 
+            await DbContext.SaveChangesAsync();
             return comment;
         }
 
-        public async Task<IEnumerable<BaseComment>> GetCommentsAsync(ContentItem entity)
+        public async Task<IEnumerable<BaseComment>> GetCommentsAsync(ContentItem entity, Site site)
         {
-            var comments = await GetDbSet().Where(c => c.ContentId == entity.Id).OrderBy(c => c.DateAdded).ToListAsync();
+            var comments = await GetDbSet().Where(c => c.ContentId == entity.Id && c.SiteIds.Contains(site.Id))
+                .OrderBy(c => c.DateAdded).ToListAsync();
             var authors = await _userDataProvider.GetDataAsync(comments.Select(c => c.AuthorId).ToArray());
             foreach (var comment in comments)
             {

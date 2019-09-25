@@ -35,7 +35,7 @@ namespace BioEngine.Core.Posts.Site.Rss
                 entities.Where(e => e.IsPublished).ForSite(site).OrderByDescending(p => p.DatePublished).Take(count));
             DateTimeOffset? mostRecentPubDate = DateTimeOffset.MinValue;
             var commentsData =
-                await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray());
+                await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray(), site);
             var items = new List<RssItem>();
             foreach (var post in posts.items)
             {

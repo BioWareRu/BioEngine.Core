@@ -7,8 +7,8 @@ namespace BioEngine.Core.Comments
 {
     public interface ICommentsProvider
     {
-        Task<Dictionary<Guid, (int count, Uri? uri)>> GetCommentsDataAsync(ContentItem[] entities);
-        Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities);
+        Task<Dictionary<Guid, (int count, Uri? uri)>> GetCommentsDataAsync(ContentItem[] entities, Site site);
+        Task<Dictionary<Guid, Uri?>> GetCommentsUrlAsync(ContentItem[] entities, Site site);
         Task<IEnumerable<BaseComment>> GetLastCommentsAsync(Site site, int count);
 
         Task<List<(ContentItem entity, int commentsCount)>> GetMostCommentedAsync(Site site, int count,
@@ -17,7 +17,7 @@ namespace BioEngine.Core.Comments
         Task<BaseComment> AddCommentAsync(ContentItem entity, string text, string authorId, Guid? replyTo = null);
         Task<BaseComment> UpdateCommentAsync(ContentItem entity, Guid commentId, string text);
         Task<BaseComment> DeleteCommentAsync(ContentItem entity, Guid commentId);
-        Task<IEnumerable<BaseComment>> GetCommentsAsync(ContentItem entity);
+        Task<IEnumerable<BaseComment>> GetCommentsAsync(ContentItem entity, Site site);
         Task<BaseComment> GetCommentByIdAsync(ContentItem entity, Guid commentId);
     }
 }
