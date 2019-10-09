@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Serilog.Sinks.Loki" Version="1.0.0" />
+    <PackageReference Include="Serilog.Sinks.Loki" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core.Logging\BioEngine.Core.Logging.csproj" />
