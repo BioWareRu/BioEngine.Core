@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace BioEngine.Core.Posts
 {
@@ -40,20 +39,6 @@ namespace BioEngine.Core.Posts
         {
             modelBuilder.RegisterContentItem<Post<TUserPk>>(logger);
             modelBuilder.RegisterEntity<PostVersion<TUserPk>>();
-            modelBuilder.RegisterEntity<PostTemplate<TUserPk>>();
-            modelBuilder.Entity<PostTemplate<TUserPk>>().Property(c => c.Data).HasConversion(
-                d => JsonConvert.SerializeObject(d,
-                    new JsonSerializerSettings
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                        TypeNameHandling = TypeNameHandling.Auto
-                    }),
-                j => JsonConvert.DeserializeObject<PostTemplateData>(j,
-                    new JsonSerializerSettings
-                    {
-                        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                        TypeNameHandling = TypeNameHandling.Auto
-                    }));
         }
     }
 }
