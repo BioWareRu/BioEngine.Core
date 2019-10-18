@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Core
 {
@@ -88,7 +89,7 @@ namespace BioEngine.Core
             }
             catch (Exception ex)
             {
-                var logger = serviceProvider.GetService<ILogger<Application>>();
+                var logger = serviceProvider.GetService<ILogger<BioEngine>>();
                 logger.LogError(ex, ex.ToString());
             }
         }
