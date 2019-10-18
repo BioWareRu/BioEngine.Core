@@ -7,35 +7,5 @@ namespace BioEngine.Core.Repository
         protected SectionRepository(BioRepositoryContext<TEntity> repositoryContext) : base(repositoryContext)
         {
         }
-
-//            TODO: Change content sites when section sites are changed
-//         protected override async Task<bool> AfterSaveAsync(TEntity item, PropertyChange[]? changes = null,
-//            TEntity? oldItem = null,
-//            IBioRepositoryOperationContext? operationContext = null)
-//        {
-//            var res = await base.AfterSaveAsync(item, changes, oldItem, operationContext);
-//            if (res && changes != null && changes.Any(c => c.Name == nameof(Section.SiteIds)))
-//            {
-//                var hasChanges = false;
-//                var contentItems = await DbContext.ContentItems.Where(p => p.SectionIds.Contains(item.Id)).ToArrayAsync();
-//                foreach (var contentItem in contentItems)
-//                {
-//                    var sections = await DbContext.Sections.Where(s => contentItem.SectionIds.Contains(s.Id)).ToArrayAsync();
-//                    contentItem.SiteIds = sections.SelectMany(s => s.SiteIds).Distinct().ToArray();
-//                    if (contentItem.SiteIds.Any())
-//                    {
-//                        DbContext.Update(contentItem);
-//                        hasChanges = true;
-//                    }
-//                }
-//
-//                if (hasChanges)
-//                {
-//                    await DbContext.SaveChangesAsync();
-//                }
-//            }
-//
-//            return res;
-//        }
     }
 }
