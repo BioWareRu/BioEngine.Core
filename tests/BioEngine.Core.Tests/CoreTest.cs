@@ -5,6 +5,8 @@ using BioEngine.Core.Modules;
 using BioEngine.Core.Tests.Fixtures;
 using BioEngine.Core.Tests.Xunit;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
 namespace BioEngine.Core.Tests
@@ -38,8 +40,7 @@ namespace BioEngine.Core.Tests
                 DatePublished = DateTimeOffset.Now,
                 IsPublished = true,
                 SiteIds = new[] {site.Id},
-                SectionIds = new[] {section.Id},
-                AuthorId = "0"
+                SectionIds = new[] {section.Id}
             };
             dbContext.Add(content);
 
@@ -49,8 +50,7 @@ namespace BioEngine.Core.Tests
                 Url = "test3",
                 DatePublished = DateTimeOffset.Now,
                 IsPublished = true,
-                SiteIds = new[] {site.Id},
-                AuthorId = "0"
+                SiteIds = new[] {site.Id}
             };
             dbContext.Add(page);
             dbContext.SaveChanges();
@@ -72,5 +72,14 @@ namespace BioEngine.Core.Tests
 
     public class TestsModule : BaseBioEngineModule
     {
+    }
+
+    public class TestBioContextModelConfigurator : IBioContextModelConfigurator
+    {
+        public void Configure(ModelBuilder modelBuilder, ILogger<BioContext> logger)
+        {
+            modelBuilder.RegisterContentItem<TestContent>(logger);
+            modelBuilder.RegisterSection<TestSection, TestSectionData>(logger);
+        }
     }
 }

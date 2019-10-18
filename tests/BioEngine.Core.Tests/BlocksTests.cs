@@ -33,8 +33,7 @@ namespace BioEngine.Core.Tests
                 DatePublished = DateTimeOffset.Now,
                 IsPublished = true,
                 SiteIds = section.SiteIds,
-                SectionIds = new[] {section.Id},
-                AuthorId = "0",
+                SectionIds = new[] {section.Id}
             };
 
             var blocks = new List<ContentBlock>();

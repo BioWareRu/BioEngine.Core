@@ -34,7 +34,7 @@ namespace BioEngine.Core.Site
         }
 
         protected virtual async Task<IActionResult> ShowContentAsync<TContent>(string url, int page = 0)
-            where TContent : ContentItem
+            where TContent : class, IContentItem
         {
             var section =
                 await Repository.GetWithBlocksAsync(async entities =>

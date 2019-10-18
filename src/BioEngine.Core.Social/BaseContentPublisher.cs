@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -14,18 +15,15 @@ namespace BioEngine.Core.Social
     {
         protected ILogger<BaseContentPublisher<TConfig, TPublishRecord>> Logger { get; }
         private readonly BioContext _dbContext;
-        private readonly BioEntitiesManager _entitiesManager;
 
         protected BaseContentPublisher(BioContext dbContext,
-            ILogger<BaseContentPublisher<TConfig, TPublishRecord>> logger,
-            BioEntitiesManager entitiesManager)
+            ILogger<BaseContentPublisher<TConfig, TPublishRecord>> logger)
         {
             Logger = logger;
             _dbContext = dbContext;
-            _entitiesManager = entitiesManager;
         }
 
-        public virtual async Task<bool> PublishAsync(ContentItem entity, TConfig config, bool needUpdate,
+        public virtual async Task<bool> PublishAsync(IContentItem entity, TConfig config, bool needUpdate,
             Site site = null)
         {
             try
@@ -44,7 +42,7 @@ namespace BioEngine.Core.Social
                     {
                         Id = Guid.NewGuid(),
                         ContentId = entity.Id,
-                        Type = _entitiesManager.GetKey(entity),
+                        Type = entity.GetKey(),
                         SiteIds = site != null ? new[] {site.Id} : entity.SiteIds
                     };
                 }
@@ -70,7 +68,7 @@ namespace BioEngine.Core.Social
             }
         }
 
-        public virtual async Task<bool> DeleteAsync(ContentItem entity, TConfig config, Site? site = null)
+        public virtual async Task<bool> DeleteAsync(IContentItem entity, TConfig config, Site? site = null)
         {
             var records = (await GetRecordsAsync(entity)).ToArray();
             if (!records.Any())
@@ -100,23 +98,23 @@ namespace BioEngine.Core.Social
             return true;
         }
 
-        protected virtual async Task<TPublishRecord> GetRecordAsync(ContentItem entity, Site? site = null)
+        protected virtual async Task<TPublishRecord> GetRecordAsync(IContentItem entity, Site? site = null)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
-                    r.Type == _entitiesManager.GetKey(entity) && r.ContentId == entity.Id
-                                                              && (site == null || r.SiteIds.Contains(site.Id)));
+                    r.Type == entity.GetKey() && r.ContentId == entity.Id
+                                              && (site == null || r.SiteIds.Contains(site.Id)));
         }
 
-        protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(ContentItem entity)
+        protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(IContentItem entity)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .Where(r =>
-                    r.Type == _entitiesManager.GetKey(entity) && r.ContentId == entity.Id)
+                    r.Type == entity.GetKey() && r.ContentId == entity.Id)
                 .ToListAsync();
         }
 
-        protected abstract Task<TPublishRecord> DoPublishAsync(TPublishRecord record, ContentItem entity, Site site,
+        protected abstract Task<TPublishRecord> DoPublishAsync(TPublishRecord record, IContentItem entity, Site site,
             TConfig config);
 
         protected abstract Task<bool> DoDeleteAsync(TPublishRecord record, TConfig config);

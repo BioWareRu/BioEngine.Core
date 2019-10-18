@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
-using BioEngine.Core.DB;
 using BioEngine.Core.Properties;
 using BioEngine.Core.Repository;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +14,6 @@ namespace BioEngine.Core
 {
     public class BioEngine
     {
-        private readonly BioEntitiesManager _entitiesManager = new BioEntitiesManager();
         private readonly List<IBioEngineModule> _modules = new List<IBioEngineModule>();
         private IHost _appHost;
 
@@ -36,12 +34,11 @@ namespace BioEngine.Core
             {
                 services.AddScoped<PropertiesProvider>();
                 services.AddScoped<BioRepositoryHooksManager>();
-                services.AddSingleton(_entitiesManager);
                 services.AddScoped(typeof(BioRepositoryContext<>));
             });
             return this;
         }
-        
+
         public BioEngine ConfigureServices(Action<IServiceCollection> conifgure)
         {
             _hostBuilder.ConfigureServices(conifgure);
@@ -73,9 +70,9 @@ namespace BioEngine.Core
         public async Task ExecuteAsync<TStartup>(Func<IServiceProvider, Task> command) where TStartup : class
         {
             var host = UseStartup<TStartup>().GetAppHost();
-            
+
             await InitAsync();
-            
+
             await host.StartAsync();
 
             var serviceProvider = host.Services;
@@ -166,7 +163,7 @@ namespace BioEngine.Core
 
             if (_registerEntities)
             {
-                module.ConfigureEntities(collection, _entitiesManager);
+                module.ConfigureDbContext(collection, configuration, environment);
             }
         }
 

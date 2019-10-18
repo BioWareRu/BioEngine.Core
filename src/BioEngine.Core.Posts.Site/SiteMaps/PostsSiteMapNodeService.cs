@@ -11,18 +11,18 @@ using Microsoft.AspNetCore.Routing;
 
 namespace BioEngine.Core.Posts.Site.SiteMaps
 {
-    public class PostsSiteMapNodeService : BaseSiteMapNodeService<Post>
+    public class PostsSiteMapNodeService<TUserPk> : BaseSiteMapNodeService<Post<TUserPk>>
     {
         protected override double Priority { get; } = 0.9;
 
         public PostsSiteMapNodeService(IHttpContextAccessor httpContextAccessor,
-            IBioRepository<Post> repository,
+            IBioRepository<Post<TUserPk>> repository,
             LinkGenerator linkGenerator) :
             base(httpContextAccessor, repository, linkGenerator)
         {
         }
 
-        protected override async Task AddNodesAsync(List<ISiteMapNode> nodes, Post[] entities)
+        protected override async Task AddNodesAsync(List<ISiteMapNode> nodes, Post<TUserPk>[] entities)
         {
             await base.AddNodesAsync(nodes, entities);
             nodes.Add(new SiteMapNode("/")

@@ -2,21 +2,22 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.DB;
+using BioEngine.Core.Entities;
 using Newtonsoft.Json;
 
-namespace BioEngine.Core.Entities
+namespace BioEngine.Core.Posts.Entities
 {
 #pragma warning disable CS8618 // Non-nullable field is uninitialized.
-    [Table("ContentVersions")]
-    [Entity("contentversion")]
-    public class ContentVersion : BaseEntity
+    [Table("PostVersions")]
+    [Entity("postversion")]
+    public class PostVersion<TUserPk> : BaseEntity
     {
         public Guid ContentId { get; set; }
         [Column(TypeName = "jsonb")] public string Data { get; set; }
 
-        public string ChangeAuthorId { get; set; }
+        public TUserPk ChangeAuthorId { get; set; }
 
-        public void SetContent(ContentItem contentItem)
+        public void SetContent(IContentItem contentItem)
         {
             Data = JsonConvert.SerializeObject(contentItem,
                 new JsonSerializerSettings
@@ -25,9 +26,9 @@ namespace BioEngine.Core.Entities
                 });
         }
 
-        public ContentItem GetContent()
+        public IContentItem GetContent()
         {
-            return JsonConvert.DeserializeObject<ContentItem>(Data,
+            return JsonConvert.DeserializeObject<IContentItem>(Data,
                 new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto,
@@ -35,7 +36,7 @@ namespace BioEngine.Core.Entities
                 });
         }
 
-        public T GetContent<T, TData>() where T : ContentItem<TData> where TData : ITypedData, new()
+        public T GetContent<T>() where T : Post<TUserPk>
         {
             return JsonConvert.DeserializeObject<T>(Data,
                 new JsonSerializerSettings

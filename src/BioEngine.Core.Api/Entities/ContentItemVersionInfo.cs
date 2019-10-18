@@ -1,11 +1,11 @@
 using System;
-using BioEngine.Core.Abstractions;
+using BioEngine.Core.Users;
 
 namespace BioEngine.Core.Api.Entities
 {
-    public class ContentItemVersionInfo
+    public class ContentItemVersionInfo<TUserPk>
     {
-        public ContentItemVersionInfo(Guid id, DateTimeOffset date, IUser user)
+        public ContentItemVersionInfo(Guid id, DateTimeOffset date, IUser<TUserPk> user)
         {
             Id = id;
             Date = date;
@@ -15,6 +15,6 @@ namespace BioEngine.Core.Api.Entities
         public Guid Id { get; }
         public DateTimeOffset Date { get; }
 
-        public IUser User { get; }
+        public IUser<TUserPk> User { get; }
     }
 }

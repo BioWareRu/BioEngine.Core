@@ -21,24 +21,22 @@ namespace BioEngine.Core.Api
         where TRepository : IContentEntityRepository<TEntity>
     {
         private readonly ContentBlocksRepository _blocksRepository;
-        protected BioEntitiesManager EntitiesManager { get; }
 
         protected ContentEntityController(
             BaseControllerContext<TEntity, TRepository> context,
-            BioEntitiesManager entitiesManager, ContentBlocksRepository blocksRepository) : base(context)
+            ContentBlocksRepository blocksRepository) : base(context)
         {
             _blocksRepository = blocksRepository;
-            EntitiesManager = entitiesManager;
         }
 
         protected override Task<AddOrUpdateOperationResult<TEntity>> DoAddAsync(TEntity entity,
-            BioRepositoryOperationContext operationContext)
+            IBioRepositoryOperationContext operationContext)
         {
             return Repository.AddWithBlocksAsync(entity, operationContext);
         }
 
         protected override Task<AddOrUpdateOperationResult<TEntity>> DoUpdateAsync(TEntity entity,
-            BioRepositoryOperationContext operationContext)
+            IBioRepositoryOperationContext operationContext)
         {
             return Repository.UpdateWithBlocksAsync(entity, operationContext);
         }
@@ -50,27 +48,13 @@ namespace BioEngine.Core.Api
 
         private ContentBlock CreateBlock(string type)
         {
-            var blockType = EntitiesManager.GetBlocksMetadata().Where(entityMetadata =>
-                    entityMetadata.Key == type &&
-                    typeof(ContentBlock).IsAssignableFrom(entityMetadata.ObjectType))
-                .Select(e => e.ObjectType).FirstOrDefault();
-            if (blockType != null)
-            {
-                return Activator.CreateInstance(blockType) as ContentBlock;
-            }
-
-            return null;
+            return ModelBuilderExtensions.CreateBlock(type);
         }
 
         protected override async Task<TEntity> MapDomainModelAsync(TRequest restModel,
             TEntity domainModel = null)
         {
             domainModel = await base.MapDomainModelAsync(restModel, domainModel);
-
-            if (domainModel is ContentItem contentItemModel && string.IsNullOrEmpty(contentItemModel.AuthorId))
-            {
-                contentItemModel.AuthorId = CurrentUser.Id;
-            }
 
             domainModel.Blocks = new List<ContentBlock>();
             var dbBlocks = await _blocksRepository.GetByIdsAsync(restModel.Blocks.Select(b => b.Id).ToArray());
@@ -107,7 +91,7 @@ namespace BioEngine.Core.Api
                     return BadRequest();
                 }
 
-                await Repository.PublishAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+                await Repository.PublishAsync(entity, GetBioRepositoryOperationContext());
                 await AfterSaveAsync(entity);
                 return Model(await MapRestModelAsync(entity));
             }
@@ -126,7 +110,7 @@ namespace BioEngine.Core.Api
                     return BadRequest();
                 }
 
-                await Repository.UnPublishAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+                await Repository.UnPublishAsync(entity, GetBioRepositoryOperationContext());
                 await AfterSaveAsync(entity);
                 return Model(await MapRestModelAsync(entity));
             }

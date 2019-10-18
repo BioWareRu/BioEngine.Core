@@ -33,30 +33,35 @@ namespace BioEngine.Core.Api
         }
 
         protected virtual Task<AddOrUpdateOperationResult<TEntity>> DoAddAsync(TEntity entity,
-            BioRepositoryOperationContext operationContext)
+            IBioRepositoryOperationContext operationContext)
         {
             return Repository.AddAsync(entity, operationContext);
         }
 
         protected virtual Task<AddOrUpdateOperationResult<TEntity>> DoUpdateAsync(TEntity entity,
-            BioRepositoryOperationContext operationContext)
+            IBioRepositoryOperationContext operationContext)
         {
             return Repository.UpdateAsync(entity, operationContext);
         }
 
         protected virtual Task<TEntity> DoDeleteAsync(Guid id,
-            BioRepositoryOperationContext operationContext)
+            IBioRepositoryOperationContext operationContext)
         {
             return Repository.DeleteAsync(id, operationContext);
         }
 
+
+        protected virtual IBioRepositoryOperationContext GetBioRepositoryOperationContext()
+        {
+            return new BioRepositoryOperationContext();
+        }
 
         [HttpPost]
         public virtual async Task<ActionResult<TResponse>> AddAsync(TRequest item)
         {
             var entity = await MapDomainModelAsync(item, Activator.CreateInstance<TEntity>());
 
-            var result = await DoAddAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+            var result = await DoAddAsync(entity, GetBioRepositoryOperationContext());
             if (result.IsSuccess)
             {
                 await AfterSaveAsync(result.Entity, result.Changes, item);
@@ -98,7 +103,7 @@ namespace BioEngine.Core.Api
 
             entity = await MapDomainModelAsync(item, entity);
 
-            var result = await DoUpdateAsync(entity, new BioRepositoryOperationContext {User = CurrentUser});
+            var result = await DoUpdateAsync(entity, GetBioRepositoryOperationContext());
             if (result.IsSuccess)
             {
                 await AfterSaveAsync(result.Entity, result.Changes, item);
@@ -123,7 +128,7 @@ namespace BioEngine.Core.Api
         [HttpDelete("{id}")]
         public virtual async Task<ActionResult<TResponse>> DeleteAsync(Guid id)
         {
-            var result = await DoDeleteAsync(id, new BioRepositoryOperationContext {User = CurrentUser});
+            var result = await DoDeleteAsync(id, GetBioRepositoryOperationContext());
             if (result != null)
             {
                 await AfterDeleteAsync(result);

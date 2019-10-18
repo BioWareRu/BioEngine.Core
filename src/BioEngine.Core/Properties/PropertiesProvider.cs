@@ -16,7 +16,6 @@ namespace BioEngine.Core.Properties
     public class PropertiesProvider
     {
         private readonly BioContext _dbContext;
-        private readonly BioEntitiesManager _entitiesManager;
         private bool _batchMode;
         private bool _checkIfExists = true;
 
@@ -26,10 +25,9 @@ namespace BioEngine.Core.Properties
         private static readonly ConcurrentDictionary<string, PropertiesSchema> Schema =
             new ConcurrentDictionary<string, PropertiesSchema>();
 
-        public PropertiesProvider(BioContext dbContext, BioEntitiesManager entitiesManager)
+        public PropertiesProvider(BioContext dbContext)
         {
             _dbContext = dbContext;
-            _entitiesManager = entitiesManager;
         }
 
         public void BeginBatch()
@@ -77,7 +75,7 @@ namespace BioEngine.Core.Properties
         public static void RegisterBioEngineContentProperties<TProperties>(string key)
             where TProperties : PropertiesSet, new()
         {
-            RegisterBioEngineProperties<TProperties>(key, typeof(ContentItem), PropertiesRegistrationType.Content);
+            RegisterBioEngineProperties<TProperties>(key, typeof(IContentItem), PropertiesRegistrationType.Content);
         }
 
         private static void RegisterBioEngineProperties<TProperties>(string key, Type entityType,
@@ -213,10 +211,7 @@ namespace BioEngine.Core.Properties
 
             var record = await LoadFromDatabaseAsync(schema, entity, siteId) ?? new PropertiesRecord
             {
-                Key = schema.Key,
-                EntityType = _entitiesManager.GetKey(entity),
-                EntityId = entity.Id,
-                SiteId = siteId
+                Key = schema.Key, EntityType = entity.GetKey(), EntityId = entity.Id, SiteId = siteId
             };
 
 
@@ -254,7 +249,7 @@ namespace BioEngine.Core.Properties
                 ? null
                 : await _dbContext.Properties.FirstOrDefaultAsync(s =>
                     s.Key == schema.Key
-                    && s.EntityType == _entitiesManager.GetKey(entity) && s.EntityId == entity.Id &&
+                    && s.EntityType == entity.GetKey() && s.EntityId == entity.Id &&
                     (siteId == null || s.SiteId == siteId.Value));
         }
 
@@ -264,7 +259,7 @@ namespace BioEngine.Core.Properties
             if (entitiesArray.Any())
             {
                 var sites = await _dbContext.Sites.ToListAsync();
-                var groups = entitiesArray.GroupBy(e => _entitiesManager.GetKey(e));
+                var groups = entitiesArray.GroupBy(e => e.GetKey());
                 foreach (var group in groups)
                 {
                     var ids = group.Where(e => e.Id != default).Select(e => e.Id);
@@ -278,7 +273,7 @@ namespace BioEngine.Core.Properties
                             schema.Value.IsRegisteredForSections()));
                     }
 
-                    if (groupEntity is ContentItem)
+                    if (groupEntity is IContentItem)
                     {
                         schemas.AddRange(Schema.Where(schema =>
                             schema.Value.IsRegisteredForContent()));

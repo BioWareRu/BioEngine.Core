@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
 using BioEngine.Core.Repository;
@@ -14,15 +13,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BioEngine.Core.Posts.Site
 {
-    public abstract class BasePostsController : SiteController<Post, PostsRepository>
+    public abstract class BasePostsController<TUserPk> : SiteController<Post<TUserPk>, PostsRepository<TUserPk>>
     {
         protected readonly TagsRepository TagsRepository;
-        private readonly ICommentsProvider _commentsProvider;
+        private readonly ICommentsProvider<TUserPk> _commentsProvider;
 
         protected BasePostsController(
-            BaseControllerContext<Post, PostsRepository> context,
+            BaseControllerContext<Post<TUserPk>, PostsRepository<TUserPk>> context,
             TagsRepository tagsRepository,
-            ICommentsProvider commentsProvider) : base(context)
+            ICommentsProvider<TUserPk> commentsProvider) : base(context)
         {
             TagsRepository = tagsRepository;
             _commentsProvider = commentsProvider;
@@ -37,9 +36,9 @@ namespace BioEngine.Core.Posts.Site
                 return PageNotFound();
             }
 
-            var commentsData = await _commentsProvider.GetCommentsDataAsync(new ContentItem[] {post}, Site);
+            var commentsData = await _commentsProvider.GetCommentsDataAsync(new IContentItem[] {post}, Site);
 
-            return View(new ContentItemViewModel(GetPageContext(), post, commentsData[post.Id].count,
+            return View(new PostViewModel<TUserPk>(GetPageContext(), post, commentsData[post.Id].count,
                 commentsData[post.Id].uri, ContentEntityViewMode.Entity));
         }
 
@@ -71,11 +70,11 @@ namespace BioEngine.Core.Posts.Site
             var (items, itemsCount) =
                 await Repository.GetAllWithBlocksAsync(async entities =>
                     (await ConfigureQueryAsync(entities, page)).WithTags(tags.items).Where(e => e.IsPublished));
-            return View("List", new ListViewModel<Post>(GetPageContext(), items,
+            return View("List", new ListViewModel<Post<TUserPk>>(GetPageContext(), items,
                 itemsCount, Page, ItemsPerPage) {Tags = tags.items});
         }
 
-        protected override void ApplyDefaultOrder(BioQuery<Post> query)
+        protected override void ApplyDefaultOrder(BioQuery<Post<TUserPk>> query)
         {
             query.OrderByDescending(p => p.DatePublished);
         }

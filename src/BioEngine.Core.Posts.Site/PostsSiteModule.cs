@@ -8,14 +8,14 @@ using Microsoft.Extensions.Hosting;
 
 namespace BioEngine.Core.Posts.Site
 {
-    public class PostsSiteModule : PostsModule
+    public class PostsSiteModule<TUserPk> : PostsModule<TUserPk>
     {
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
         {
             base.ConfigureServices(services, configuration, environment);
-            services.AddScoped<ISiteMapNodeService, PostsSiteMapNodeService>();
-            services.AddScoped<IRssItemsProvider, PostsRssItemsProvider>();
+            services.AddScoped<ISiteMapNodeService, PostsSiteMapNodeService<TUserPk>>();
+            services.AddScoped<IRssItemsProvider, PostsRssItemsProvider<TUserPk>>();
         }
     }
 }
