@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Api;
 using BioEngine.Core.Api.Entities;
 using BioEngine.Core.Entities;
@@ -113,6 +114,11 @@ namespace BioEngine.Core.Posts.Api
             }
 
             return domainModel;
+        }
+
+        protected override IBioRepositoryOperationContext GetBioRepositoryOperationContext()
+        {
+            return new UserBioRepositoryOperationContext<TUserPk> {User = _currentUserProvider.CurrentUser};
         }
     }
 }
