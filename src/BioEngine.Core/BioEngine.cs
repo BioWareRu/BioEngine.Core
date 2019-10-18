@@ -72,20 +72,25 @@ namespace BioEngine.Core
 
         public async Task ExecuteAsync<TStartup>(Func<IServiceProvider, Task> command) where TStartup : class
         {
+            GetHostBuilder().UseConsoleLifetime();
             var host = UseStartup<TStartup>().GetAppHost();
             
             await InitAsync();
-            
-            await host.StartAsync();
 
             var serviceProvider = host.Services;
 
-            using (var scope = serviceProvider.CreateScope())
+            try
             {
-                await command(scope.ServiceProvider);
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    await command(scope.ServiceProvider);
+                }
             }
-
-            await host.StopAsync();
+            catch (Exception ex)
+            {
+                var logger = serviceProvider.GetService<ILogger<Application>>();
+                logger.LogError(ex, ex.ToString());
+            }
         }
 
         private BioEngine UseStartup<TStartup>() where TStartup : class
