@@ -120,7 +120,7 @@ namespace BioEngine.Core.Comments
             return results;
         }
 
-        public abstract Task<BaseComment<TUserPk>> AddCommentAsync(IContentItem entity, string text, string authorId,
+        public abstract Task<BaseComment<TUserPk>> AddCommentAsync(IContentItem entity, string text, TUserPk authorId,
             Guid? replyTo = null);
 
         public abstract Task<BaseComment<TUserPk>> UpdateCommentAsync(IContentItem entity, Guid commentId, string text);

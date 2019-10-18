@@ -17,7 +17,7 @@ namespace BioEngine.Core.Comments
         Task<List<(TContent entity, int commentsCount)>> GetMostCommentedAsync<TContent>(Site site, int count,
             TimeSpan period) where TContent : class, IContentItem;
 
-        Task<BaseComment<TUserPk>> AddCommentAsync(IContentItem entity, string text, string authorId,
+        Task<BaseComment<TUserPk>> AddCommentAsync(IContentItem entity, string text, TUserPk authorId,
             Guid? replyTo = null);
 
         Task<BaseComment<TUserPk>> UpdateCommentAsync(IContentItem entity, Guid commentId, string text);
