@@ -38,7 +38,9 @@ namespace BioEngine.Core.Modules
         protected virtual void RegisterDbConfigurators(IServiceCollection services, Assembly assembly)
         {
             services.Scan(s =>
-                s.FromAssemblies(assembly).AddClasses(classes => classes.AssignableTo<IBioContextModelConfigurator>())
+                s.FromAssemblies(assembly).AddClasses(classes =>
+                        classes.Where(type => !type.ContainsGenericParameters)
+                            .AssignableTo<IBioContextModelConfigurator>())
                     .As<IBioContextModelConfigurator>());
         }
 
