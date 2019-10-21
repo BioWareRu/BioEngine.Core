@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Core
 {
@@ -69,20 +70,28 @@ namespace BioEngine.Core
 
         public async Task ExecuteAsync<TStartup>(Func<IServiceProvider, Task> command) where TStartup : class
         {
-            var host = UseStartup<TStartup>().GetAppHost();
-
-            await InitAsync();
-
-            await host.StartAsync();
-
-            var serviceProvider = host.Services;
-
-            using (var scope = serviceProvider.CreateScope())
+            GetHostBuilder().UseConsoleLifetime();
+            using (var host = UseStartup<TStartup>().GetAppHost())
             {
-                await command(scope.ServiceProvider);
-            }
+                await InitAsync();
 
-            await host.StopAsync();
+                var serviceProvider = host.Services;
+                await host.StartAsync();
+                try
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        await command(scope.ServiceProvider);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var logger = serviceProvider.GetService<ILogger<BioEngine>>();
+                    logger.LogError(ex, ex.ToString());
+                }
+
+                await host.StopAsync();
+            }
         }
 
         private BioEngine UseStartup<TStartup>() where TStartup : class
