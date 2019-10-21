@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Comments;
 using BioEngine.Core.DB;
-using BioEngine.Core.Entities;
 using BioEngine.Core.Entities.Blocks;
 using BioEngine.Core.Posts.Db;
 using BioEngine.Core.Posts.Entities;
@@ -15,14 +15,14 @@ using Microsoft.AspNetCore.Routing;
 
 namespace BioEngine.Core.Posts.Site.Rss
 {
-    public class PostsRssItemsProvider : IRssItemsProvider
+    public class PostsRssItemsProvider<TUserPk> : IRssItemsProvider
     {
-        private readonly PostsRepository _postsRepository;
+        private readonly PostsRepository<TUserPk> _postsRepository;
         private readonly LinkGenerator _linkGenerator;
-        private readonly ICommentsProvider _commentsProvider;
+        private readonly ICommentsProvider<TUserPk> _commentsProvider;
 
-        public PostsRssItemsProvider(PostsRepository postsRepository, LinkGenerator linkGenerator,
-            ICommentsProvider commentsProvider)
+        public PostsRssItemsProvider(PostsRepository<TUserPk> postsRepository, LinkGenerator linkGenerator,
+            ICommentsProvider<TUserPk> commentsProvider)
         {
             _postsRepository = postsRepository;
             _linkGenerator = linkGenerator;
@@ -35,7 +35,7 @@ namespace BioEngine.Core.Posts.Site.Rss
                 entities.Where(e => e.IsPublished).ForSite(site).OrderByDescending(p => p.DatePublished).Take(count));
             DateTimeOffset? mostRecentPubDate = DateTimeOffset.MinValue;
             var commentsData =
-                await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as ContentItem).ToArray(), site);
+                await _commentsProvider.GetCommentsDataAsync(posts.items.Select(p => p as IContentItem).ToArray(), site);
             var items = new List<RssItem>();
             foreach (var post in posts.items)
             {
@@ -72,7 +72,7 @@ namespace BioEngine.Core.Posts.Site.Rss
             return items;
         }
 
-        private string GetDescription(Post post)
+        private string GetDescription(Post<TUserPk> post)
         {
             var description = "";
 

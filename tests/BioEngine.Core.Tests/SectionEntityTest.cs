@@ -49,7 +49,6 @@ namespace BioEngine.Core.Tests
                 Title = "Test Content 2",
                 Url = "content2",
                 SectionIds = new[] {section.Id},
-                AuthorId = "1",
                 Blocks = new List<ContentBlock> {new TextBlock {Data = new TextBlockData {Text = "Bla"}}}
             };
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
@@ -23,11 +22,38 @@ namespace BioEngine.Core.Modules
             return AssemblyScanner.FindValidatorsInAssembly(GetType().Assembly);
         }
 
-        public virtual void ConfigureEntities(IServiceCollection serviceCollection,
-            BioEntitiesManager entitiesManager)
+        public virtual void ConfigureDbContext(IServiceCollection services, IConfiguration configuration,
+            IHostEnvironment environment)
         {
-            RegisterRepositories(GetType().Assembly, serviceCollection, entitiesManager);
+            RegisterDbConfigurators(services, GetType().Assembly);
+            RegisterRepositories(services, GetType().Assembly);
         }
+
+        public virtual void RegisterEntities<T>(IServiceCollection services)
+        {
+            RegisterDbConfigurators(services, typeof(T).Assembly);
+            RegisterRepositories(services, typeof(T).Assembly);
+        }
+
+        protected virtual void RegisterDbConfigurators(IServiceCollection services, Assembly assembly)
+        {
+            services.Scan(s =>
+                s.FromAssemblies(assembly).AddClasses(classes => classes.AssignableTo<IBioContextModelConfigurator>())
+                    .As<IBioContextModelConfigurator>());
+        }
+
+        protected virtual void RegisterRepositories<T>(IServiceCollection services)
+        {
+            RegisterRepositories(services, typeof(T).Assembly);
+        }
+
+        protected virtual void RegisterRepositories(IServiceCollection services, Assembly assembly)
+        {
+            services.Scan(s =>
+                s.FromAssemblies(assembly).AddClasses(classes => classes.AssignableTo<IBioRepository>())
+                    .AsSelfWithInterfaces());
+        }
+
 
         public virtual Task InitAsync(IServiceProvider serviceProvider, IConfiguration configuration,
             IHostEnvironment environment)
@@ -35,26 +61,6 @@ namespace BioEngine.Core.Modules
             return Task.CompletedTask;
         }
 
-        protected void RegisterRepositories(Assembly assembly, IServiceCollection serviceCollection,
-            BioEntitiesManager entitiesManager)
-        {
-            var method = entitiesManager.GetType().GetMethod(nameof(BioEntitiesManager.RegisterEntity),
-                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            if (method == null)
-            {
-                throw new Exception("Method BioEntitiesManager.RegisterEntity not found");
-            }
-
-            foreach (var definedType in assembly.DefinedTypes.Where(type =>
-                !type.IsAbstract && typeof(IEntity).IsAssignableFrom(type)))
-            {
-                method.MakeGenericMethod(definedType).Invoke(entitiesManager, null);
-            }
-
-            serviceCollection.Scan(s =>
-                s.FromAssemblies(assembly).AddClasses(classes => classes.AssignableTo<IBioRepository>())
-                    .AsSelfWithInterfaces());
-        }
 
         protected virtual void CheckConfig()
         {

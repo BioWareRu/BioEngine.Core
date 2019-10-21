@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using BioEngine.Core.DB;
 using BioEngine.Core.Pages.Db;
 using BioEngine.Core.Pages.Entities;
 using BioEngine.Core.Search;
@@ -15,8 +14,7 @@ namespace BioEngine.Core.Pages.Search
         private readonly PagesRepository _pagesRepository;
 
         public PagesSearchProvider(ILogger<PagesSearchProvider> logger,
-            PagesRepository pagesRepository, BioEntitiesManager entitiesManager, ISearcher searcher = null) : base(logger, entitiesManager,
-            searcher)
+            PagesRepository pagesRepository, ISearcher searcher = null) : base(logger, searcher)
         {
             _pagesRepository = pagesRepository;
         }

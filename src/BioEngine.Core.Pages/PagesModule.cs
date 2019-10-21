@@ -3,9 +3,11 @@ using BioEngine.Core.Modules;
 using BioEngine.Core.Pages.Entities;
 using BioEngine.Core.Pages.Search;
 using BioEngine.Core.Search;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Core.Pages
 {
@@ -18,10 +20,21 @@ namespace BioEngine.Core.Pages
             services.RegisterSearchProvider<PagesSearchProvider, Page>();
         }
 
-        public override void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
+        public override void ConfigureDbContext(IServiceCollection services, IConfiguration configuration,
+            IHostEnvironment environment)
         {
-            base.ConfigureEntities(serviceCollection, entitiesManager);
-            RegisterRepositories(typeof(Page).Assembly, serviceCollection, entitiesManager);
+            base.ConfigureDbContext(services, configuration, environment);
+            RegisterEntities<PagesModule>(services);
+        }
+    }
+
+    public class PagesBioContextModelConfigurator : IBioContextModelConfigurator
+    {
+        public void Configure(ModelBuilder modelBuilder, ILogger<BioContext> logger)
+        {
+            modelBuilder.RegisterSiteEntity<Page>();
+            modelBuilder.Entity<Page>().HasIndex(p => p.IsPublished);
+            modelBuilder.Entity<Page>().HasIndex(p => p.Url).IsUnique();
         }
     }
 }

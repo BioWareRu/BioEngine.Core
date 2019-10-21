@@ -20,7 +20,6 @@ namespace BioEngine.Core.Repository
         protected readonly List<IValidator<TEntity>> Validators;
         protected readonly PropertiesProvider PropertiesProvider;
         protected readonly BioRepositoryHooksManager HooksManager;
-        protected readonly BioEntitiesManager EntitiesManager;
 
         protected BioRepository(BioRepositoryContext<TEntity> repositoryContext)
         {
@@ -28,7 +27,6 @@ namespace BioEngine.Core.Repository
             Validators = repositoryContext.Validators ?? new List<IValidator<TEntity>>();
             PropertiesProvider = repositoryContext.PropertiesProvider;
             HooksManager = repositoryContext.HooksManager;
-            EntitiesManager = repositoryContext.EntitiesManager;
             Init();
         }
 

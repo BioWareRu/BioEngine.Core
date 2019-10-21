@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Api.Models;
-using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Users;
@@ -26,8 +25,7 @@ namespace BioEngine.Core.Api
         where TRepository : IContentEntityRepository<TEntity>
     {
         protected SectionController(BaseControllerContext<TEntity, TRepository> context,
-            BioEntitiesManager entitiesManager,
-            ContentBlocksRepository blocksRepository) : base(context, entitiesManager, blocksRepository)
+            ContentBlocksRepository blocksRepository) : base(context, blocksRepository)
         {
         }
 

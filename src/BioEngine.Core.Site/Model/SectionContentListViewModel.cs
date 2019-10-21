@@ -1,9 +1,10 @@
+using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Site.Model
 {
     public class SectionContentListViewModel<TSection, TContent> : ListViewModel<TContent>
-        where TContent : ContentItem where TSection : Section
+        where TContent : class, IContentItem where TSection : Section
     {
         public new TSection Section { get; }
 

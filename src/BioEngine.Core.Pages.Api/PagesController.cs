@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Api;
-using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Pages.Db;
 using BioEngine.Core.Pages.Entities;
@@ -17,8 +16,7 @@ namespace BioEngine.Core.Pages.Api
         ApiPagesController : ContentEntityController<Page, PagesRepository, Entities.Page, Entities.Page>
     {
         protected ApiPagesController(BaseControllerContext<Page, PagesRepository> context,
-            BioEntitiesManager entitiesManager, ContentBlocksRepository blocksRepository) : base(context,
-            entitiesManager, blocksRepository)
+            ContentBlocksRepository blocksRepository) : base(context, blocksRepository)
         {
         }
 

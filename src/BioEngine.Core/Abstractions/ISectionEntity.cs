@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using BioEngine.Core.Entities;
 
 namespace BioEngine.Core.Abstractions
 {
@@ -6,5 +8,6 @@ namespace BioEngine.Core.Abstractions
     {
         Guid[] SectionIds { get; set; }
         Guid[] TagIds { get; set; }
+        List<Tag> Tags { get; set; }
     }
 }

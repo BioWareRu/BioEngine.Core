@@ -29,12 +29,7 @@ namespace BioEngine.Core.Db.InMemory
                 options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
                     .UseInMemoryDatabase(Config.InMemoryDatabaseName).UseInternalServiceProvider(p);
             });
-        }
-
-        public override void ConfigureEntities(IServiceCollection serviceCollection, BioEntitiesManager entitiesManager)
-        {
-            base.ConfigureEntities(serviceCollection, entitiesManager);
-            entitiesManager.RequireArrayConversions();
+            ModelBuilderExtensions.RequireArrayConversion();
         }
     }
 

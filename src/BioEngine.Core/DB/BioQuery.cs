@@ -316,7 +316,7 @@ namespace BioEngine.Core.DB
         }
 
         public static BioQuery<T> WithTags<T>(this BioQuery<T> query, Tag[] tags)
-            where T : class, IEntity, ITaggedContentEntity
+            where T : class, IEntity, IContentItem
         {
             Expression<Func<T, bool>>? ex = null;
             foreach (var tag in tags)

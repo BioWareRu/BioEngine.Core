@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core.Comments\BioEngine.Core.Comments.csproj" />
     <ProjectReference Include="..\BioEngine.Core.Search\BioEngine.Core.Search.csproj" />
+    <ProjectReference Include="..\BioEngine.Core.Users\BioEngine.Core.Users.csproj" />
     <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj" />
   </ItemGroup>
 
