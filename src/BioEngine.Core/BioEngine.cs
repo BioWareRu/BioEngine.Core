@@ -42,7 +42,7 @@ namespace BioEngine.Core
             });
             return this;
         }
-        
+
         public BioEngine ConfigureServices(Action<IServiceCollection> conifgure)
         {
             _hostBuilder.ConfigureServices(conifgure);
@@ -74,23 +74,27 @@ namespace BioEngine.Core
         public async Task ExecuteAsync<TStartup>(Func<IServiceProvider, Task> command) where TStartup : class
         {
             GetHostBuilder().UseConsoleLifetime();
-            var host = UseStartup<TStartup>().GetAppHost();
-            
-            await InitAsync();
-
-            var serviceProvider = host.Services;
-
-            try
+            using (var host = UseStartup<TStartup>().GetAppHost())
             {
-                using (var scope = serviceProvider.CreateScope())
+
+                await InitAsync();
+
+                var serviceProvider = host.Services;
+                await host.StartAsync();
+                try
                 {
-                    await command(scope.ServiceProvider);
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        await command(scope.ServiceProvider);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                var logger = serviceProvider.GetService<ILogger<BioEngine>>();
-                logger.LogError(ex, ex.ToString());
+                catch (Exception ex)
+                {
+                    var logger = serviceProvider.GetService<ILogger<BioEngine>>();
+                    logger.LogError(ex, ex.ToString());
+                }
+
+                await host.StopAsync();
             }
         }
 
