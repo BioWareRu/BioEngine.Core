@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using BioEngine.Core.Api;
-using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Web;
@@ -16,8 +15,8 @@ namespace BioEngine.Extra.Ads.Api
         AdsApiController : ContentEntityController<Ad, AdsRepository, Entities.Ad, Entities.Ad>
     {
         protected AdsApiController(BaseControllerContext<Ad, AdsRepository> context,
-            BioEntitiesManager entitiesManager, ContentBlocksRepository blocksRepository) : base(context,
-            entitiesManager, blocksRepository)
+            ContentBlocksRepository blocksRepository) : base(context,
+            blocksRepository)
         {
         }
 
