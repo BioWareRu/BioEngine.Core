@@ -9,9 +9,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="cloudscribe.Syndication.Web" Version="3.0.0" />
+    <PackageReference Include="cloudscribe.Syndication.Web" Version="3.0.1" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
-    <PackageReference Include="cloudscribe.Web.SiteMap" Version="4.0.0" />
+    <PackageReference Include="cloudscribe.Web.SiteMap" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core\BioEngine.Core.csproj" />
