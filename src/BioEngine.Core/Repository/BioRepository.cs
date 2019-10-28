@@ -337,7 +337,7 @@ namespace BioEngine.Core.Repository
         }
 
 
-        public virtual async Task<TEntity> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null)
+        public virtual async Task<TEntity?> DeleteAsync(Guid id, IBioRepositoryOperationContext? operationContext = null)
         {
             var item = await GetByIdAsync(id, (Action<BioQuery<TEntity>>)null);
             if (item != null)

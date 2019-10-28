@@ -24,8 +24,8 @@ namespace BioEngine.Core.Posts.Db
             return typeof(Section).IsAssignableFrom(type);
         }
 
-        public override async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[] changes = null,
-            IBioRepositoryOperationContext operationContext = null)
+        public override async Task<bool> AfterSaveAsync<T>(T item, PropertyChange[]? changes = null,
+            IBioRepositoryOperationContext? operationContext = null)
         {
             var res = await base.AfterSaveAsync(item, changes, operationContext);
             if (res && item is Section && changes != null && changes.Any(c => c.Name == nameof(Section.SiteIds)))

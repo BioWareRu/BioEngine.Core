@@ -24,7 +24,7 @@ namespace BioEngine.Core.Social
         }
 
         public virtual async Task<bool> PublishAsync(IContentItem entity, TConfig config, bool needUpdate,
-            Site site = null)
+            Site? site = null)
         {
             try
             {
