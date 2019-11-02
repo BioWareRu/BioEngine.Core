@@ -56,6 +56,7 @@ namespace BioEngine.Core.Entities
         public double VerticalResolution { get; set; }
         public double HorizontalResolution { get; set; }
 
+        public StorageItemPictureThumbnail? LargeThumbnail { get; set; }
         public StorageItemPictureThumbnail? MediumThumbnail { get; set; }
         public StorageItemPictureThumbnail? SmallThumbnail { get; set; }
     }

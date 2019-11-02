@@ -26,6 +26,9 @@ namespace BioEngine.Core.Storage
         }
 
         public Uri PublicUri { get; }
+
+        public int LargeThumbnailWidth { get; set; } = 800;
+        public int LargeThumbnailHeight { get; set; } = 800;
         public int MediumThumbnailWidth { get; set; } = 300;
         public int MediumThumbnailHeight { get; set; } = 300;
         public int SmallThumbnailWidth { get; set; } = 100;

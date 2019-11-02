@@ -276,6 +276,9 @@ namespace BioEngine.Core.Storage
                     {
                         VerticalResolution = image.Height,
                         HorizontalResolution = image.Width,
+                        LargeThumbnail = await CreateThumbnailAsync(image,
+                            _options.LargeThumbnailWidth,
+                            _options.LargeThumbnailHeight, destinationPath, storageItem.StorageFileName),
                         MediumThumbnail = await CreateThumbnailAsync(image,
                             _options.MediumThumbnailWidth,
                             _options.MediumThumbnailHeight, destinationPath, storageItem.StorageFileName),
