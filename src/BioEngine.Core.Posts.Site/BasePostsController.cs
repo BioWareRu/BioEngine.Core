@@ -76,7 +76,7 @@ namespace BioEngine.Core.Posts.Site
 
         protected override void ApplyDefaultOrder(BioQuery<Post<TUserPk>> query)
         {
-            query.OrderByDescending(p => p.DatePublished);
+            query.OrderByDescending(p => p.IsPublished ? p.DatePublished : p.DateUpdated);
         }
     }
 }
