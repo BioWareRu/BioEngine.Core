@@ -172,6 +172,7 @@ namespace BioEngine.Core.Storage
 
             await TryProcessImageAsync(storageItem, memoryStream, basePath);
 
+            memoryStream.Seek(0, SeekOrigin.Begin);
             await DoSaveAsync(destinationPath, memoryStream);
 
             var result = await _repository.AddAsync(storageItem);
@@ -265,6 +266,7 @@ namespace BioEngine.Core.Storage
         {
             try
             {
+                file.Seek(0, SeekOrigin.Begin);
                 using (var image = Image.Load<Rgba32>(file))
                 {
                     storageItem.Type = StorageItemType.Picture;
