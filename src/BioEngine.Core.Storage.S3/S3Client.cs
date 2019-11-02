@@ -53,19 +53,14 @@ namespace BioEngine.Core.Storage.S3
             }
         }
 
-        public async Task<bool> UploadAsync(string path, string tmpPath)
+        public async Task<bool> UploadAsync(string path, Stream file)
         {
             await CreateBucketAsync(_options.Bucket);
             try
             {
-                using (var fileToUpload =
-                    new FileStream(tmpPath, FileMode.Open))
-                {
-                    await _fileTransferUtility.UploadAsync(fileToUpload,
-                        _options.Bucket, path);
-                    File.Delete(tmpPath);
-                    return true;
-                }
+                await _fileTransferUtility.UploadAsync(file,
+                    _options.Bucket, path);
+                return true;
             }
             catch (Exception e)
             {

@@ -21,9 +21,7 @@ namespace BioEngine.Core.Api.Controllers
         [HttpPost("upload")]
         public async Task<StorageNode> UploadAsync([FromQuery] string name, [FromQuery] string path = "/")
         {
-            var file = await GetBodyAsFileAsync();
-
-            var item = await Storage.SaveFileAsync(file, name, path, "storage");
+            var item = await Storage.SaveFileAsync(Request.Body, name, path, "storage");
             return new StorageNode(item);
         }
         

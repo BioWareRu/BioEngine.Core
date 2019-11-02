@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using BioEngine.Core.Api;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Pages.Db;
-using BioEngine.Core.Pages.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Page = BioEngine.Core.Pages.Entities.Page;
 
 namespace BioEngine.Core.Pages.Api
 {
@@ -22,8 +22,7 @@ namespace BioEngine.Core.Pages.Api
 
         public override async Task<ActionResult<StorageItem>> UploadAsync(string name)
         {
-            var file = await GetBodyAsFileAsync();
-            return await Storage.SaveFileAsync(file, name,
+            return await Storage.SaveFileAsync(Request.Body, name,
                 $"pages/{DateTimeOffset.UtcNow.Year.ToString()}/{DateTimeOffset.UtcNow.Month.ToString()}");
         }
 

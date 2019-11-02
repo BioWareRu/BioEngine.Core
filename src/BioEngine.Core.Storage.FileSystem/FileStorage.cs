@@ -19,7 +19,7 @@ namespace BioEngine.Core.Storage.FileSystem
             _storagePath = options.StoragePath;
         }
 
-        protected override Task<bool> DoSaveAsync(string path, string tmpPath)
+        protected override async Task<bool> DoSaveAsync(string path, Stream file)
         {
             var dirPath = Path.Combine(_storagePath, Path.GetDirectoryName(path));
             if (!Directory.Exists(dirPath))
@@ -27,8 +27,10 @@ namespace BioEngine.Core.Storage.FileSystem
                 Directory.CreateDirectory(dirPath ?? throw new Exception($"Empty dir path in {path}"));
             }
 
-            File.Move(tmpPath, path);
-            return Task.FromResult(true);
+            await using var fileStream = File.Create(path);
+            file.Seek(0, SeekOrigin.Begin);
+            await file.CopyToAsync(fileStream);
+            return true;
         }
 
         protected override Task<bool> DoDeleteAsync(string path)

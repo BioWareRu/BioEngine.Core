@@ -32,8 +32,7 @@ namespace BioEngine.Core.Api
 
         public override async Task<ActionResult<StorageItem>> UploadAsync([FromQuery] string name)
         {
-            var file = await GetBodyAsFileAsync();
-            return await Storage.SaveFileAsync(file, name, Path.Combine("sections", GetUploadPath()));
+            return await Storage.SaveFileAsync(Request.Body, name, Path.Combine("sections", GetUploadPath()));
         }
 
         protected abstract string GetUploadPath();

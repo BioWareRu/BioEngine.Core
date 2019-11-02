@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using BioEngine.Core.Entities;
 
@@ -9,7 +10,7 @@ namespace BioEngine.Core.Storage
     {
         Task<IEnumerable<StorageNode>> ListItemsAsync(string path, string root = "/");
 
-        Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/");
+        Task<StorageItem> SaveFileAsync(Stream file, string fileName, string path, string root = "/");
 
         Task<bool> DeleteAsync(StorageItem item);
         Task<bool> DeleteAsync(string path, string root = "/");

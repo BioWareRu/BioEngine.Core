@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Repository;
 using JetBrains.Annotations;
@@ -20,9 +21,9 @@ namespace BioEngine.Core.Storage.S3
         }
 
 
-        protected override Task<bool> DoSaveAsync(string path, string tmpPath)
+        protected override Task<bool> DoSaveAsync(string path, Stream file)
         {
-            return _s3Client.UploadAsync(path, tmpPath);
+            return _s3Client.UploadAsync(path, file);
         }
 
         protected override Task<bool> DoDeleteAsync(string path)

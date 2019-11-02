@@ -36,8 +36,7 @@ namespace BioEngine.Core.Posts.Api
 
         public override async Task<ActionResult<StorageItem>> UploadAsync(string name)
         {
-            var file = await GetBodyAsFileAsync();
-            return await Storage.SaveFileAsync(file, name,
+            return await Storage.SaveFileAsync(Request.Body, name,
                 $"posts/{DateTimeOffset.UtcNow.Year.ToString()}/{DateTimeOffset.UtcNow.Month.ToString()}");
         }
 

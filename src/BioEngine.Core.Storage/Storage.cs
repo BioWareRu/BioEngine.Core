@@ -11,6 +11,9 @@ using BioEngine.Core.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -145,7 +148,7 @@ namespace BioEngine.Core.Storage
         }
 
         [SuppressMessage("ReSharper", "RCS1198")]
-        public async Task<StorageItem> SaveFileAsync(byte[] file, string fileName, string path, string root = "/")
+        public async Task<StorageItem> SaveFileAsync(Stream file, string fileName, string path, string root = "/")
         {
             var hash = HashBytesToString(Sha256.ComputeHash(file));
             var storageItem = await _repository.GetAsync(q => q.Where(i => i.Hash == hash));
@@ -157,27 +160,17 @@ namespace BioEngine.Core.Storage
             var basePath = GetFullPath(path, root);
             var destinationPath = GetFilePath(basePath, fileName);
 
-            var tmpPath = Path.Combine(Path.GetTempPath(), fileName.ToLowerInvariant());
-
-            using (var sourceStream = new FileStream(tmpPath,
-                FileMode.OpenOrCreate, FileAccess.Write, FileShare.None,
-                4096, true))
-            {
-                await sourceStream.WriteAsync(file, 0, file.Length);
-            }
-
-
             storageItem = await _repository.NewAsync();
             storageItem.FileName = fileName;
-            storageItem.FileSize = file.LongLength;
+            storageItem.FileSize = file.Length;
             storageItem.FilePath = destinationPath;
             storageItem.Path = Path.GetDirectoryName(destinationPath).Replace("\\", "/");
             storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
             storageItem.Hash = hash;
 
-            await TryProcessImageAsync(storageItem, tmpPath, basePath);
+            await TryProcessImageAsync(storageItem, file, basePath);
 
-            await DoSaveAsync(destinationPath, tmpPath);
+            await DoSaveAsync(destinationPath, file);
 
             var result = await _repository.AddAsync(storageItem);
             if (!result.IsSuccess)
@@ -256,7 +249,7 @@ namespace BioEngine.Core.Storage
             await _repository.FinishBatchAsync();
         }
 
-        protected abstract Task<bool> DoSaveAsync(string path, string tmpPath);
+        protected abstract Task<bool> DoSaveAsync(string path, Stream file);
         protected abstract Task<bool> DoDeleteAsync(string path);
 
         private string GetStorageFileName(string fileName)
@@ -265,12 +258,12 @@ namespace BioEngine.Core.Storage
             return $"{Guid.NewGuid().ToString()}{extension}";
         }
 
-        private async Task TryProcessImageAsync(StorageItem storageItem, string filePath,
+        private async Task TryProcessImageAsync(StorageItem storageItem, Stream file,
             string destinationPath)
         {
             try
             {
-                using (var image = Image.Load<Rgba32>(filePath))
+                using (var image = Image.Load<Rgba32>(file))
                 {
                     storageItem.Type = StorageItemType.Picture;
                     storageItem.PictureInfo = new StorageItemPictureInfo
@@ -300,11 +293,23 @@ namespace BioEngine.Core.Storage
             thumb.Mutate(i =>
                 i.Resize(image.Width >= image.Height ? maxWidth : 0, image.Height > image.Width ? maxHeight : 0));
             var thumbFileName = $"{thumb.Width.ToString()}_{thumb.Height.ToString()}_{fileName}";
-            var tmpPath = Path.Combine(Path.GetTempPath(), thumbFileName);
-            thumb.Save(tmpPath);
+            var thumbStream = new MemoryStream();
+            var ext = fileName.Substring(fileName.LastIndexOf('.')).ToLowerInvariant();
+            IImageFormat format = ext switch
+            {
+                "png" => (IImageFormat)PngFormat.Instance,
+                "jpg" => JpegFormat.Instance,
+                "jpeg" => JpegFormat.Instance,
+                _ => throw new Exception($"Unknown image format: {ext}")
+            };
+
+            thumb.Save(thumbStream, format);
             var thumbPath = Path.Combine(destinationPath, "thumb", thumbFileName).Replace("\\", "/");
-            if (thumbPath.StartsWith("/")) thumbPath = thumbPath.Substring(1);
-            await DoSaveAsync(thumbPath, tmpPath);
+            if (thumbPath.StartsWith("/"))
+            {
+                thumbPath = thumbPath.Substring(1);
+            }
+            await DoSaveAsync(thumbPath, thumbStream);
 
             return new StorageItemPictureThumbnail(new Uri($"{_options.PublicUri}/{thumbPath}"), thumbPath, thumb.Width,
                 thumb.Height);
