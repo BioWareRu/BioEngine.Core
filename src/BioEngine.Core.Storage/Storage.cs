@@ -148,9 +148,11 @@ namespace BioEngine.Core.Storage
         }
 
         [SuppressMessage("ReSharper", "RCS1198")]
-        public async Task<StorageItem> SaveFileAsync(Stream file, string fileName, string path, string root = "/")
+        public async Task<StorageItem> SaveFileAsync(Stream fileStream, string fileName, string path, string root = "/")
         {
-            var hash = HashBytesToString(Sha256.ComputeHash(file));
+            var memoryStream = new MemoryStream();
+            await fileStream.CopyToAsync(memoryStream);
+            var hash = HashBytesToString(Sha256.ComputeHash(memoryStream.GetBuffer()));
             var storageItem = await _repository.GetAsync(q => q.Where(i => i.Hash == hash));
             if (storageItem != null)
             {
@@ -162,15 +164,15 @@ namespace BioEngine.Core.Storage
 
             storageItem = await _repository.NewAsync();
             storageItem.FileName = fileName;
-            storageItem.FileSize = file.Length;
+            storageItem.FileSize = memoryStream.Length;
             storageItem.FilePath = destinationPath;
             storageItem.Path = Path.GetDirectoryName(destinationPath).Replace("\\", "/");
             storageItem.PublicUri = new Uri($"{_options.PublicUri}/{destinationPath}");
             storageItem.Hash = hash;
 
-            await TryProcessImageAsync(storageItem, file, basePath);
+            await TryProcessImageAsync(storageItem, memoryStream, basePath);
 
-            await DoSaveAsync(destinationPath, file);
+            await DoSaveAsync(destinationPath, memoryStream);
 
             var result = await _repository.AddAsync(storageItem);
             if (!result.IsSuccess)
