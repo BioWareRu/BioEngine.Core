@@ -22,8 +22,7 @@ namespace BioEngine.Extra.Ads.Api
 
         public override async Task<ActionResult<StorageItem>> UploadAsync(string name)
         {
-            var file = await GetBodyAsFileAsync();
-            return await Storage.SaveFileAsync(file, name,
+            return await Storage.SaveFileAsync(HttpContext.Request.Body, name,
                 $"ads/{DateTimeOffset.UtcNow.Year.ToString()}/{DateTimeOffset.UtcNow.Month.ToString()}");
         }
 
