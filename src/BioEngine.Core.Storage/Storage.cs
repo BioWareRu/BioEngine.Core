@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
@@ -301,9 +303,11 @@ namespace BioEngine.Core.Storage
             var ext = fileName.Substring(fileName.LastIndexOf('.')).ToLowerInvariant();
             IImageFormat format = ext switch
             {
-                "png" => (IImageFormat)PngFormat.Instance,
-                "jpg" => JpegFormat.Instance,
-                "jpeg" => JpegFormat.Instance,
+                ".png" => PngFormat.Instance,
+                ".jpg" => JpegFormat.Instance,
+                ".jpeg" => JpegFormat.Instance,
+                ".gif" => GifFormat.Instance,
+                ".bmp" => BmpFormat.Instance,
                 _ => throw new Exception($"Unknown image format: {ext}")
             };
 
@@ -313,6 +317,7 @@ namespace BioEngine.Core.Storage
             {
                 thumbPath = thumbPath.Substring(1);
             }
+
             await DoSaveAsync(thumbPath, thumbStream);
 
             return new StorageItemPictureThumbnail(new Uri($"{_options.PublicUri}/{thumbPath}"), thumbPath, thumb.Width,
