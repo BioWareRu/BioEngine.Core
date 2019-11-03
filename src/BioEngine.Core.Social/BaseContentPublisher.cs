@@ -24,12 +24,12 @@ namespace BioEngine.Core.Social
         }
 
         public virtual async Task<bool> PublishAsync(IContentItem entity, TConfig config, bool needUpdate,
-            Site? site = null)
+            Site site, bool allSites = false)
         {
             try
             {
                 var isNew = false;
-                var record = await GetRecordAsync(entity, site);
+                var record = await GetRecordAsync(entity, site, allSites);
                 if (record != null && !needUpdate)
                 {
                     return true;
@@ -43,7 +43,7 @@ namespace BioEngine.Core.Social
                         Id = Guid.NewGuid(),
                         ContentId = entity.Id,
                         Type = entity.GetKey(),
-                        SiteIds = site != null ? new[] {site.Id} : entity.SiteIds
+                        SiteIds = !allSites ? new[] {site.Id} : entity.SiteIds
                     };
                 }
 
@@ -68,7 +68,7 @@ namespace BioEngine.Core.Social
             }
         }
 
-        public virtual async Task<bool> DeleteAsync(IContentItem entity, TConfig config, Site? site = null)
+        public virtual async Task<bool> DeleteAsync(IContentItem entity, TConfig config, Site site, bool allSites = false)
         {
             var records = (await GetRecordsAsync(entity)).ToArray();
             if (!records.Any())
@@ -78,7 +78,7 @@ namespace BioEngine.Core.Social
 
             foreach (var record in records)
             {
-                if (site != null && !record.SiteIds.Contains(site.Id))
+                if (!allSites && !record.SiteIds.Contains(site.Id))
                 {
                     continue;
                 }
@@ -98,12 +98,12 @@ namespace BioEngine.Core.Social
             return true;
         }
 
-        protected virtual async Task<TPublishRecord> GetRecordAsync(IContentItem entity, Site? site = null)
+        protected virtual async Task<TPublishRecord> GetRecordAsync(IContentItem entity, Site site, bool allSites)
         {
             return await _dbContext.Set<TPublishRecord>()
                 .FirstOrDefaultAsync(r =>
                     r.Type == entity.GetKey() && r.ContentId == entity.Id
-                                              && (site == null || r.SiteIds.Contains(site.Id)));
+                                              && (allSites || r.SiteIds.Contains(site.Id)));
         }
 
         protected async Task<IEnumerable<TPublishRecord>> GetRecordsAsync(IContentItem entity)
