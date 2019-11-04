@@ -9,7 +9,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!--Fix ef core on preview8 until https://github.com/aspnet/EntityFrameworkCore/issues/17374 is fixed-->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0-preview8.19405.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0" />
     <!---->
   </ItemGroup>
   <ItemGroup>
