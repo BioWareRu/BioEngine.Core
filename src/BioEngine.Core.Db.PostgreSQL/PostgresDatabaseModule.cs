@@ -73,20 +73,21 @@ namespace BioEngine.Core.Db.PostgreSQL
             services.AddEntityFrameworkNpgsql();
             if (Config.EnableContextPooling)
             {
-                services.AddDbContextPool<TDbContext>((p, options) => ConfigureNpgsql(options, connBuilder));
+                services.AddDbContextPool<TDbContext>((p, options) => ConfigureNpgsql(options, connBuilder, p));
             }
             else
             {
-                services.AddDbContext<TDbContext>((p, options) => ConfigureNpgsql(options, connBuilder));
+                services.AddDbContext<TDbContext>((p, options) => ConfigureNpgsql(options, connBuilder, p));
             }
         }
 
-        private void ConfigureNpgsql(DbContextOptionsBuilder options, NpgsqlConnectionStringBuilder connBuilder)
+        private void ConfigureNpgsql(DbContextOptionsBuilder options, NpgsqlConnectionStringBuilder connBuilder,
+            IServiceProvider p)
         {
             options.UseNpgsql(connBuilder.ConnectionString,
                 builder => builder.MigrationsAssembly(Config.MigrationsAssembly != null
                     ? Config.MigrationsAssembly.FullName
-                    : typeof(DbContext).Assembly.FullName));
+                    : typeof(DbContext).Assembly.FullName)).UseInternalServiceProvider(p);
             if (Config.EnableSensitiveLogging)
             {
                 options.EnableSensitiveDataLogging();

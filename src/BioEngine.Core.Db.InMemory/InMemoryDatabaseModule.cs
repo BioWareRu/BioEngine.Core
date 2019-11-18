@@ -23,11 +23,13 @@ namespace BioEngine.Core.Db.InMemory
         public override void ConfigureServices(IServiceCollection services, IConfiguration configuration,
             IHostEnvironment environment)
         {
+            base.ConfigureServices(services, configuration, environment);
+            
             services.AddEntityFrameworkInMemoryDatabase();
             services.AddDbContext<TDbContext>((p, options) =>
             {
                 options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                    .UseInMemoryDatabase(Config.InMemoryDatabaseName);
+                    .UseInMemoryDatabase(Config.InMemoryDatabaseName).UseInternalServiceProvider(p);
             });
             ModelBuilderExtensions.RequireArrayConversion();
         }
