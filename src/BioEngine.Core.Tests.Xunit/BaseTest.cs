@@ -165,6 +165,11 @@ namespace BioEngine.Core.Tests.Xunit
             return ServiceProvider.GetRequiredService<T>();
         }
 
+        public IServiceScope CreateScope()
+        {
+            return ServiceProvider.CreateScope();
+        }
+
         public ILogger<T> GetLogger<T>()
         {
             return ServiceProvider.GetRequiredService<ILogger<T>>();
