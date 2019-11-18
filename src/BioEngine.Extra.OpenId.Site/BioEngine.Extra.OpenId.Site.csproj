@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IdentityModel" Version="4.0.0"/>
+    <PackageReference Include="IdentityModel" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BioEngine.Core.Site\BioEngine.Core.Site.csproj"/>
-    <ProjectReference Include="..\BioEngine.Extra.OpenId\BioEngine.Extra.OpenId.csproj"/>
+    <ProjectReference Include="..\BioEngine.Core.Site\BioEngine.Core.Site.csproj" />
+    <ProjectReference Include="..\BioEngine.Extra.OpenId\BioEngine.Extra.OpenId.csproj" />
   </ItemGroup>
 </Project>
