@@ -2,10 +2,12 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using BioEngine.Core.DB;
 using BioEngine.Core.Entities;
 using BioEngine.Core.Repository;
 using BioEngine.Core.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,14 +49,16 @@ namespace BioEngine.Core.Tests
         public async Task Update()
         {
             var scope = GetScope();
-            var context = scope.GetDbContext();
+            
             var repository = scope.Get<SitesRepository>();
             var site = await repository.GetByIdAsync(CoreTestScope.SiteId);
             const string newTitle = "Test new";
             var oldDate = site.DateUpdated;
             site.Title = newTitle;
-            await repository.UpdateAsync(site);
+            var result = await repository.UpdateAsync(site);
+            Assert.True(result.IsSuccess);
             Assert.True(site.DateUpdated > oldDate);
+            var context = scope.CreateScope().ServiceProvider.GetService<BioContext>();
             var siteFromDb = await context.Sites.FirstAsync(s => s.Id == site.Id);
             Assert.Equal(newTitle, siteFromDb.Title);
         }
@@ -107,7 +111,7 @@ namespace BioEngine.Core.Tests
             var scope = GetScope();
             var context = scope.GetDbContext();
             var repository = scope.Get<SitesRepository>();
-            var site = await context.Sites.FirstAsync();
+            var site = await repository.GetAsync();
             var oldSite = await context.Sites.AsNoTracking().FirstAsync();
 
             var originalTitle = site.Title;
