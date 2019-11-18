@@ -27,7 +27,7 @@ namespace BioEngine.Core.Db.InMemory
             services.AddDbContext<TDbContext>((p, options) =>
             {
                 options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                    .UseInMemoryDatabase(Config.InMemoryDatabaseName).UseInternalServiceProvider(p);
+                    .UseInMemoryDatabase(Config.InMemoryDatabaseName);
             });
             ModelBuilderExtensions.RequireArrayConversion();
         }
