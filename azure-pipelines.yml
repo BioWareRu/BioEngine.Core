@@ -9,7 +9,7 @@ resources:
                 - 5432:5432
 
 variables:
-    Version: 3.0.$(Build.BuildId)
+    Version: 3.1.$(Build.BuildId)
     BE_POSTGRES_HOST: localhost
     BE_POSTGRES_USERNAME: brc
     BE_POSTGRES_PASSWORD: 123
