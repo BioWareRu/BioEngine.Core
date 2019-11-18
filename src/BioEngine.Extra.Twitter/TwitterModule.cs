@@ -28,7 +28,7 @@ namespace BioEngine.Extra.Twitter
     public class TwitterBioContextConfigurator: IBioContextModelConfigurator{
         public void Configure(ModelBuilder modelBuilder, ILogger<BioContext> logger)
         {
-            modelBuilder.RegisterEntity<TwitterPublishRecord>();
+            modelBuilder.RegisterSiteEntity<TwitterPublishRecord>();
         }
     }
 }

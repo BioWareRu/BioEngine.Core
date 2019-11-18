@@ -16,6 +16,7 @@ namespace BioEngine.Core.Entities
         public string FilePath { get; set; }
         public string Path { get; set; }
         public StorageItemType Type { get; set; } = StorageItemType.Other;
+        [Column(TypeName = "jsonb")]
         public StorageItemPictureInfo? PictureInfo { get; set; }
         public string? Hash { get; set; }
 

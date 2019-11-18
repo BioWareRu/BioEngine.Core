@@ -30,14 +30,16 @@ namespace BioEngine.Core.DB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.RegisterJsonConversion<Menu, List<MenuItem>>(s => s.Items);
-            modelBuilder.RegisterJsonConversion<StorageItem, StorageItemPictureInfo>(s => s.PictureInfo);
+            
+            
             modelBuilder.Entity<StorageItem>().Property(i => i.PublicUri)
                 .HasConversion(u => u.ToString(), s => new Uri(s));
             if (ModelBuilderExtensions.IsArrayConversionRequired())
             {
                 modelBuilder.RegisterSiteEntityConversions<Section>();
                 modelBuilder.RegisterSiteEntityConversions<Menu>();
+                modelBuilder.RegisterJsonStringConversion<Menu, List<MenuItem>>(s => s.Items);
+                modelBuilder.RegisterJsonStringConversion<StorageItem, StorageItemPictureInfo>(s => s.PictureInfo);
             }
 
             modelBuilder.Entity<Section>().HasIndex(s => s.SiteIds);

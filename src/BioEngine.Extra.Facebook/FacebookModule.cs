@@ -29,7 +29,7 @@ namespace BioEngine.Extra.Facebook
     public class FacebookBioContextConfigurator: IBioContextModelConfigurator{
         public void Configure(ModelBuilder modelBuilder, ILogger<BioContext> logger)
         {
-            modelBuilder.RegisterEntity<FacebookPublishRecord>();
+            modelBuilder.RegisterSiteEntity<FacebookPublishRecord>();
         }
     }
     

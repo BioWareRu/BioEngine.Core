@@ -5,6 +5,7 @@ using BioEngine.Core.Abstractions;
 using BioEngine.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BioEngine.Core.DB
 {
@@ -128,6 +129,12 @@ namespace BioEngine.Core.DB
                 .Entity<TEntity>()
                 .Property(s => s.TagIds)
                 .HasColumnType("jsonb");
+            
+            if (_requireArrayConversion)
+            {
+                modelBuilder.RegisterJsonStringConversion<TEntity, Guid[]>(e => e.SectionIds);
+                modelBuilder.RegisterJsonStringConversion<TEntity, Guid[]>(e => e.TagIds);
+            }
         }
 
         public static void RegisterSiteEntityConversions<TEntity>(this ModelBuilder modelBuilder)
@@ -137,16 +144,21 @@ namespace BioEngine.Core.DB
                 .Entity<TEntity>()
                 .Property(s => s.SiteIds)
                 .HasColumnType("jsonb");
+            if (_requireArrayConversion)
+            {
+                modelBuilder.RegisterJsonStringConversion<TEntity, Guid[]>(e => e.SiteIds);
+            }
         }
 
-        public static void RegisterJsonConversion<TEntity, TProperty>(this ModelBuilder modelBuilder,
+        public static void RegisterJsonStringConversion<TEntity, TProperty>(this ModelBuilder modelBuilder,
             Expression<Func<TEntity, TProperty>> propertySelector)
             where TEntity : class
         {
             modelBuilder
                 .Entity<TEntity>()
                 .Property(propertySelector)
-                .HasColumnType("jsonb");
+                .HasConversion(data => JsonConvert.SerializeObject(data),
+                    json => JsonConvert.DeserializeObject<TProperty>(json));
         }
 
         private static void RegisterDataConversion<TEntity, TData>(this ModelBuilder modelBuilder)
@@ -157,6 +169,10 @@ namespace BioEngine.Core.DB
                 .Property(e => e.Data)
                 .HasColumnType("jsonb")
                 .HasColumnName(nameof(ITypedEntity<TData>.Data));
+            if (_requireArrayConversion)
+            {
+                modelBuilder.RegisterJsonStringConversion<TEntity, TData>(e => e.Data);
+            }
         }
 
         private static void RegisterDiscriminator<TBase, TObject>(this ModelBuilder modelBuilder,
