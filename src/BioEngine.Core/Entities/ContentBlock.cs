@@ -29,7 +29,7 @@ namespace BioEngine.Core.Entities
 
     {
         [Column(TypeName = "jsonb")]
-        public T Data { get; set; }
+        public T Data { get; set; } = new T();
 
         public override object GetData()
         {
