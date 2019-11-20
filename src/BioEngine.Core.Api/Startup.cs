@@ -10,12 +10,9 @@ namespace BioEngine.Core.Api
 {
     public abstract class BioEngineApiStartup : BioEngineWebStartup
     {
-        protected IHostEnvironment HostEnvironment { get; }
-
-        protected BioEngineApiStartup(IConfiguration configuration, IHostEnvironment hostEnvironment) : base(
-            configuration)
+        protected BioEngineApiStartup(IConfiguration configuration, IHostEnvironment environment) : base(
+            configuration, environment)
         {
-            HostEnvironment = hostEnvironment;
         }
 
         protected override IMvcBuilder ConfigureMvc(IMvcBuilder mvcBuilder)
@@ -31,7 +28,7 @@ namespace BioEngine.Core.Api
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = HostEnvironment.ApplicationName, Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = Environment.ApplicationName, Version = "v1"});
                 //var security = new Dictionary<string, IEnumerable<string>> {,};
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement

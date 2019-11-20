@@ -9,7 +9,8 @@ namespace BioEngine.Core.Site
 {
     public abstract class BioEngineSiteStartup : BioEngineWebStartup
     {
-        protected BioEngineSiteStartup(IConfiguration configuration) : base(configuration)
+        protected BioEngineSiteStartup(IConfiguration configuration, IHostEnvironment environment) : base(configuration,
+            environment)
         {
         }
 

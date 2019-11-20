@@ -11,10 +11,12 @@ namespace BioEngine.Core.Web
     public abstract class BioEngineWebStartup
     {
         protected readonly IConfiguration Configuration;
+        protected readonly IHostEnvironment Environment;
 
-        protected BioEngineWebStartup(IConfiguration configuration)
+        protected BioEngineWebStartup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public virtual void ConfigureServices(IServiceCollection services)
