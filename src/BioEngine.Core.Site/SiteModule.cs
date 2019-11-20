@@ -21,11 +21,6 @@ namespace BioEngine.Core.Site
             base.ConfigureServices(services, configuration, environment);
             services.AddSingleton(Config);
             services.AddHttpContextAccessor();
-            if (Config.EnableRuntimeCompilation)
-            {
-                services.AddMvc().AddRazorRuntimeCompilation();
-            }
-
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
     }
@@ -82,6 +77,5 @@ namespace BioEngine.Core.Site
         }
 
         public Guid SiteId { get; }
-        public bool EnableRuntimeCompilation { get; set; }
     }
 }
