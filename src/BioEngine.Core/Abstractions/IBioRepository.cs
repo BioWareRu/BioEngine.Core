@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using BioEngine.Core.DB;
 using BioEngine.Core.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace BioEngine.Core.Abstractions
 {
@@ -47,5 +48,7 @@ namespace BioEngine.Core.Abstractions
 
 
         PropertyChange[] GetChanges(TEntity item, TEntity oldEntity);
+
+        DbSet<T> Set<T>() where T : class;
     }
 }

@@ -294,6 +294,11 @@ namespace BioEngine.Core.Repository
             return changes.ToArray();
         }
 
+        public DbSet<T> Set<T>() where T : class
+        {
+            return DbContext.Set<T>();
+        }
+
         public virtual async Task<AddOrUpdateOperationResult<TEntity>> UpdateAsync(TEntity item,
             IBioRepositoryOperationContext? operationContext = null)
         {
