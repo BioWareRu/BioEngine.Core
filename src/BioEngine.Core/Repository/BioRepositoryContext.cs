@@ -17,8 +17,7 @@ namespace BioEngine.Core.Repository
         public PropertiesProvider PropertiesProvider { get; }
         public BioRepositoryHooksManager HooksManager { get; }
 
-        public BioRepositoryContext(
-            IServiceScopeFactory serviceScopeFactory)
+        public BioRepositoryContext(IServiceScopeFactory serviceScopeFactory)
         {
             _scope = serviceScopeFactory.CreateScope();
             DbContext = _scope.ServiceProvider.GetRequiredService<BioContext>();
