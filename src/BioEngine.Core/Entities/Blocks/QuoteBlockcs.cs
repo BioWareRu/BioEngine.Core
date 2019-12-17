@@ -18,5 +18,6 @@ namespace BioEngine.Core.Entities.Blocks
         public string Text { get; set; } = "";
         public string Author { get; set; } = "";
         public string Link { get; set; } = "";
+        public StorageItem? Picture { get; set; } = new StorageItem();
     }
 }
