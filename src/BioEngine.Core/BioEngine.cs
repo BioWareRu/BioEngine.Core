@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using BioEngine.Core.Abstractions;
 using BioEngine.Core.Properties;
@@ -132,17 +133,15 @@ namespace BioEngine.Core
             return _hostBuilder;
         }
 
-        public async Task InitAsync()
+        private async Task InitAsync()
         {
             var host = GetAppHost();
-            using (var scope = host.Services.CreateScope())
+            using var scope = host.Services.CreateScope();
+            foreach (var module in _modules)
             {
-                foreach (var module in _modules)
-                {
-                    await module.InitAsync(scope.ServiceProvider,
-                        scope.ServiceProvider.GetRequiredService<IConfiguration>(),
-                        scope.ServiceProvider.GetRequiredService<IHostEnvironment>());
-                }
+                await module.InitAsync(scope.ServiceProvider,
+                    scope.ServiceProvider.GetRequiredService<IConfiguration>(),
+                    scope.ServiceProvider.GetRequiredService<IHostEnvironment>());
             }
         }
 
@@ -150,6 +149,11 @@ namespace BioEngine.Core
             Func<IConfiguration, IHostEnvironment, TModuleConfig> configure)
             where TModule : IBioEngineModule<TModuleConfig>, new() where TModuleConfig : class
         {
+            if (configure == null)
+            {
+                throw new Exception($"Module {typeof(TModule)} added without configuration method");
+            }
+
             var module = new TModule();
             ConfigureModule(module, configure);
             _modules.Add(module);
@@ -159,6 +163,11 @@ namespace BioEngine.Core
         public BioEngine AddModule<TModule>()
             where TModule : IBioEngineModule, new()
         {
+            if (typeof(TModule).GetTypeInfo().ImplementedInterfaces
+                .Any(i => i.Name.StartsWith("IBioEngineModule") && i.IsGenericType))
+            {
+                throw new Exception($"Module {typeof(TModule)} is implementing IBioEngineModule<TConfig>. It must be added using AddModule<TModule, TModuleConfig> method.");
+            }
             var module = new TModule();
             ConfigureModule(module);
             _modules.Add(module);
