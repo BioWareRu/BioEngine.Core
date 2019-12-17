@@ -24,8 +24,6 @@ namespace BioEngine.Core.Users
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(BioPolicies.Admin,
-                    builder => builder.RequireAuthenticatedUser().RequireClaim(ClaimTypes.Role, "admin"));
                 options.AddPolicy(BioPolicies.User, builder => builder.RequireAuthenticatedUser());
                 foreach (var policy in Config.Policies)
                 {
