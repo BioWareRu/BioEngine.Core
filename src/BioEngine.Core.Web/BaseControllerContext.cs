@@ -12,14 +12,17 @@ namespace BioEngine.Core.Web
         public readonly IStorage Storage;
         public readonly PropertiesProvider PropertiesProvider;
         public ILogger Logger { get; }
+        public string Version { get; }
 
         public BaseControllerContext(ILoggerFactory loggerFactory, IStorage storage,
-            PropertiesProvider propertiesProvider, LinkGenerator linkGenerator)
+            PropertiesProvider propertiesProvider, LinkGenerator linkGenerator,
+            BioEngineCoreModuleConfig coreModuleConfig)
         {
             LinkGenerator = linkGenerator;
             Storage = storage;
             PropertiesProvider = propertiesProvider;
             Logger = loggerFactory.CreateLogger(GetType());
+            Version = coreModuleConfig.Version;
         }
     }
 
@@ -31,8 +34,9 @@ namespace BioEngine.Core.Web
 
         public BaseControllerContext(ILoggerFactory loggerFactory, IStorage storage,
             PropertiesProvider propertiesProvider, LinkGenerator linkGenerator,
+            BioEngineCoreModuleConfig coreModuleConfig,
             TRepository repository) : base(loggerFactory, storage, propertiesProvider,
-            linkGenerator)
+            linkGenerator, coreModuleConfig)
         {
             Repository = repository;
         }

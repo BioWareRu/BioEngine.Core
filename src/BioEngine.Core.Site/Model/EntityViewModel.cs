@@ -85,7 +85,7 @@ namespace BioEngine.Core.Site.Model
             if (Entity is IContentEntity contentEntity)
             {
                 return new EntityViewModel<IContentEntity>(
-                    new PageViewModelContext(LinkGenerator, PropertiesProvider, Site, Section),
+                    new PageViewModelContext(LinkGenerator, PropertiesProvider, Site, Version, Section),
                     contentEntity,
                     Mode);
             }

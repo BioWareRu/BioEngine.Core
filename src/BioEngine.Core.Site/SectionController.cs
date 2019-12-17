@@ -61,7 +61,7 @@ namespace BioEngine.Core.Site
 
         protected virtual PageViewModelContext GetPageContext(TSection section)
         {
-            var context = new PageViewModelContext(LinkGenerator, PropertiesProvider, Site, section);
+            var context = new PageViewModelContext(LinkGenerator, PropertiesProvider, Site, Version, section);
 
             return context;
         }

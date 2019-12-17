@@ -80,5 +80,11 @@ namespace BioEngine.Core.Modules
             Config = configure(configuration, environment);
             CheckConfig();
         }
+
+        public override void ConfigureServices(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+        {
+            base.ConfigureServices(services, configuration, environment);
+            services.AddSingleton(Config);
+        }
     }
 }

@@ -12,6 +12,8 @@ namespace BioEngine.Core.Web
         protected IStorage Storage { get; }
         protected PropertiesProvider PropertiesProvider { get; }
         protected LinkGenerator LinkGenerator { get; }
+        
+        protected string Version { get; }
 
         protected BaseController(BaseControllerContext context)
         {
@@ -19,6 +21,7 @@ namespace BioEngine.Core.Web
             Storage = context.Storage;
             PropertiesProvider = context.PropertiesProvider;
             LinkGenerator = context.LinkGenerator;
+            Version = context.Version;
         }
     }
 }

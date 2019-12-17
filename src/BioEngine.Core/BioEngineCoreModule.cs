@@ -6,8 +6,18 @@ using Microsoft.Extensions.Logging;
 
 namespace BioEngine.Core
 {
-    public class BioEngineCoreModule : BaseBioEngineModule
+    public class BioEngineCoreModule : BaseBioEngineModule<BioEngineCoreModuleConfig>
     {
+    }
+
+    public class BioEngineCoreModuleConfig
+    {
+        public BioEngineCoreModuleConfig(string version)
+        {
+            Version = version;
+        }
+
+        public string Version { get; }
     }
 
     public class CoreBioContextModelConfigurator : IBioContextModelConfigurator

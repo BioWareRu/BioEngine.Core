@@ -38,7 +38,7 @@ namespace BioEngine.Core.Site.Model
 
         public PageViewModelContext GetContext()
         {
-            return new PageViewModelContext(LinkGenerator, PropertiesProvider, Site, Section);
+            return new PageViewModelContext(LinkGenerator, PropertiesProvider, Site, Version, Section);
         }
     }
 }

@@ -25,7 +25,16 @@ namespace BioEngine.Core
         public BioEngine(string[] args)
         {
             _hostBuilder = Host.CreateDefaultBuilder(args);
-            AddModule<BioEngineCoreModule>();
+            AddModule<BioEngineCoreModule, BioEngineCoreModuleConfig>((configuration, environment) =>
+            {
+                var version = $"dev-{Guid.NewGuid()}";
+                if (!string.IsNullOrEmpty(configuration["APP_VERSION"]))
+                {
+                    version = configuration["APP_VERSION"];
+                }
+
+                return new BioEngineCoreModuleConfig(version);
+            });
         }
 
         public BioEngine AddEntities()

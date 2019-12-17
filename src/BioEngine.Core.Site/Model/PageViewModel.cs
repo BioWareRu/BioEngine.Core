@@ -13,6 +13,7 @@ namespace BioEngine.Core.Site.Model
         public readonly Section Section;
         protected readonly PropertiesProvider PropertiesProvider;
         protected readonly LinkGenerator LinkGenerator;
+        public string Version { get; }
 
         protected PageViewModel(PageViewModelContext context)
         {
@@ -20,6 +21,7 @@ namespace BioEngine.Core.Site.Model
             Section = context.Section;
             PropertiesProvider = context.PropertiesProvider;
             LinkGenerator = context.LinkGenerator;
+            Version = context.Version;
         }
 
 
