@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Security.Claims;
 using BioEngine.Core.Modules;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
