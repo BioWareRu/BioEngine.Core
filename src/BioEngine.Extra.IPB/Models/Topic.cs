@@ -1,4 +1,6 @@
-﻿namespace BioEngine.Extra.IPB.Models
+﻿using System;
+
+namespace BioEngine.Extra.IPB.Models
 {
     public class Topic
     {
@@ -26,5 +28,6 @@
         public int? Pinned { get; set; }
         public string Post { get; set; } = "";
         public int Author { get; set; }
+        public DateTimeOffset Date { get; set; }
     }
 }

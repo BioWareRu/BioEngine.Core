@@ -59,7 +59,8 @@ namespace BioEngine.Extra.IPB.Publishing
                     Title = item.Title,
                     Hidden = !item.IsPublished ? 1 : 0,
                     Post = await _contentRender.RenderHtmlAsync(item, site),
-                    Author = int.Parse(config.AuthorId)
+                    Author = int.Parse(config.AuthorId),
+                    Date = item.DatePublished ?? item.DateUpdated
                 };
                 var createdTopic = await apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
                 if (createdTopic.FirstPost != null)
@@ -78,7 +79,8 @@ namespace BioEngine.Extra.IPB.Publishing
                         Hidden = !item.IsPublished ? 1 : 0,
                         Author = int.Parse(config.AuthorId),
                         Forum = config.ForumId,
-                        Post = await _contentRender.RenderHtmlAsync(item, site)
+                        Post = await _contentRender.RenderHtmlAsync(item, site),
+                        Date = item.DatePublished ?? item.DateUpdated
                     });
             }
 
