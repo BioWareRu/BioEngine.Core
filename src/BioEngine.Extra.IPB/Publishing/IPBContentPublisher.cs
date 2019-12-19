@@ -51,17 +51,17 @@ namespace BioEngine.Extra.IPB.Publishing
 
             var apiClient = _apiClientFactory.GetPublishClient();
 
+            var topic = new TopicCreateModel
+            {
+                Title = item.Title,
+                Hidden = !item.IsPublished ? 1 : 0,
+                Author = int.Parse(config.AuthorId),
+                Forum = config.ForumId,
+                Post = await _contentRender.RenderHtmlAsync(item, site),
+                Date = item.DatePublished ?? item.DateUpdated
+            };
             if (record.TopicId == 0)
             {
-                var topic = new TopicCreateModel
-                {
-                    Forum = config.ForumId,
-                    Title = item.Title,
-                    Hidden = !item.IsPublished ? 1 : 0,
-                    Post = await _contentRender.RenderHtmlAsync(item, site),
-                    Author = int.Parse(config.AuthorId),
-                    Date = item.DatePublished ?? item.DateUpdated
-                };
                 var createdTopic = await apiClient.PostAsync<TopicCreateModel, Topic>("forums/topics", topic);
                 if (createdTopic.FirstPost != null)
                 {
@@ -71,17 +71,7 @@ namespace BioEngine.Extra.IPB.Publishing
             }
             else
             {
-                await apiClient.PostAsync<TopicCreateModel, Topic>(
-                    $"forums/topics/{record.TopicId.ToString()}",
-                    new TopicCreateModel
-                    {
-                        Title = item.Title,
-                        Hidden = !item.IsPublished ? 1 : 0,
-                        Author = int.Parse(config.AuthorId),
-                        Forum = config.ForumId,
-                        Post = await _contentRender.RenderHtmlAsync(item, site),
-                        Date = item.DatePublished ?? item.DateUpdated
-                    });
+                await apiClient.PostAsync<TopicCreateModel, Topic>($"forums/topics/{record.TopicId.ToString()}", topic);
             }
 
             return record;
