@@ -9,7 +9,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core.Api\BioEngine.Core.Api.csproj" />
