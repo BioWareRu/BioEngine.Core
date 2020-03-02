@@ -101,7 +101,7 @@ namespace BioEngine.Core.Search.ElasticSearch
         {
             indexName = $"{_options.Prefix}_{indexName}";
             var result = await GetClient()
-                .DeleteIndexAsync(Indices.All, descriptor => descriptor.Index(indexName.ToLowerInvariant()));
+                .Indices.DeleteAsync(Indices.All, descriptor => descriptor.Index(indexName.ToLowerInvariant()));
             return result.Acknowledged;
         }
 
@@ -145,23 +145,23 @@ namespace BioEngine.Core.Search.ElasticSearch
         public async Task InitAsync(string indexName)
         {
             indexName = $"{_options.Prefix}_{indexName}";
-            var indexExists = await GetClient().IndexExistsAsync(indexName);
+            var indexExists = await GetClient().Indices.ExistsAsync(indexName);
             if (indexExists.Exists)
             {
-                await GetClient().CloseIndexAsync(indexName);
-                var result = await GetClient().UpdateIndexSettingsAsync(indexName, c => c.IndexSettings(s =>
+                await GetClient().Indices.CloseAsync(indexName);
+                var result = await GetClient().Indices.UpdateSettingsAsync(indexName, c => c.IndexSettings(s =>
                     s.Analysis(BuildIndexDescriptor)));
                 if (!result.IsValid)
                 {
                     throw result.OriginalException;
                 }
 
-                await GetClient().OpenIndexAsync(indexName);
+                await GetClient().Indices.OpenAsync(indexName);
             }
             else
             {
                 var result = await GetClient()
-                    .CreateIndexAsync(indexName,
+                    .Indices.CreateAsync(indexName,
                         c => c.Settings(s => s.Analysis(BuildIndexDescriptor)));
                 if (!result.IsValid)
                 {

@@ -309,6 +309,7 @@ namespace BioEngine.Core.Storage
                 ".png" => PngFormat.Instance,
                 ".jpg" => JpegFormat.Instance,
                 ".jpeg" => JpegFormat.Instance,
+                ".jfif" => JpegFormat.Instance,
                 ".gif" => GifFormat.Instance,
                 ".bmp" => BmpFormat.Instance,
                 _ => throw new Exception($"Unknown image format: {ext}")
