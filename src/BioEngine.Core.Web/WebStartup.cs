@@ -53,19 +53,14 @@ namespace BioEngine.Core.Web
             endpoints.MapControllers();
             endpoints.MapHealthChecks("/health");
         }
-        
+
         public virtual void RegisterEndpoints(IEndpointRouteBuilder endpoints)
         {
         }
 
-        public void Configure(IApplicationBuilder app, IHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            if (env.IsProduction())
+            if (Environment.IsProduction())
             {
                 var options = new ForwardedHeadersOptions
                 {
@@ -73,21 +68,31 @@ namespace BioEngine.Core.Web
                 };
                 options.KnownProxies.Clear();
                 options.KnownNetworks.Clear();
-                options.RequireHeaderSymmetry = false;
                 app.UseForwardedHeaders(options);
+            }
+
+            ConfigureStart(app);
+
+            if (Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseStaticFiles();
 
-            ConfigureBeforeRouting(app, env);
+            ConfigureBeforeRouting(app, Environment);
             app.UseRouting();
-            ConfigureAfterRouting(app, env);
+            ConfigureAfterRouting(app, Environment);
 
             app.UseEndpoints(endpoints =>
             {
-                ConfigureEndpoints(app, env, endpoints);
+                ConfigureEndpoints(app, Environment, endpoints);
                 RegisterEndpoints(endpoints);
             });
+        }
+
+        protected virtual void ConfigureStart(IApplicationBuilder appBuilder)
+        {
         }
     }
 }
