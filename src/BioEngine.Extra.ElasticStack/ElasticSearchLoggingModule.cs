@@ -4,6 +4,7 @@ using BioEngine.Core.Logging;
 using Elastic.Apm.SerilogEnricher;
 using Elastic.CommonSchema.Serilog;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 
 namespace BioEngine.Extra.ElasticStack
@@ -12,14 +13,17 @@ namespace BioEngine.Extra.ElasticStack
     {
         protected override LoggerConfiguration ConfigureProd(LoggerConfiguration loggerConfiguration, string appName)
         {
-            return loggerConfiguration.Enrich.WithElasticApmCorrelationInfo()
+            return loggerConfiguration
+                .Enrich.WithElasticApmCorrelationInfo()
+                .Enrich.WithProperty("ApplicationName", appName)
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(Config.ElasticSearchUrls)
                 {
                     CustomFormatter = new EcsTextFormatter(),
                     AutoRegisterTemplate = true,
                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
                     IndexFormat = Config.LoggingIndexFormat
-                });
+                })
+                .MinimumLevel.Override("Elastic.Apm", LogEventLevel.Error);
         }
     }
 
