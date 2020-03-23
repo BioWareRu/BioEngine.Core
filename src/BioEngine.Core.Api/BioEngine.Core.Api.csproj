@@ -13,7 +13,7 @@
     <ProjectReference Include="..\BioEngine.Core.Web\BioEngine.Core.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Auth" />
