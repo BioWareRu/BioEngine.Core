@@ -9,7 +9,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IdentityModel" Version="4.1.1" />
+    <PackageReference Include="IdentityModel" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core.Site\BioEngine.Core.Site.csproj" />
