@@ -9,7 +9,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.5.0.5" />
+    <PackageReference Include="AWSSDK.S3" Version="3.5.1.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BioEngine.Core.Storage\BioEngine.Core.Storage.csproj" />
